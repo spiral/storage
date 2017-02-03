@@ -1,4 +1,4 @@
-Storage API: Amazon, Rackspace, FTP, SFTP, Filesystem, GridFS
+Storage API layer
 ========
 [![Latest Stable Version](https://poser.pugx.org/spiral/storage/v/stable)](https://packagist.org/packages/spiral/storage) 
 [![License](https://poser.pugx.org/spiral/storage/license)](https://packagist.org/packages/spiral/storage)
