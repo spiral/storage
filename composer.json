@@ -1,7 +1,7 @@
 {
   "name": "spiral/storage",
-  "type": "framework",
-  "description": "Spiral, Core Components",
+  "type": "library",
+  "description": "Storage API layer: Amazon, Rackspace, FTP, SFTP, Filesystem, GridFS ",
   "license": "MIT",
   "authors": [
     {
@@ -11,14 +11,18 @@
   ],
   "require": {
     "php": ">=7.0",
-    "spiral/components": "^1.1",
+    "spiral/common": "^0.9",
     "psr/simple-cache": "^1.0",
     "guzzlehttp/guzzle": "~6.0"
   },
   "require-dev": {
     "phpunit/phpunit": "~5.0",
     "mockery/mockery": "^0.9.4",
-    "vlucas/phpdotenv": "^2.1"
+    "vlucas/phpdotenv": "^2.1",
+    "mongodb/mongodb": "^1.0.1"
+  },
+  "suggest": {
+    "mongodb/mongodb": "To enable support of GridFS storage"
   },
   "autoload": {
     "psr-4": {
