@@ -1,7 +1,7 @@
 {
   "name": "spiral/storage",
   "type": "library",
-  "description": "Storage API layer: Amazon, Rackspace, FTP, SFTP, Filesystem, GridFS ",
+  "description": "Storage API: Amazon, Rackspace, FTP, SFTP, Filesystem, GridFS",
   "license": "MIT",
   "authors": [
     {
