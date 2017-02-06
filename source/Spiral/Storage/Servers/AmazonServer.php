@@ -57,17 +57,20 @@ class AmazonServer extends AbstractServer
         parent::__construct($options, $files);
 
         //This code is going to use additional abstraction layer to connect storage and guzzle
-        $this->setClient($client ?? new Client($this->options));
+        $this->client = $client ?? new Client($this->options);
     }
 
     /**
+     * Version of driver with alternative client being set up.
+     *
      * @param ClientInterface $client
      *
      * @return self
      */
-    public function setClient(ClientInterface $client): AmazonServer
+    public function withClient(ClientInterface $client): AmazonServer
     {
-        $this->client = $client;
+        $server = clone $this;
+        $server->client = $client;
 
         return $this;
     }

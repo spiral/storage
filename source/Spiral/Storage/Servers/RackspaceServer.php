@@ -95,17 +95,24 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
         }
 
         //Initiating Guzzle
-        $this->setClient($client ?? new Client($this->options))->connect();
+        $this->client = $client ?? new Client($this->options);
+        $this->connect();
     }
 
     /**
+     * Version of driver with alternative client being set up.
+     *
      * @param ClientInterface $client
      *
      * @return self
      */
-    public function setClient(ClientInterface $client): RackspaceServer
+    public function withClient(ClientInterface $client): RackspaceServer
     {
-        $this->client = $client;
+        $server = clone $this;
+        $server->authToken = [];
+        $server->cache = [];
+        $server->client = $client;
+        $server->connect();
 
         return $this;
     }
