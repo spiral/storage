@@ -32,9 +32,9 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     use LoggerTrait;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $authToken = [];
+    private $authToken;
 
     /**
      * Some operations can be performed only inside one region.
@@ -109,8 +109,9 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     public function withClient(ClientInterface $client): RackspaceServer
     {
         $server = clone $this;
-        $server->authToken = [];
+        $server->authToken = null;
         $server->cache = [];
+        $server->regions = [];
         $server->client = $client;
         $server->connect();
 
