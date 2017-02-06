@@ -110,7 +110,6 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     {
         $server = clone $this;
         $server->authToken = null;
-        $server->cache = [];
         $server->regions = [];
         $server->client = $client;
         $server->connect();
