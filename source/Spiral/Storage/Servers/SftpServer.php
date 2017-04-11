@@ -67,9 +67,6 @@ class SftpServer extends AbstractServer
                 "Unable to initialize sftp storage server, extension 'ssh2' not found"
             );
         }
-
-        //Let's automatically connect!
-        $this->connect();
     }
 
     /**
@@ -77,6 +74,7 @@ class SftpServer extends AbstractServer
      */
     public function exists(BucketInterface $bucket, string $name): bool
     {
+        $this->connect();
         return file_exists($this->castRemoteFilename($bucket, $name));
     }
 
@@ -85,6 +83,7 @@ class SftpServer extends AbstractServer
      */
     public function size(BucketInterface $bucket, string $name)
     {
+        $this->connect();
         if (!$this->exists($bucket, $name)) {
             return null;
         }
@@ -97,6 +96,8 @@ class SftpServer extends AbstractServer
      */
     public function put(BucketInterface $bucket, string $name, $source): bool
     {
+        $this->connect();
+
         //Converting into stream
         $stream = $this->castStream($source);
 
@@ -123,6 +124,8 @@ class SftpServer extends AbstractServer
      */
     public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
     {
+        $this->connect();
+
         //Thought native sftp resource
         return \GuzzleHttp\Psr7\stream_for(
             fopen($this->castRemoteFilename($bucket, $name), 'rb')
@@ -134,6 +137,8 @@ class SftpServer extends AbstractServer
      */
     public function delete(BucketInterface $bucket, string $name)
     {
+        $this->connect();
+
         if (!$this->exists($bucket, $name)) {
             throw new ServerException("Unable to delete object, file not found");
         }
@@ -149,6 +154,8 @@ class SftpServer extends AbstractServer
      */
     public function rename(BucketInterface $bucket, string $oldName, string $newName): bool
     {
+        $this->connect();
+
         if (!$this->exists($bucket, $oldName)) {
             throw new ServerException(
                 "Unable to rename storage object '{$oldName}', object does not exists at SFTP server"
@@ -177,6 +184,10 @@ class SftpServer extends AbstractServer
      */
     protected function connect()
     {
+        if (!empty($this->sftp)) {
+            return;
+        }
+
         $session = ssh2_connect(
             $this->options['host'],
             $this->options['port'],

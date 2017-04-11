@@ -96,7 +96,6 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
 
         //Initiating Guzzle
         $this->client = $client ?? new Client($this->options);
-        $this->connect();
     }
 
     /**
@@ -112,7 +111,6 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
         $server->authToken = null;
         $server->regions = [];
         $server->client = $client;
-        $server->connect();
 
         return $this;
     }
@@ -129,6 +127,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
         string $name,
         ResponseInterface &$response = null
     ): bool {
+        $this->connect();
         try {
             $response = $this->client->send($this->buildRequest('HEAD', $bucket, $name));
         } catch (ClientException $e) {
@@ -159,6 +158,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
      */
     public function size(BucketInterface $bucket, string $name)
     {
+        $this->connect();
         if (!$this->exists($bucket, $name, $response)) {
             return null;
         }
@@ -174,6 +174,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
      */
     public function put(BucketInterface $bucket, string $name, $source): bool
     {
+        $this->connect();
         if (empty($mimetype = \GuzzleHttp\Psr7\mimetype_from_filename($name))) {
             $mimetype = self::DEFAULT_MIMETYPE;
         }
@@ -204,6 +205,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
      */
     public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
     {
+        $this->connect();
         try {
             $response = $this->client->send($this->buildRequest('GET', $bucket, $name));
         } catch (ClientException $e) {
@@ -227,6 +229,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
      */
     public function delete(BucketInterface $bucket, string $name, bool $retry = true)
     {
+        $this->connect();
         if (!$this->exists($bucket, $name)) {
             throw new ServerException("Unable to delete object, file not found");
         }
@@ -254,6 +257,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
      */
     public function rename(BucketInterface $bucket, string $oldName, string $newName): bool
     {
+        $this->connect();
         try {
             $request = $this->buildRequest('PUT', $bucket, $newName, [
                 'X-Copy-From'    => '/' . $bucket->getOption('container') . '/' . rawurlencode($oldName),
@@ -282,6 +286,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
      */
     public function copy(BucketInterface $bucket, BucketInterface $destination, string $name): bool
     {
+        $this->connect();
         if ($bucket->getOption('region') != $destination->getOption('region')) {
             $this->logger()->warning(
                 "Copying between regions are not allowed by Rackspace and performed using local buffer."

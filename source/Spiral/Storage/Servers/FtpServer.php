@@ -52,8 +52,6 @@ class FtpServer extends AbstractServer
                 "Unable to initialize ftp storage server, extension 'ftp' not found"
             );
         }
-
-        $this->connect();
     }
 
     /**
@@ -61,6 +59,8 @@ class FtpServer extends AbstractServer
      */
     public function exists(BucketInterface $bucket, string $name): bool
     {
+        $this->connect();
+
         return ftp_size($this->connection, $this->getPath($bucket, $name)) != -1;
     }
 
@@ -69,6 +69,7 @@ class FtpServer extends AbstractServer
      */
     public function size(BucketInterface $bucket, string $name)
     {
+        $this->connect();
         if (($size = ftp_size($this->connection, $this->getPath($bucket, $name))) != -1) {
             return $size;
         }
@@ -81,6 +82,7 @@ class FtpServer extends AbstractServer
      */
     public function put(BucketInterface $bucket, string $name, $source): bool
     {
+        $this->connect();
         $location = $this->ensureLocation($bucket, $name);
         if (!ftp_put($this->connection, $location, $this->castFilename($source), FTP_BINARY)) {
             throw new ServerException("Unable to put '{$name}' to FTP server");
@@ -94,6 +96,7 @@ class FtpServer extends AbstractServer
      */
     public function allocateFilename(BucketInterface $bucket, string $name): string
     {
+        $this->connect();
         if (!$this->exists($bucket, $name)) {
             throw new ServerException(
                 "Unable to create local filename for '{$name}', object does not exists"
@@ -117,6 +120,7 @@ class FtpServer extends AbstractServer
      */
     public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
     {
+        $this->connect();
         if (!$filename = $this->allocateFilename($bucket, $name)) {
             throw new ServerException(
                 "Unable to create stream for '{$name}', object does not exists"
@@ -132,6 +136,7 @@ class FtpServer extends AbstractServer
      */
     public function delete(BucketInterface $bucket, string $name)
     {
+        $this->connect();
         if (!$this->exists($bucket, $name)) {
             throw new ServerException("Unable to delete object, file not found");
         }
@@ -144,6 +149,7 @@ class FtpServer extends AbstractServer
      */
     public function rename(BucketInterface $bucket, string $oldName, string $newName): bool
     {
+        $this->connect();
         if (!$this->exists($bucket, $oldName)) {
             throw new ServerException("Unable to rename '{$oldName}', object does not exists");
         }
@@ -164,6 +170,7 @@ class FtpServer extends AbstractServer
         BucketInterface $destination,
         string $name
     ): bool {
+        $this->connect();
         if (!$this->exists($bucket, $name)) {
             throw new ServerException("Unable to replace '{$name}', object does not exists");
         }
@@ -183,7 +190,11 @@ class FtpServer extends AbstractServer
      */
     protected function connect()
     {
-        $this->connection = ftp_connect(
+        if (!empty($this->connection)) {
+            return;
+        }
+
+        $connection = ftp_connect(
             $this->options['host'],
             $this->options['port'],
             $this->options['timeout']
@@ -206,6 +217,8 @@ class FtpServer extends AbstractServer
                 "Unable to set passive mode at remote FTP server '{$this->options['host']}'"
             );
         }
+
+        $this->connection = $connection;
     }
 
     /**
@@ -294,6 +307,7 @@ class FtpServer extends AbstractServer
     {
         if (!empty($this->connection)) {
             ftp_close($this->connection);
+            $this->connection = null;
         }
     }
 }
