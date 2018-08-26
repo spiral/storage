@@ -11,13 +11,13 @@ namespace Spiral\Storage\Servers;
 
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
-use Spiral\Files\FileManager;
 use Spiral\Files\FilesInterface;
 use Spiral\Files\Streams\StreamableInterface;
 use Spiral\Files\Streams\StreamWrapper;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\ServerException;
 use Spiral\Storage\ServerInterface;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * AbstractServer implementation with different naming.
@@ -29,23 +29,19 @@ abstract class AbstractServer implements ServerInterface
      */
     const DEFAULT_MIMETYPE = 'application/octet-stream';
 
-    /**
-     * @var FilesInterface
-     */
+    /** @var FilesInterface */
     protected $files;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options = [];
 
     /**
      * @param array          $options Server specific options.
      * @param FilesInterface $files   Required for operations with local filesystem.
      */
-    public function __construct(array $options, FilesInterface $files = null)
+    public function __construct(array $options, FilesInterface $files)
     {
-        $this->files = $files ?? new FileManager();
+        $this->files = $files;
         $this->options = $options + $this->options;
     }
 
@@ -100,12 +96,12 @@ abstract class AbstractServer implements ServerInterface
     protected function castFilename($source): string
     {
         if (empty($source)) {
-            return StreamWrapper::localFilename(\GuzzleHttp\Psr7\stream_for(''));
+            return StreamWrapper::localFilename(stream_for(''));
         }
 
         if (is_string($source)) {
             if ($this->isFilename($source)) {
-                $source = \GuzzleHttp\Psr7\stream_for(fopen($source, 'rb'));
+                $source = stream_for(fopen($source, 'rb'));
             } else {
                 throw new ServerException(
                     "Source must be a valid resource, stream or filename, invalid value given"
@@ -146,12 +142,12 @@ abstract class AbstractServer implements ServerInterface
 
         if (empty($source)) {
             //Guzzle?
-            return \GuzzleHttp\Psr7\stream_for('');
+            return stream_for('');
         }
 
         if ($this->isFilename($source)) {
             //Must never pass user string in here, use Stream
-            return \GuzzleHttp\Psr7\stream_for(fopen($source, 'rb'));
+            return stream_for(fopen($source, 'rb'));
         }
 
         //We do not allow source names in a string form

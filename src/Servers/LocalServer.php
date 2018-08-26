@@ -13,6 +13,7 @@ use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\ServerException;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Provides abstraction level to work with data located in local filesystem.
@@ -30,7 +31,7 @@ class LocalServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function size(BucketInterface $bucket, string $name)
+    public function size(BucketInterface $bucket, string $name): ?int
     {
         if (!$this->files->exists($this->getPath($bucket, $name))) {
             return null;
@@ -81,9 +82,7 @@ class LocalServer extends AbstractServer
         }
 
         //Getting readonly stream
-        return \GuzzleHttp\Psr7\stream_for(
-            fopen($this->allocateFilename($bucket, $name), 'rb')
-        );
+        return stream_for(fopen($this->allocateFilename($bucket, $name), 'rb'));
     }
 
     /**
@@ -158,7 +157,7 @@ class LocalServer extends AbstractServer
 
         $mode = $bucket->getOption('mode', FilesInterface::RUNTIME);
 
-        //Pre-enshuring location
+        //Pre-ensuring location
         $this->files->ensureDirectory(dirname($destination), $mode);
 
         if (!$this->files->move($filename, $destination)) {
