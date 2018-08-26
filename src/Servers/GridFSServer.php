@@ -22,16 +22,14 @@ use function GuzzleHttp\Psr7\stream_for;
  */
 class GridFSServer extends AbstractServer
 {
-    /**
-     * @var Database
-     */
+    /** @var Database */
     protected $database;
 
     /**
      * @param Database            $database
      * @param FilesInterface|null $files
      */
-    public function __construct(Database $database, FilesInterface $files = null)
+    public function __construct(Database $database, FilesInterface $files)
     {
         parent::__construct([], $files);
         $this->database = $database;
