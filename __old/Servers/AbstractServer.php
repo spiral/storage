@@ -11,7 +11,6 @@ namespace Spiral\Storage\Servers;
 
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
-use Spiral\Core\Component;
 use Spiral\Files\FileManager;
 use Spiral\Files\FilesInterface;
 use Spiral\Files\Streams\StreamableInterface;
@@ -23,7 +22,7 @@ use Spiral\Storage\ServerInterface;
 /**
  * AbstractServer implementation with different naming.
  */
-abstract class AbstractServer extends Component implements ServerInterface
+abstract class AbstractServer implements ServerInterface
 {
     /**
      * Default mimetype to be used when nothing else can be applied.

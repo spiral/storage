@@ -9,9 +9,7 @@
 namespace Spiral\Storage\Entities;
 
 use Psr\Http\Message\StreamInterface;
-use Spiral\Core\Component;
 use Spiral\Core\Exceptions\ScopeException;
-use Spiral\Core\Traits\SaturateTrait;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\BucketException;
 use Spiral\Storage\Exceptions\ObjectException;
@@ -21,23 +19,15 @@ use Spiral\Storage\StorageInterface;
 /**
  * Default implementation of storage object. This is immutable class.
  */
-class StorageObject extends Component implements ObjectInterface
+class StorageObject implements ObjectInterface
 {
-    use SaturateTrait;
-
-    /**
-     * @var BucketInterface
-     */
+    /** @var BucketInterface */
     private $bucket = null;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $address = false;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $name = false;
 
     /**
@@ -52,9 +42,9 @@ class StorageObject extends Component implements ObjectInterface
      *
      * @throws ScopeException
      */
-    public function __construct(string $address, StorageInterface $storage = null)
+    public function __construct(string $address, StorageInterface $storage)
     {
-        $this->storage = $this->saturate($storage, StorageInterface::class);
+        $this->storage = $storage;
 
         $this->address = $address;
         $this->bucket = $this->storage->locateBucket($address, $this->name);
@@ -103,7 +93,7 @@ class StorageObject extends Component implements ObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function getSize()
+    public function getSize(): ?int
     {
         return $this->bucket->size($this->name);
     }

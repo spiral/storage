@@ -9,9 +9,7 @@
 namespace Spiral\Storage;
 
 use Spiral\Files\Streams\StreamableInterface;
-use Spiral\Storage\Exceptions\BucketException;
 use Spiral\Storage\Exceptions\ObjectException;
-use Spiral\Storage\Exceptions\ServerException;
 
 /**
  * Representation of a single storage object. Technically this is only helper interface, does not
@@ -54,7 +52,7 @@ interface ObjectInterface extends StreamableInterface
      * @return int|bool
      * @throws ObjectException
      */
-    public function getSize();
+    public function getSize(): ?int;
 
     /**
      * Must return filename which is valid in associated FilesInterface instance. Must trow an

@@ -8,6 +8,7 @@
 
 namespace Spiral\Storage\Configs;
 
+use Spiral\Core\Container\Autowire;
 use Spiral\Core\InjectableConfig;
 use Spiral\Core\Traits\Config\AliasTrait;
 
@@ -39,6 +40,11 @@ class StorageConfig extends InjectableConfig
     public function hasServer(string $server): bool
     {
         return isset($this->config['servers'][$server]);
+    }
+
+    public function getServer(string $server): Autowire
+    {
+
     }
 
     /**

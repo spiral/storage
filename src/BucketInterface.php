@@ -11,7 +11,6 @@ namespace Spiral\Storage;
 use Psr\Http\Message\StreamInterface;
 use Spiral\Files\Streams\StreamableInterface;
 use Spiral\Storage\Exceptions\BucketException;
-use Spiral\Storage\Exceptions\ServerException;
 use Spiral\Storage\Exceptions\StorageException;
 
 /**
@@ -106,7 +105,7 @@ interface BucketInterface
      *
      * @throws BucketException
      */
-    public function size(string $name);
+    public function size(string $name): ?int;
 
     /**
      * Put given content under given name in associated bucket server. Must replace already existed
@@ -184,14 +183,17 @@ interface BucketInterface
     /**
      * Move storage object data to another bucket. Method must return new object address on success.
      *
-     * @todo Add ability to specify new name, not only destination.
-     *
      * @param BucketInterface $destination
      * @param string          $name
+     * @param string          $rename New name, keep null to preserve original name.
      *
      * @return string
      *
      * @throws BucketException
      */
-    public function replace(BucketInterface $destination, string $name): string;
+    public function replace(
+        BucketInterface $destination,
+        string $name,
+        string $rename = null
+    ): string;
 }

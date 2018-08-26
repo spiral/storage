@@ -11,7 +11,6 @@ namespace Spiral\Storage\Entities;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Log\LoggerAwareInterface;
-use Spiral\Core\Component;
 use Spiral\Core\Container\InjectableInterface;
 use Spiral\Debug\Traits\BenchmarkTrait;
 use Spiral\Debug\Traits\LoggerTrait;
@@ -21,40 +20,28 @@ use Spiral\Storage\Exceptions\BucketException;
 use Spiral\Storage\Exceptions\ServerException;
 use Spiral\Storage\ServerInterface;
 use Spiral\Storage\StorageManager;
+use Zend\Diactoros\Stream;
 
 /**
  * Default implementation of storage bucket.
  */
-class StorageBucket extends Component implements
-    BucketInterface,
-    LoggerAwareInterface,
-    InjectableInterface
+//todo: sprintf
+class StorageBucket implements BucketInterface, LoggerAwareInterface, InjectableInterface
 {
     use BenchmarkTrait, LoggerTrait;
 
-    /**
-     * To let IoC who need to inject us.
-     */
     const INJECTOR = StorageManager::class;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $name = '';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $prefix = '';
 
-    /**
-     * @var ServerInterface
-     */
+    /** @var ServerInterface */
     private $server = null;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $options = [];
 
     /**
@@ -141,7 +128,10 @@ class StorageBucket extends Component implements
      */
     public function exists(string $name): bool
     {
-        $this->logger()->info(
+        $this->getLogger()->info(sprintf(
+                "",
+                1
+            ) .
             "Check existence of '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
         );
 
@@ -151,16 +141,16 @@ class StorageBucket extends Component implements
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
-            $this->benchmark($benchmark);
+            $benchmark->complete();
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function size(string $name)
+    public function size(string $name): ?int
     {
-        $this->logger()->info(
+        $this->getLogger()->info(
             "Get size of '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
         );
 
@@ -170,7 +160,7 @@ class StorageBucket extends Component implements
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
-            $this->benchmark($benchmark);
+            $benchmark->complete();
         }
     }
 
@@ -179,7 +169,7 @@ class StorageBucket extends Component implements
      */
     public function put(string $name, $source): string
     {
-        $this->logger()->info(
+        $this->getLogger()->info(
             "Put '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
         );
 
@@ -189,7 +179,7 @@ class StorageBucket extends Component implements
         }
 
         if (is_resource($source)) {
-            $source = \GuzzleHttp\Psr7\stream_for($source);
+            $source = new Stream($source, 'r');
         }
 
         $benchmark = $this->benchmark($this->getName(), "put::{$this->buildAddress($name)}");
@@ -201,7 +191,7 @@ class StorageBucket extends Component implements
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
-            $this->benchmark($benchmark);
+            $benchmark->complete();
         }
     }
 
@@ -210,7 +200,7 @@ class StorageBucket extends Component implements
      */
     public function allocateFilename(string $name): string
     {
-        $this->logger()->info(
+        $this->getLogger()->info(
             "Allocate filename of '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
         );
 
@@ -223,7 +213,7 @@ class StorageBucket extends Component implements
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
-            $this->benchmark($benchmark);
+            $benchmark->complete();
         }
     }
 
@@ -232,7 +222,7 @@ class StorageBucket extends Component implements
      */
     public function allocateStream(string $name): StreamInterface
     {
-        $this->logger()->info(
+        $this->getLogger()->info(
             "Get stream for '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
         );
 
@@ -245,7 +235,7 @@ class StorageBucket extends Component implements
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
-            $this->benchmark($benchmark);
+            $benchmark->complete();
         }
     }
 
@@ -254,7 +244,7 @@ class StorageBucket extends Component implements
      */
     public function delete(string $name)
     {
-        $this->logger()->info(
+        $this->getLogger()->info(
             "Delete '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
         );
 
@@ -267,7 +257,7 @@ class StorageBucket extends Component implements
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
-            $this->benchmark($benchmark);
+            $benchmark->complete();
         }
     }
 
@@ -280,7 +270,7 @@ class StorageBucket extends Component implements
             return true;
         }
 
-        $this->logger()->info(
+        $this->getLogger()->info(
             "Rename '{$this->buildAddress($oldName)}' to '{$this->buildAddress($newName)}' "
             . "in '{$this->getName()}' bucket."
         );
@@ -296,7 +286,7 @@ class StorageBucket extends Component implements
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
-            $this->benchmark($benchmark);
+            $benchmark->complete();
         }
     }
 
@@ -305,13 +295,13 @@ class StorageBucket extends Component implements
      */
     public function copy(BucketInterface $destination, string $name): string
     {
-        if ($destination == $this) {
+        if ($destination === $this) {
             return $this->buildAddress($name);
         }
 
         //Internal copying
         if ($this->getServer() === $destination->getServer()) {
-            $this->logger()->info(
+            $this->getLogger()->info(
                 "Internal copy of '{$this->buildAddress($name)}' "
                 . "to '{$destination->buildAddress($name)}' in '{$this->getName()}' bucket."
             );
@@ -325,10 +315,11 @@ class StorageBucket extends Component implements
             } catch (ServerException$e) {
                 throw new BucketException($e->getMessage(), $e->getCode(), $e);
             } finally {
-                $this->benchmark($benchmark);
+                $benchmark->complete();
             }
+
         } else {
-            $this->logger()->info(
+            $this->getLogger()->info(
                 "External copy of '{$this->getName()}'.'{$this->buildAddress($name)}' "
                 . "to '{$destination->getName()}'.'{$destination->buildAddress($name)}'."
             );
@@ -343,15 +334,18 @@ class StorageBucket extends Component implements
     /**
      * {@inheritdoc}
      */
-    public function replace(BucketInterface $destination, string $name): string
-    {
-        if ($destination == $this) {
+    public function replace(
+        BucketInterface $destination,
+        string $name,
+        string $rename = null
+    ): string {
+        if ($destination === $this) {
             return $this->buildAddress($name);
         }
 
         //Internal copying
-        if ($this->getServer() == $destination->getServer()) {
-            $this->logger()->info(
+        if ($this->getServer() === $destination->getServer()) {
+            $this->getLogger()->info(
                 "Internal move '{$this->buildAddress($name)}' "
                 . "to '{$destination->buildAddress($name)}' in '{$this->getName()}' bucket."
             );
@@ -365,10 +359,10 @@ class StorageBucket extends Component implements
             } catch (ServerException$e) {
                 throw new BucketException($e->getMessage(), $e->getCode(), $e);
             } finally {
-                $this->benchmark($benchmark);
+                $benchmark->complete();
             }
         } else {
-            $this->logger()->info(
+            $this->getLogger()->info(
                 "External move '{$this->getName()}'.'{$this->buildAddress($name)}'"
                 . " to '{$destination->getName()}'.'{$destination->buildAddress($name)}'."
             );

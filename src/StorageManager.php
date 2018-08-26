@@ -8,8 +8,6 @@
 
 namespace Spiral\Storage;
 
-use Spiral\Core\Component;
-use Spiral\Core\Container;
 use Spiral\Core\Container\InjectorInterface;
 use Spiral\Core\FactoryInterface;
 use Spiral\Storage\Configs\StorageConfig;
@@ -22,30 +20,20 @@ use Spiral\Storage\Exceptions\StorageException;
  * general purpose abstraction for file storage, it does not and will not support directory
  * listings and features specific to storage adapter (however such functionality can be added at
  * server level).
- *
- * @todo check Guzzle dependency and if there is something lighter for PSR7 curl wrappers
- * @todo add async processing?
  */
-class StorageManager extends Component implements StorageInterface, InjectorInterface
+class StorageManager implements StorageInterface, InjectorInterface
 {
-    /**
-     * @var BucketInterface[]
-     */
+    /**  @var BucketInterface[] */
     private $buckets = [];
 
-    /**
-     * @var ServerInterface[]
-     */
+    /** @var ServerInterface[] */
     private $servers = [];
 
-    /**
-     * @var StorageConfig
-     */
+    /** @var StorageConfig */
     protected $config;
 
     /**
      * @invisible
-     *
      * @var FactoryInterface
      */
     protected $factory;
@@ -54,15 +42,15 @@ class StorageManager extends Component implements StorageInterface, InjectorInte
      * @param StorageConfig    $config
      * @param FactoryInterface $factory
      */
-    public function __construct(StorageConfig $config, FactoryInterface $factory = null)
+    public function __construct(StorageConfig $config, FactoryInterface $factory)
     {
         $this->config = $config;
-        $this->factory = $factory ?? new Container();
+        $this->factory = $factory;
 
         //Loading buckets (we need all instances to properly allocate bucket name by address) (really?)
         foreach ($this->config->getBuckets() as $name => $bucket) {
             //Using default implementation
-            $this->buckets[$name] = $this->constructBucket($name, $bucket);
+            $this->buckets[$name] = $this->makeBucket($name, $bucket);
         }
     }
 
@@ -142,7 +130,7 @@ class StorageManager extends Component implements StorageInterface, InjectorInte
      *
      * @throws StorageException
      */
-    public function addServer($name, ServerInterface $server)
+    public function addServer(string $name, ServerInterface $server): self
     {
         if (isset($this->servers[$name])) {
             throw new StorageException(
@@ -239,7 +227,7 @@ class StorageManager extends Component implements StorageInterface, InjectorInte
      *
      * @throws StorageException
      */
-    private function constructBucket(string $name, array $bucket): StorageBucket
+    private function makeBucket(string $name, array $bucket): StorageBucket
     {
         $parameters = $bucket + compact('name');
         unset($parameters['server']);
@@ -258,9 +246,7 @@ class StorageManager extends Component implements StorageInterface, InjectorInte
 
         return $this->factory->make(
             StorageBucket::class,
-            $parameters + [
-                'server' => $this->getServer($bucket['server'])
-            ]
+            $parameters + ['server' => $this->getServer($bucket['server'])]
         );
     }
 }

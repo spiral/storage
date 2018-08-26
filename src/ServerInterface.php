@@ -40,7 +40,7 @@ interface ServerInterface
      * @return int|null
      * @throws ServerException
      */
-    public function size(BucketInterface $bucket, string $name);
+    public function size(BucketInterface $bucket, string $name): ?int;
 
     /**
      * Put object data into specified bucket under given name, must replace existed data.
