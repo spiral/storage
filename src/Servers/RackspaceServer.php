@@ -23,6 +23,7 @@ use Spiral\Debug\Traits\LoggerTrait;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\ServerException;
+use function GuzzleHttp\Psr7\mimetype_from_filename;
 
 /**
  * Provides abstraction level to work with data located in Rackspace cloud.
@@ -69,20 +70,18 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     protected $client = null;
 
     /**
-     * @param array                $options
-     * @param CacheInterface|null  $cache
-     * @param FilesInterface|null  $files
-     * @param ClientInterface|null $client
+     * @param array               $options
+     * @param FilesInterface      $files
+     * @param CacheInterface|null $cache
      */
     public function __construct(
         array $options,
-        CacheInterface $cache = null,
-        FilesInterface $files = null,
-
-        ClientInterface $client = null
+        FilesInterface $files,
+        CacheInterface $cache = null
     ) {
         parent::__construct($options, $files);
         $this->cache = $cache;
+        $this->client = new Client($this->options);
 
         if (!empty($this->cache) && $this->options['cache']) {
             $this->authToken = $this->cache->get(
@@ -93,9 +92,6 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
                 $this->options['username'] . '@rackspace-regions'
             );
         }
-
-        //Initiating Guzzle
-        $this->client = $client ?? new Client($this->options);
     }
 
     /**
@@ -156,7 +152,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function size(BucketInterface $bucket, string $name)
+    public function size(BucketInterface $bucket, string $name): ?int
     {
         $this->connect();
         if (!$this->exists($bucket, $name, $response)) {
@@ -175,7 +171,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     public function put(BucketInterface $bucket, string $name, $source): bool
     {
         $this->connect();
-        if (empty($mimetype = \GuzzleHttp\Psr7\mimetype_from_filename($name))) {
+        if (empty($mimetype = mimetype_from_filename($name))) {
             $mimetype = self::DEFAULT_MIMETYPE;
         }
 
@@ -224,8 +220,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     /**
      * {@inheritdoc}
      *
-     * @todo debug to figure out why Rackspace is not reliable
-     * @see  https://github.com/rackspace/php-opencloud/issues/477
+     * @see https://github.com/rackspace/php-opencloud/issues/477
      */
     public function delete(BucketInterface $bucket, string $name, bool $retry = true)
     {
@@ -259,10 +254,15 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     {
         $this->connect();
         try {
-            $request = $this->buildRequest('PUT', $bucket, $newName, [
-                'X-Copy-From'    => '/' . $bucket->getOption('container') . '/' . rawurlencode($oldName),
-                'Content-Length' => 0
-            ]);
+            $request = $this->buildRequest(
+                'PUT',
+                $bucket,
+                $newName,
+                [
+                    'X-Copy-From'    => '/' . $bucket->getOption('container') . '/' . rawurlencode($oldName),
+                    'Content-Length' => 0
+                ]
+            );
 
             $this->client->send($request);
         } catch (ClientException $e) {
@@ -288,7 +288,7 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
     {
         $this->connect();
         if ($bucket->getOption('region') != $destination->getOption('region')) {
-            $this->logger()->warning(
+            $this->getLogger()->warning(
                 "Copying between regions are not allowed by Rackspace and performed using local buffer."
             );
 
@@ -297,10 +297,15 @@ class RackspaceServer extends AbstractServer implements LoggerAwareInterface
         }
 
         try {
-            $request = $this->buildRequest('PUT', $destination, $name, [
-                'X-Copy-From'    => '/' . $bucket->getOption('container') . '/' . rawurlencode($name),
-                'Content-Length' => 0
-            ]);
+            $request = $this->buildRequest(
+                'PUT',
+                $destination,
+                $name,
+                [
+                    'X-Copy-From'    => '/' . $bucket->getOption('container') . '/' . rawurlencode($name),
+                    'Content-Length' => 0
+                ]
+            );
 
             $this->client->send($request);
         } catch (ClientException $e) {

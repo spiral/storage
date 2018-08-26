@@ -59,7 +59,7 @@ class SftpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $options, FilesInterface $files = null)
+    public function __construct(array $options, FilesInterface $files )
     {
         parent::__construct($options, $files);
 

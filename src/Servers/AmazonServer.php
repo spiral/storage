@@ -21,6 +21,7 @@ use Psr\Http\Message\UriInterface;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\ServerException;
+use function GuzzleHttp\Psr7\mimetype_from_filename;
 
 /**
  * Provides abstraction level to work with data located in Amazon S3 cloud.
@@ -45,19 +46,13 @@ class AmazonServer extends AbstractServer
     protected $client = null;
 
     /**
-     * @param array                $options
-     * @param FilesInterface|null  $files
-     * @param ClientInterface|null $client
+     * @param array               $options
+     * @param FilesInterface|null $files
      */
-    public function __construct(
-        array $options,
-        FilesInterface $files = null,
-        ClientInterface $client = null
-    ) {
+    public function __construct(array $options, FilesInterface $files)
+    {
         parent::__construct($options, $files);
-
-        //This code is going to use additional abstraction layer to connect storage and guzzle
-        $this->client = $client ?? new Client($this->options);
+        $this->client = new Client($this->options);
     }
 
     /**
@@ -88,7 +83,11 @@ class AmazonServer extends AbstractServer
         ResponseInterface &$response = null
     ): bool {
         try {
-            $response = $this->client->send($this->buildRequest('HEAD', $bucket, $name));
+            $response = $this->client->send($this->buildRequest(
+                'HEAD',
+                $bucket,
+                $name
+            ));
         } catch (ClientException $e) {
             if ($e->getCode() == 404) {
                 return false;
@@ -108,7 +107,7 @@ class AmazonServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function size(BucketInterface $bucket, string $name)
+    public function size(BucketInterface $bucket, string $name): ?int
     {
         if (!$this->exists($bucket, $name, $response)) {
             return null;
@@ -125,7 +124,7 @@ class AmazonServer extends AbstractServer
      */
     public function put(BucketInterface $bucket, string $name, $source): bool
     {
-        if (empty($mimetype = \GuzzleHttp\Psr7\mimetype_from_filename($name))) {
+        if (empty($mimetype = mimetype_from_filename($name))) {
             $mimetype = self::DEFAULT_MIMETYPE;
         }
 
@@ -185,10 +184,16 @@ class AmazonServer extends AbstractServer
     public function rename(BucketInterface $bucket, string $oldName, string $newName): bool
     {
         try {
-            $request = $this->buildRequest('PUT', $bucket, $newName, [], [
-                'Acl'         => $bucket->getOption('public') ? 'public-read' : 'private',
-                'Copy-Source' => $this->buildUri($bucket, $oldName)->getPath()
-            ]);
+            $request = $this->buildRequest(
+                'PUT',
+                $bucket,
+                $newName,
+                [],
+                [
+                    'Acl'         => $bucket->getOption('public') ? 'public-read' : 'private',
+                    'Copy-Source' => $this->buildUri($bucket, $oldName)->getPath()
+                ]
+            );
 
             $this->client->send($request);
         } catch (ClientException $e) {
@@ -211,10 +216,16 @@ class AmazonServer extends AbstractServer
     public function copy(BucketInterface $bucket, BucketInterface $destination, string $name): bool
     {
         try {
-            $request = $this->buildRequest('PUT', $destination, $name, [], [
-                'Acl'         => $destination->getOption('public') ? 'public-read' : 'private',
-                'Copy-Source' => $this->buildUri($bucket, $name)->getPath()
-            ]);
+            $request = $this->buildRequest(
+                'PUT',
+                $destination,
+                $name,
+                [],
+                [
+                    'Acl'         => $destination->getOption('public') ? 'public-read' : 'private',
+                    'Copy-Source' => $this->buildUri($bucket, $name)->getPath()
+                ]
+            );
 
             $this->client->send($request);
         } catch (ClientException $e) {
@@ -329,9 +340,12 @@ class AmazonServer extends AbstractServer
 
         return $request->withAddedHeader(
             'Authorization',
-            'AWS ' . $this->options['accessKey'] . ':' . base64_encode(
-                hash_hmac('sha1', join("\n", $signature), $this->options['secretKey'], true)
-            )
+            'AWS ' . $this->options['accessKey'] . ':' . base64_encode(hash_hmac(
+                'sha1',
+                join("\n", $signature),
+                $this->options['secretKey'],
+                true
+            ))
         );
     }
 
@@ -346,7 +360,7 @@ class AmazonServer extends AbstractServer
      */
     private function createHeaders(BucketInterface $bucket, string $name, $source): array
     {
-        if (empty($mimetype = \GuzzleHttp\Psr7\mimetype_from_filename($name))) {
+        if (empty($mimetype = mimetype_from_filename($name))) {
             $mimetype = self::DEFAULT_MIMETYPE;
         };
 

@@ -15,6 +15,7 @@ use Spiral\Files\FilesInterface;
 use Spiral\Files\Streams\StreamWrapper;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\ServerException;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Provides abstraction level to work with data located in GridFS storage.
@@ -49,7 +50,7 @@ class GridFSServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function size(BucketInterface $bucket, string $name)
+    public function size(BucketInterface $bucket, string $name): ?int
     {
         if (!$this->exists($bucket, $name)) {
             return null;
@@ -108,7 +109,7 @@ class GridFSServer extends AbstractServer
         rewind($resource);
 
         //Ugly :/
-        return \GuzzleHttp\Psr7\stream_for($resource);
+        return stream_for($resource);
     }
 
     /**
