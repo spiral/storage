@@ -185,15 +185,10 @@ interface BucketInterface
      *
      * @param BucketInterface $destination
      * @param string          $name
-     * @param string          $rename New name, keep null to preserve original name.
      *
      * @return string
      *
      * @throws BucketException
      */
-    public function replace(
-        BucketInterface $destination,
-        string $name,
-        string $rename = null
-    ): string;
+    public function replace(BucketInterface $destination, string $name): string;
 }

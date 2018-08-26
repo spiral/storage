@@ -20,7 +20,7 @@ use Spiral\Storage\Exceptions\BucketException;
 use Spiral\Storage\Exceptions\ServerException;
 use Spiral\Storage\ServerInterface;
 use Spiral\Storage\StorageManager;
-use Zend\Diactoros\Stream;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Default implementation of storage bucket.
@@ -129,11 +129,10 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
     public function exists(string $name): bool
     {
         $this->getLogger()->info(sprintf(
-                "",
-                1
-            ) .
-            "Check existence of '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
-        );
+            "check existence of '%s' in '%s' bucket.",
+            $this->buildAddress($name),
+            $this->getName()
+        ));
 
         $benchmark = $this->benchmark($this->getName(), "exists::{$this->buildAddress($name)}");
         try {
@@ -150,9 +149,11 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
      */
     public function size(string $name): ?int
     {
-        $this->getLogger()->info(
-            "Get size of '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
-        );
+        $this->getLogger()->info(sprintf(
+            "get size of '%s' in '%s' bucket.",
+            $this->buildAddress($name),
+            $this->getName()
+        ));
 
         $benchmark = $this->benchmark($this->getName(), "size::{$this->buildAddress($name)}");
         try {
@@ -169,9 +170,11 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
      */
     public function put(string $name, $source): string
     {
-        $this->getLogger()->info(
-            "Put '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
-        );
+        $this->getLogger()->info(sprintf(
+            "put '%s' in '%s' bucket.",
+            $this->buildAddress($name),
+            $this->getName()
+        ));
 
         if ($source instanceof UploadedFileInterface || $source instanceof StreamableInterface) {
             //Known simplification for UploadedFile
@@ -179,7 +182,7 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
         }
 
         if (is_resource($source)) {
-            $source = new Stream($source, 'r');
+            $source = stream_for($source);
         }
 
         $benchmark = $this->benchmark($this->getName(), "put::{$this->buildAddress($name)}");
@@ -200,9 +203,11 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
      */
     public function allocateFilename(string $name): string
     {
-        $this->getLogger()->info(
-            "Allocate filename of '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
-        );
+        $this->getLogger()->info(sprintf(
+            "allocate filename of '%s' in '%s' bucket.",
+            $this->buildAddress($name),
+            $this->getName()
+        ));
 
         $benchmark = $this->benchmark(
             $this->getName(), "filename::{$this->buildAddress($name)}"
@@ -222,9 +227,11 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
      */
     public function allocateStream(string $name): StreamInterface
     {
-        $this->getLogger()->info(
-            "Get stream for '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
-        );
+        $this->getLogger()->info(sprintf(
+            "get stream for '%s' in '%s' bucket.",
+            $this->buildAddress($name),
+            $this->getName()
+        ));
 
         $benchmark = $this->benchmark(
             $this->getName(), "stream::{$this->buildAddress($name)}"
@@ -244,9 +251,11 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
      */
     public function delete(string $name)
     {
-        $this->getLogger()->info(
-            "Delete '{$this->buildAddress($name)}' in '{$this->getName()}' bucket."
-        );
+        $this->getLogger()->info(sprintf(
+            "delete '%s' in '%s' bucket.",
+            $this->buildAddress($name),
+            $this->getName()
+        ));
 
         $benchmark = $this->benchmark(
             $this->getName(), "delete::{$this->buildAddress($name)}"
@@ -270,10 +279,12 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
             return true;
         }
 
-        $this->getLogger()->info(
-            "Rename '{$this->buildAddress($oldName)}' to '{$this->buildAddress($newName)}' "
-            . "in '{$this->getName()}' bucket."
-        );
+        $this->getLogger()->info(sprintf(
+            "rename '%s' to '%s' in '%s' bucket.",
+            $this->buildAddress($oldName),
+            $this->buildAddress($newName),
+            $this->getName()
+        ));
 
         $benchmark = $this->benchmark(
             $this->getName(), "rename::{$this->buildAddress($oldName)}"
@@ -301,10 +312,12 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
 
         //Internal copying
         if ($this->getServer() === $destination->getServer()) {
-            $this->getLogger()->info(
-                "Internal copy of '{$this->buildAddress($name)}' "
-                . "to '{$destination->buildAddress($name)}' in '{$this->getName()}' bucket."
-            );
+            $this->getLogger()->info(sprintf(
+                "internal copy of '%s' to '%s' from '%s' bucket.",
+                $this->buildAddress($name),
+                $destination->buildAddress($name),
+                $this->getName()
+            ));
 
             $benchmark = $this->benchmark(
                 $this->getName(), "copy::{$this->buildAddress($name)}"
@@ -319,10 +332,13 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
             }
 
         } else {
-            $this->getLogger()->info(
-                "External copy of '{$this->getName()}'.'{$this->buildAddress($name)}' "
-                . "to '{$destination->getName()}'.'{$destination->buildAddress($name)}'."
-            );
+            $this->getLogger()->info(sprintf(
+                "external copy of '%s'.'%s' to '%s'.'%s'.",
+                $this->getName(),
+                $this->buildAddress($name),
+                $destination->getName(),
+                $destination->buildAddress($name)
+            ));
 
             $destination->put($name, $stream = $this->allocateStream($name));
             $stream->detach();
@@ -334,21 +350,20 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
     /**
      * {@inheritdoc}
      */
-    public function replace(
-        BucketInterface $destination,
-        string $name,
-        string $rename = null
-    ): string {
+    public function replace(BucketInterface $destination, string $name): string
+    {
         if ($destination === $this) {
             return $this->buildAddress($name);
         }
 
         //Internal copying
         if ($this->getServer() === $destination->getServer()) {
-            $this->getLogger()->info(
-                "Internal move '{$this->buildAddress($name)}' "
-                . "to '{$destination->buildAddress($name)}' in '{$this->getName()}' bucket."
-            );
+            $this->getLogger()->info(sprintf(
+                "internal move of '%s' to '%s' from '%s' bucket.",
+                $this->buildAddress($name),
+                $destination->buildAddress($name),
+                $this->getName()
+            ));
 
             $benchmark = $this->benchmark(
                 $this->getName(), "replace::{$this->buildAddress($name)}"
@@ -362,10 +377,13 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
                 $benchmark->complete();
             }
         } else {
-            $this->getLogger()->info(
-                "External move '{$this->getName()}'.'{$this->buildAddress($name)}'"
-                . " to '{$destination->getName()}'.'{$destination->buildAddress($name)}'."
-            );
+            $this->getLogger()->info(sprintf(
+                "external move of '%s'.'%s' to '%s'.'%s'.",
+                $this->getName(),
+                $this->buildAddress($name),
+                $destination->getName(),
+                $destination->buildAddress($name)
+            ));
 
             //Copying using temporary stream (buffer)
             $destination->put($name, $stream = $this->allocateStream($name));
