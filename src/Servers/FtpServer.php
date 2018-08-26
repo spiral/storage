@@ -13,6 +13,7 @@ use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\ServerException;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Provides abstraction level to work with data located at remove FTP server.
@@ -67,7 +68,7 @@ class FtpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function size(BucketInterface $bucket, string $name)
+    public function size(BucketInterface $bucket, string $name): ?int
     {
         $this->connect();
         if (($size = ftp_size($this->connection, $this->getPath($bucket, $name))) != -1) {
@@ -106,9 +107,12 @@ class FtpServer extends AbstractServer
         //File should be removed after processing
         $tempFilename = $this->files->tempFilename($this->files->extension($name));
 
-        if (
-        !ftp_get($this->connection, $tempFilename, $this->getPath($bucket, $name), FTP_BINARY)
-        ) {
+        if (!ftp_get(
+            $this->connection,
+            $tempFilename,
+            $this->getPath($bucket, $name),
+            FTP_BINARY
+        )) {
             throw new ServerException("Unable to create local filename for '{$name}'");
         }
 
@@ -128,7 +132,7 @@ class FtpServer extends AbstractServer
         }
 
         //Thought local file
-        return \GuzzleHttp\Psr7\stream_for(fopen($filename, 'rb'));
+        return stream_for(fopen($filename, 'rb'));
     }
 
     /**

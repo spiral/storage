@@ -13,6 +13,7 @@ use Spiral\Files\FilesInterface;
 use Spiral\Files\Streams\StreamWrapper;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\ServerException;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Provides abstraction level to work with data located at remove SFTP server.
@@ -75,13 +76,14 @@ class SftpServer extends AbstractServer
     public function exists(BucketInterface $bucket, string $name): bool
     {
         $this->connect();
+
         return file_exists($this->castRemoteFilename($bucket, $name));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function size(BucketInterface $bucket, string $name)
+    public function size(BucketInterface $bucket, string $name): ?int
     {
         $this->connect();
         if (!$this->exists($bucket, $name)) {
@@ -127,9 +129,7 @@ class SftpServer extends AbstractServer
         $this->connect();
 
         //Thought native sftp resource
-        return \GuzzleHttp\Psr7\stream_for(
-            fopen($this->castRemoteFilename($bucket, $name), 'rb')
-        );
+        return stream_for(fopen($this->castRemoteFilename($bucket, $name), 'rb'));
     }
 
     /**
