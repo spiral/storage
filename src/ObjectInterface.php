@@ -8,7 +8,7 @@
 
 namespace Spiral\Storage;
 
-use Spiral\Files\Streams\StreamableInterface;
+use Spiral\Streams\StreamableInterface;
 use Spiral\Storage\Exceptions\ObjectException;
 
 /**

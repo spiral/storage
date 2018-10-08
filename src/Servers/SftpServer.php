@@ -10,7 +10,7 @@ namespace Spiral\Storage\Servers;
 
 use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
-use Spiral\Files\Streams\StreamWrapper;
+use Spiral\Streams\StreamWrapper;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\ServerException;
 use function GuzzleHttp\Psr7\stream_for;

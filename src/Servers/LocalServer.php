@@ -67,7 +67,7 @@ class LocalServer extends AbstractServer
         }
 
         //localFilename call is required to mock filesystem operations (clone file in a future?)
-        return $this->files->localFilename($this->getPath($bucket, $name));
+        return $this->getPath($bucket, $name);
     }
 
     /**

@@ -13,7 +13,8 @@
     "php": ">=7.1",
     "spiral/core": "^1.0",
     "spiral/debug": "^1.0",
-    "spiral/files": "^1.0",
+    "spiral/files": "^2.0",
+    "spiral/streams": "^1.0",
     "psr/simple-cache": "^1.0",
     "guzzlehttp/guzzle": "^6.3"
   },

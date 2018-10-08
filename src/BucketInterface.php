@@ -9,7 +9,7 @@
 namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
-use Spiral\Files\Streams\StreamableInterface;
+use Spiral\Streams\StreamableInterface;
 use Spiral\Storage\Exceptions\BucketException;
 use Spiral\Storage\Exceptions\StorageException;
 

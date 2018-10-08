@@ -14,7 +14,7 @@ use Psr\Log\LoggerAwareInterface;
 use Spiral\Core\Container\InjectableInterface;
 use Spiral\Debug\Traits\BenchmarkTrait;
 use Spiral\Debug\Traits\LoggerTrait;
-use Spiral\Files\Streams\StreamableInterface;
+use Spiral\Streams\StreamableInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exceptions\BucketException;
 use Spiral\Storage\Exceptions\ServerException;
