@@ -9,7 +9,7 @@
 namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
-use Spiral\Storage\Exceptions\ServerException;
+use Spiral\Storage\Exception\ServerException;
 
 /**
  * Server provide storage specific abstraction level. Must implement every low level storage

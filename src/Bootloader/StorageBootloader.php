@@ -6,7 +6,7 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Bootloaders;
+namespace Spiral\Storage\Bootloader;
 
 use Spiral\Core\Bootloaders\Bootloader;
 

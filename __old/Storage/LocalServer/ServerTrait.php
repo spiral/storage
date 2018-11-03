@@ -7,9 +7,9 @@
 namespace Spiral\Tests\Storage\LocalServer;
 
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Entities\StorageBucket;
+use Spiral\Storage\Entity\StorageBucket;
 use Spiral\Storage\ServerInterface;
-use Spiral\Storage\Servers\LocalServer;
+use Spiral\Storage\Server\LocalServer;
 
 trait ServerTrait
 {

@@ -6,7 +6,7 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Exceptions;
+namespace Spiral\Storage\Exception;
 
 /**
  * Exceptions raised by storage objects.

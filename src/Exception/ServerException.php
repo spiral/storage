@@ -6,7 +6,7 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Exceptions;
+namespace Spiral\Storage\Exception;
 
 /**
  * Runtime server exception - connection is down, bad location and etc, bad configuration.

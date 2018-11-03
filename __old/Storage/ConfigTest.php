@@ -7,8 +7,8 @@
 namespace Spiral\Tests\Storage;
 
 use Spiral\Storage\Configs\StorageConfig;
-use Spiral\Storage\Servers\AmazonServer;
-use Spiral\Storage\Servers\LocalServer;
+use Spiral\Storage\Server\AmazonServer;
+use Spiral\Storage\Server\LocalServer;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {

@@ -6,15 +6,14 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Entities;
+namespace Spiral\Storage\Entity;
 
 use Psr\Http\Message\StreamInterface;
 use Spiral\Core\Exceptions\ScopeException;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Exceptions\BucketException;
-use Spiral\Storage\Exceptions\ObjectException;
+use Spiral\Storage\Exception\BucketException;
+use Spiral\Storage\Exception\ObjectException;
 use Spiral\Storage\ObjectInterface;
-use Spiral\Storage\StorageInterface;
 
 /**
  * Default implementation of storage object. This is immutable class.
@@ -25,37 +24,16 @@ class StorageObject implements ObjectInterface
     private $bucket = null;
 
     /** @var string */
-    private $address = false;
-
-    /** @var string */
     private $name = false;
 
     /**
-     * @invisible
-     * @var StorageInterface
+     * @param BucketInterface $bucket
+     * @param string          $name
      */
-    protected $storage = null;
-
-    /**
-     * @param string                $address
-     * @param StorageInterface|null $storage
-     *
-     * @throws ScopeException
-     */
-    public function __construct(string $address, StorageInterface $storage)
+    public function __construct(BucketInterface $bucket, string $name)
     {
-        $this->storage = $storage;
-
-        $this->address = $address;
-        $this->bucket = $this->storage->locateBucket($address, $this->name);
-
-        if (empty($this->name)) {
-            throw new ObjectException("Unable to create StorageObject with empty name");
-        }
-
-        if (empty($this->bucket)) {
-            throw new ObjectException("Unable to resolve bucket for address '{$address}'");
-        }
+        $this->bucket = $bucket;
+        $this->name = $name;
     }
 
     /**
@@ -71,7 +49,7 @@ class StorageObject implements ObjectInterface
      */
     public function getAddress(): string
     {
-        return $this->address;
+        return $this->bucket->buildAddress($this->name);
     }
 
     /**
@@ -140,12 +118,11 @@ class StorageObject implements ObjectInterface
     public function rename(string $newName): ObjectInterface
     {
         try {
-            $this->address = $this->bucket->rename($this->name, $newName);
+            $this->bucket->rename($this->name, $newName);
+            $this->name = $newName;
         } catch (BucketException $e) {
             throw new ObjectException($e->getMessage(), $e->getCode(), $e);
         }
-
-        $this->name = $newName;
 
         return $this;
     }
@@ -153,16 +130,13 @@ class StorageObject implements ObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function copy($destination): ObjectInterface
+    public function copy(BucketInterface $destination): ObjectInterface
     {
-        if (is_string($destination)) {
-            $destination = $this->storage->getBucket($destination);
-        }
-
         $object = clone $this;
         $object->bucket = $destination;
+
         try {
-            $object->address = $this->bucket->copy($destination, $this->name);
+            $this->bucket->copy($destination, $this->name);
         } catch (BucketException $e) {
             throw new ObjectException($e->getMessage(), $e->getCode(), $e);
         }
@@ -173,18 +147,14 @@ class StorageObject implements ObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function replace($destination): ObjectInterface
+    public function replace(BucketInterface $destination): ObjectInterface
     {
-        if (is_string($destination)) {
-            $destination = $this->storage->getBucket($destination);
-        }
         try {
-            $this->address = $this->bucket->replace($destination, $this->name);
+            $this->bucket->replace($destination, $this->name);
+            $this->bucket = $destination;
         } catch (BucketException $e) {
             throw new ObjectException($e->getMessage(), $e->getCode(), $e);
         }
-
-        $this->bucket = $destination;
 
         return $this;
     }
@@ -194,6 +164,6 @@ class StorageObject implements ObjectInterface
      */
     public function __toString(): string
     {
-        return $this->address;
+        return $this->bucket->buildAddress($this->name);
     }
 }

@@ -6,13 +6,13 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Servers;
+namespace Spiral\Storage\Server;
 
 use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
 use Spiral\Streams\StreamWrapper;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Exceptions\ServerException;
+use Spiral\Storage\Exception\ServerException;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**

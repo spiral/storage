@@ -7,9 +7,9 @@
 namespace Spiral\Tests\Storage\RackspaceServer;
 
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Entities\StorageBucket;
+use Spiral\Storage\Entity\StorageBucket;
 use Spiral\Storage\ServerInterface;
-use Spiral\Storage\Servers\RackspaceServer;
+use Spiral\Storage\Server\RackspaceServer;
 
 trait ServerTrait
 {

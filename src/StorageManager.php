@@ -11,9 +11,9 @@ namespace Spiral\Storage;
 use Spiral\Core\Container\InjectorInterface;
 use Spiral\Core\FactoryInterface;
 use Spiral\Storage\Configs\StorageConfig;
-use Spiral\Storage\Entities\StorageBucket;
-use Spiral\Storage\Entities\StorageObject;
-use Spiral\Storage\Exceptions\StorageException;
+use Spiral\Storage\Entity\StorageBucket;
+use Spiral\Storage\Entity\StorageObject;
+use Spiral\Storage\Exception\StorageException;
 
 /**
  * Default implementation of StorageInterface. Please note that StorageManager component provides

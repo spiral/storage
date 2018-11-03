@@ -6,14 +6,12 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Exceptions;
-
-use Spiral\Core\Exceptions\RuntimeException;
+namespace Spiral\Storage\Exception;
 
 /**
  * Generic storage exception.
  */
-class StorageException extends RuntimeException
+class StorageException extends \RuntimeException
 {
 
 }

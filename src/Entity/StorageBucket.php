@@ -6,26 +6,25 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Entities;
+namespace Spiral\Storage\Entity;
 
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Log\LoggerAwareInterface;
 use Spiral\Core\Container\InjectableInterface;
 use Spiral\Debug\Traits\BenchmarkTrait;
-use Spiral\Debug\Traits\LoggerTrait;
-use Spiral\Streams\StreamableInterface;
+use Spiral\Logger\Traits\LoggerTrait;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Exceptions\BucketException;
-use Spiral\Storage\Exceptions\ServerException;
+use Spiral\Storage\Exception\BucketException;
+use Spiral\Storage\Exception\ServerException;
 use Spiral\Storage\ServerInterface;
 use Spiral\Storage\StorageManager;
+use Spiral\Streams\StreamableInterface;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Default implementation of storage bucket.
  */
-//todo: sprintf
 class StorageBucket implements BucketInterface, LoggerAwareInterface, InjectableInterface
 {
     use BenchmarkTrait, LoggerTrait;
@@ -134,7 +133,11 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
             $this->getName()
         ));
 
-        $benchmark = $this->benchmark($this->getName(), "exists::{$this->buildAddress($name)}");
+        $benchmark = $this->benchmark(
+            $this->getName(),
+            "exists::{$this->buildAddress($name)}"
+        );
+
         try {
             return (bool)$this->server->exists($this, $name);
         } catch (ServerException$e) {
@@ -155,7 +158,11 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
             $this->getName()
         ));
 
-        $benchmark = $this->benchmark($this->getName(), "size::{$this->buildAddress($name)}");
+        $benchmark = $this->benchmark(
+            $this->getName(),
+            "size::{$this->buildAddress($name)}"
+        );
+
         try {
             return $this->server->size($this, $name);
         } catch (ServerException$e) {
@@ -185,7 +192,11 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
             $source = stream_for($source);
         }
 
-        $benchmark = $this->benchmark($this->getName(), "put::{$this->buildAddress($name)}");
+        $benchmark = $this->benchmark(
+            $this->getName(),
+            "put::{$this->buildAddress($name)}"
+        );
+
         try {
             $this->server->put($this, $name, $source);
 
@@ -210,7 +221,8 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
         ));
 
         $benchmark = $this->benchmark(
-            $this->getName(), "filename::{$this->buildAddress($name)}"
+            $this->getName(),
+            "filename::{$this->buildAddress($name)}"
         );
 
         try {
@@ -234,7 +246,8 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
         ));
 
         $benchmark = $this->benchmark(
-            $this->getName(), "stream::{$this->buildAddress($name)}"
+            $this->getName(),
+            "stream::{$this->buildAddress($name)}"
         );
 
         try {
@@ -258,7 +271,8 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
         ));
 
         $benchmark = $this->benchmark(
-            $this->getName(), "delete::{$this->buildAddress($name)}"
+            $this->getName(),
+            "delete::{$this->buildAddress($name)}"
         );
 
         try {
@@ -287,7 +301,8 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
         ));
 
         $benchmark = $this->benchmark(
-            $this->getName(), "rename::{$this->buildAddress($oldName)}"
+            $this->getName(),
+            "rename::{$this->buildAddress($oldName)}"
         );
 
         try {
@@ -320,7 +335,8 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
             ));
 
             $benchmark = $this->benchmark(
-                $this->getName(), "copy::{$this->buildAddress($name)}"
+                $this->getName(),
+                "copy::{$this->buildAddress($name)}"
             );
 
             try {
@@ -366,7 +382,8 @@ class StorageBucket implements BucketInterface, LoggerAwareInterface, Injectable
             ));
 
             $benchmark = $this->benchmark(
-                $this->getName(), "replace::{$this->buildAddress($name)}"
+                $this->getName(),
+                "replace::{$this->buildAddress($name)}"
             );
 
             try {

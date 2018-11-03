@@ -10,8 +10,8 @@ namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
 use Spiral\Streams\StreamableInterface;
-use Spiral\Storage\Exceptions\BucketException;
-use Spiral\Storage\Exceptions\StorageException;
+use Spiral\Storage\Exception\BucketException;
+use Spiral\Storage\Exception\StorageException;
 
 /**
  * Abstraction level between remote storage and local filesystem. Provides set of generic file

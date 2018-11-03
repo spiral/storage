@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  ftp_storage:
+    image: stilliard/pure-ftpd:hardened
+    ports:
+    - "11433:1433"
+    environment:
+
+
+#  sftp_storage:
+#    image: mysql:latest
+#    restart: 'always'
+#    command: --default-authentication-plugin=mysql_native_password
+#    ports:
+#    - "13306:3306"
+#    environment:
+#      MYSQL_DATABASE: "spiral"
+#      MYSQL_ROOT_PASSWORD: "root"
+#      MYSQL_ROOT_HOST: "%"
+#
+#  mongodb_storage:
+#    image: mysql:5.5
+#    restart: 'always'
+#    ports:
+#    - "13305:3306"
+#    environment:
+#      MYSQL_DATABASE: "spiral"
+#      MYSQL_ROOT_PASSWORD: "root"
+#      MYSQL_ROOT_HOST: "%"
+#
+#  s3_storage:
+#    image: postgres:11
+#    restart: always
+#    ports:
+#    - "15432:5432"
+#    environment:
+#      POSTGRES_DB: "spiral"
+#      POSTGRES_USER: "postgres"
+#      POSTGRES_PASSWORD: "postgres"

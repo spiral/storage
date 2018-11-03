@@ -9,9 +9,9 @@ namespace Spiral\Tests\Storage\GridFSServer;
 use MongoDB\Database;
 use MongoDB\Driver\Manager;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Entities\StorageBucket;
+use Spiral\Storage\Entity\StorageBucket;
 use Spiral\Storage\ServerInterface;
-use Spiral\Storage\Servers\GridFSServer;
+use Spiral\Storage\Server\GridFSServer;
 
 trait ServerTrait
 {

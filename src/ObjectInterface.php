@@ -8,8 +8,8 @@
 
 namespace Spiral\Storage;
 
+use Spiral\Storage\Exception\ObjectException;
 use Spiral\Streams\StreamableInterface;
-use Spiral\Storage\Exceptions\ObjectException;
 
 /**
  * Representation of a single storage object. Technically this is only helper interface, does not
@@ -85,22 +85,22 @@ interface ObjectInterface extends StreamableInterface
      * Copy storage object to another bucket. Method must return ObjectInterface which points to
      * new storage object.
      *
-     * @param BucketInterface|string $destination
+     * @param BucketInterface $destination
      *
      * @return self
      * @throws ObjectException
      */
-    public function copy($destination): ObjectInterface;
+    public function copy(BucketInterface $destination): ObjectInterface;
 
     /**
      * Move storage object data to another bucket.
      *
-     * @param BucketInterface|string $destination
+     * @param BucketInterface $destination
      *
      * @return self
      * @throws ObjectException
      */
-    public function replace($destination): ObjectInterface;
+    public function replace(BucketInterface $destination): ObjectInterface;
 
     /**
      * Must be serialized into object address.

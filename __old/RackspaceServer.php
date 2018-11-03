@@ -6,7 +6,7 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Servers;
+namespace Spiral\Storage\Server;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -22,7 +22,7 @@ use Psr\SimpleCache\CacheInterface;
 use Spiral\Debug\Traits\LoggerTrait;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Exceptions\ServerException;
+use Spiral\Storage\Exception\ServerException;
 use function GuzzleHttp\Psr7\mimetype_from_filename;
 
 /**

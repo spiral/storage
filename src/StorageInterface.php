@@ -10,10 +10,10 @@ namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
 use Spiral\Streams\StreamableInterface;
-use Spiral\Storage\Exceptions\BucketException;
-use Spiral\Storage\Exceptions\ObjectException;
-use Spiral\Storage\Exceptions\ServerException;
-use Spiral\Storage\Exceptions\StorageException;
+use Spiral\Storage\Exception\BucketException;
+use Spiral\Storage\Exception\ObjectException;
+use Spiral\Storage\Exception\ServerException;
+use Spiral\Storage\Exception\StorageException;
 
 /**
  * Abstraction level to work with local and remote files represented using storage objects and

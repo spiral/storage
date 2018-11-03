@@ -7,7 +7,7 @@
 namespace Spiral\Tests\Storage;
 
 use Mockery as m;
-use Spiral\Storage\Entities\StorageBucket;
+use Spiral\Storage\Entity\StorageBucket;
 use Spiral\Storage\ServerInterface;
 
 class BucketTest extends \PHPUnit_Framework_TestCase

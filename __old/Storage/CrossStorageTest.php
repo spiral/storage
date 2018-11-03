@@ -12,7 +12,7 @@ use Psr\Http\Message\StreamInterface;
 use Spiral\Core\Container;
 use Spiral\Storage\Configs\StorageConfig;
 use Spiral\Storage\ObjectInterface;
-use Spiral\Storage\Servers;
+use Spiral\Storage\Server;
 use Spiral\Storage\StorageManager;
 
 class CrossStorageTest extends \PHPUnit_Framework_TestCase
@@ -62,7 +62,7 @@ class CrossStorageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Spiral\Storage\Exceptions\StorageException
+     * @expectedException \Spiral\Storage\Exception\StorageException
      * @expectedExceptionMessage Unable to locate bucket for a given address 'invalid'
      */
     public function testFailBucketLocation()
@@ -204,27 +204,27 @@ class CrossStorageTest extends \PHPUnit_Framework_TestCase
         $config = new StorageConfig([
             'servers' => [
                 'local'     => [
-                    'class'   => Servers\LocalServer::class,
+                    'class'   => Server\LocalServer::class,
                     'options' => [
                         'home' => __DIR__ . '/Servers/LocalServer/fixtures/'
                     ]
                 ],
                 'amazon'    => [
-                    'class'   => Servers\AmazonServer::class,
+                    'class'   => Server\AmazonServer::class,
                     'options' => [
                         'accessKey' => env('STORAGE_AMAZON_KEY'),
                         'secretKey' => env('STORAGE_AMAZON_SECRET'),
                     ]
                 ],
                 'rackspace' => [
-                    'class'   => Servers\RackspaceServer::class,
+                    'class'   => Server\RackspaceServer::class,
                     'options' => [
                         'username' => env('STORAGE_RACKSPACE_USERNAME'),
                         'apiKey'   => env('STORAGE_RACKSPACE_API_KEY')
                     ]
                 ],
                 'ftp'       => [
-                    'class'   => Servers\FtpServer::class,
+                    'class'   => Server\FtpServer::class,
                     'options' => [
                         'host'     => env('STORAGE_FTP_HOST'),
                         'login'    => env('STORAGE_FTP_USERNAME'),
@@ -232,7 +232,7 @@ class CrossStorageTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'sftp'      => [
-                    'class'   => Servers\SftpServer::class,
+                    'class'   => Server\SftpServer::class,
                     'options' => [
                         'host'       => env('STORAGE_SFTP_HOST'),
                         'home'       => env('STORAGE_SFTP_HOME'),
@@ -242,7 +242,7 @@ class CrossStorageTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'gridFS'    => [
-                    'class'   => Servers\GridFSServer::class,
+                    'class'   => Server\GridFSServer::class,
                     'options' => []
                 ],
             ],

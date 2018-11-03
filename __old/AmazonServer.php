@@ -7,7 +7,7 @@
  * @copyright ©2009-2011
  */
 
-namespace Spiral\Storage\Servers;
+namespace Spiral\Storage\Server;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -20,7 +20,7 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Exceptions\ServerException;
+use Spiral\Storage\Exception\ServerException;
 use function GuzzleHttp\Psr7\mimetype_from_filename;
 
 /**
