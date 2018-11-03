@@ -6,19 +6,16 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Entity;
+namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
-use Spiral\Core\Exceptions\ScopeException;
-use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exception\BucketException;
 use Spiral\Storage\Exception\ObjectException;
-use Spiral\Storage\ObjectInterface;
 
 /**
  * Default implementation of storage object. This is immutable class.
  */
-class StorageObject implements ObjectInterface
+final class StorageObject implements ObjectInterface
 {
     /** @var BucketInterface */
     private $bucket = null;

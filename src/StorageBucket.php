@@ -6,7 +6,7 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Entity;
+namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -14,18 +14,15 @@ use Psr\Log\LoggerAwareInterface;
 use Spiral\Core\Container\InjectableInterface;
 use Spiral\Debug\Traits\BenchmarkTrait;
 use Spiral\Logger\Traits\LoggerTrait;
-use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exception\BucketException;
 use Spiral\Storage\Exception\ServerException;
-use Spiral\Storage\ServerInterface;
-use Spiral\Storage\StorageManager;
 use Spiral\Streams\StreamableInterface;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * Default implementation of storage bucket.
  */
-class StorageBucket implements BucketInterface, LoggerAwareInterface, InjectableInterface
+final class StorageBucket implements BucketInterface, LoggerAwareInterface, InjectableInterface
 {
     use BenchmarkTrait, LoggerTrait;
 
