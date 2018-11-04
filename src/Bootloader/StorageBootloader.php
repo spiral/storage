@@ -23,6 +23,7 @@ class StorageBootloader extends Bootloader
 
     const SINGLETONS = [
         StorageInterface::class => StorageManager::class,
+        StorageManager::class   => StorageManager::class
     ];
 
     const BINDINGS = [

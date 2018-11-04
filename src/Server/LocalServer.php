@@ -25,7 +25,6 @@ class LocalServer extends AbstractServer
      */
     public function disconnect()
     {
-
     }
 
     /**
