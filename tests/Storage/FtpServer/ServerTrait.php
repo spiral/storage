@@ -1,29 +1,32 @@
 <?php
 /**
- * Spiral, Core Components
+ * Spiral Framework.
  *
- * @author Wolfy-J
+ * @license   MIT
+ * @author    Anton Titov (Wolfy-J)
  */
-namespace Spiral\Tests\Storage\FtpServer;
+
+namespace Spiral\Storage\Tests\FtpServer;
 
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Entities\StorageBucket;
+use Spiral\Storage\Server\FtpServer;
 use Spiral\Storage\ServerInterface;
-use Spiral\Storage\Servers\FtpServer;
+use Spiral\Storage\StorageBucket;
 
 trait ServerTrait
 {
+    protected static $server;
     protected $bucket;
     protected $secondary;
-    protected $server;
 
-    public function setUp()
+    protected function getServer(): ServerInterface
     {
-        if (empty(env('STORAGE_FTP_USERNAME'))) {
-            $this->skipped = true;
-            $this->markTestSkipped('FTP credentials are not set');
-        }
+        return self::$server ?? self::$server = new FtpServer([
+                'host'     => self::$OPTS['ftp']['host'],
+                'username' => self::$OPTS['ftp']['username'],
+                'password' => self::$OPTS['ftp']['password']
+            ]);
     }
 
     protected function getBucket(): BucketInterface
@@ -33,13 +36,13 @@ trait ServerTrait
         }
 
         $bucket = new StorageBucket(
+            $this->getServer(),
             'ftp',
-            env('STORAGE_FTP_PREFIX'),
+            'ftp:',
             [
-                'directory' => env('STORAGE_FTP_DIRECTORY'),
+                'directory' => '/',
                 'mode'      => FilesInterface::READONLY
-            ],
-            $this->getServer()
+            ]
         );
 
         $bucket->setLogger($this->makeLogger());
@@ -47,33 +50,24 @@ trait ServerTrait
         return $this->bucket = $bucket;
     }
 
-    protected function secondaryBucket(): BucketInterface
+    protected function getSecondaryBucket(): BucketInterface
     {
         if (!empty($this->secondary)) {
             return $this->secondary;
         }
 
         $bucket = new StorageBucket(
+            $this->getServer(),
             'ftp-2',
-            env('STORAGE_FTP_PREFIX_2'),
+            'ftp2:',
             [
-                'directory' => env('STORAGE_FTP_DIRECTORY_2'),
+                'directory' => 'ftp2/',
                 'mode'      => FilesInterface::READONLY
-            ],
-            $this->getServer()
+            ]
         );
 
         $bucket->setLogger($this->makeLogger());
 
         return $this->secondary = $bucket;
-    }
-
-    protected function getServer(): ServerInterface
-    {
-        return $this->server ?? $this->server = new FtpServer([
-                'host'     => env('STORAGE_FTP_HOST'),
-                'login'    => env('STORAGE_FTP_USERNAME'),
-                'password' => env('STORAGE_FTP_PASSWORD')
-            ]);
     }
 }

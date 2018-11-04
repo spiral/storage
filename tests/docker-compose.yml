@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  ftp_storage:
+    image: stilliard/pure-ftpd:hardened
+    ports:
+    - "21:21"
+    - "30000-30009:30000-30009"
+    environment:
+    - "FTP_USER_NAME=phpunit"
+    - "FTP_USER_PASS=phpunit"
+    - "FTP_USER_HOME=/home/phpunit"
+    command: "/run.sh -l puredb:/etc/pure-ftpd/pureftpd.pdb -E -j -P localhost -s -A -j -Z -H -4 -E -X -x"
+
+  sftp_storage:
+    image: atmoz/sftp
+    restart: 'always'
+    ports:
+    - "2222:22"
+    command: phpunit:phpunit:::upload
+
+  mongo_storage:
+    image: mongo
+    restart: 'always'
+    ports:
+    - "27017:27017"
+
+  s3_storage:
+    image: adobe/s3mock
+    restart: always
+    ports:
+    - "9190:9190"
+    - "9191:9191"

@@ -4,19 +4,24 @@
  *
  * @author Wolfy-J
  */
-namespace Spiral\Tests\Storage\LocalServer;
+
+namespace Spiral\Storage\Tests\LocalServer;
 
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Entities\StorageBucket;
+use Spiral\Storage\Server\LocalServer;
 use Spiral\Storage\ServerInterface;
-use Spiral\Storage\Servers\LocalServer;
+use Spiral\Storage\StorageBucket;
 
 trait ServerTrait
 {
+    protected $server;
     protected $bucket;
     protected $secondary;
 
-    protected $server;
+    protected function getServer(): ServerInterface
+    {
+        return $this->server ?? $this->server = new LocalServer(['home' => self::$OPTS['home']]);
+    }
 
     protected function getBucket(): BucketInterface
     {
@@ -25,10 +30,10 @@ trait ServerTrait
         }
 
         $bucket = new StorageBucket(
+            $this->getServer(),
             'files',
             'file:',
-            ['directory' => '/'],
-            $this->getServer()
+            ['directory' => '/']
         );
 
         $bucket->setLogger($this->makeLogger());
@@ -36,26 +41,21 @@ trait ServerTrait
         return $this->bucket = $bucket;
     }
 
-    protected function secondaryBucket(): BucketInterface
+    protected function getSecondaryBucket(): BucketInterface
     {
         if (!empty($this->secondary)) {
             return $this->secondary;
         }
 
         $bucket = new StorageBucket(
+            $this->getServer(),
             'files-2',
             'file-2:',
-            ['directory' => '/secondary/'],
-            $this->getServer()
+            ['directory' => '/secondary/']
         );
 
         $bucket->setLogger($this->makeLogger());
 
         return $this->secondary = $bucket;
-    }
-
-    protected function getServer(): ServerInterface
-    {
-        return $this->server?? $this->server = new LocalServer(['home' => __DIR__ . '/fixtures/']);
     }
 }

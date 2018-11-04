@@ -10,18 +10,16 @@
          processIsolation="false"
          stopOnFailure="false"
          stopOnError="false"
-         syntaxCheck="true"
-        >
-
+>
     <testsuites>
-        <testsuite name="Spiral Framework Core Tests">
+        <testsuite name="Storage API layer Tests">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory>source/Spiral</directory>
+            <directory>src</directory>
         </whitelist>
     </filter>
 </phpunit>

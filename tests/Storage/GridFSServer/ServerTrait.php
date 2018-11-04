@@ -4,14 +4,15 @@
  *
  * @author Wolfy-J
  */
-namespace Spiral\Tests\Storage\GridFSServer;
+
+namespace Spiral\Storage\Tests\GridFSServer;
 
 use MongoDB\Database;
 use MongoDB\Driver\Manager;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Entities\StorageBucket;
+use Spiral\Storage\Server\GridFSServer;
 use Spiral\Storage\ServerInterface;
-use Spiral\Storage\Servers\GridFSServer;
+use Spiral\Storage\StorageBucket;
 
 trait ServerTrait
 {
@@ -19,12 +20,14 @@ trait ServerTrait
     protected $secondary;
     protected $server;
 
-    public function setUp()
+    protected function getServer(): ServerInterface
     {
-        if (empty(env('MONGO_DATABASE'))) {
-            $this->skipped = true;
-            $this->markTestSkipped('Mongo credentials are not set');
-        }
+        return $this->server ?? $this->server = new GridFSServer(
+                new Database(
+                    new Manager(self::$OPTS['mongodb']['conn']),
+                    self::$OPTS['mongodb']['database']
+                )
+            );
     }
 
     protected function getBucket(): BucketInterface
@@ -34,10 +37,10 @@ trait ServerTrait
         }
 
         $bucket = new StorageBucket(
+            $this->getServer(),
             'mongo',
             'mongo:',
-            ['bucket' => 'grid-fs'],
-            $this->getServer()
+            ['bucket' => 'grid-fs']
         );
 
         $bucket->setLogger($this->makeLogger());
@@ -45,28 +48,21 @@ trait ServerTrait
         return $this->bucket = $bucket;
     }
 
-    protected function secondaryBucket(): BucketInterface
+    protected function getSecondaryBucket(): BucketInterface
     {
         if (!empty($this->secondary)) {
             return $this->secondary;
         }
 
         $bucket = new StorageBucket(
+            $this->getServer(),
             'mongo-2',
             'mongo-2:',
-            ['bucket' => 'grid-fs-2'],
-            $this->getServer()
+            ['bucket' => 'grid-fs-2']
         );
 
         $bucket->setLogger($this->makeLogger());
 
         return $this->secondary = $bucket;
-    }
-
-    protected function getServer(): ServerInterface
-    {
-        return $this->server ?? $this->server = new GridFSServer(
-                new Database(new Manager(env('MONGO_CONNECTION')), env('MONGO_DATABASE'))
-            );
     }
 }

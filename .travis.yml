@@ -1,13 +1,19 @@
 language: php
 
+sudo: required
+
 services:
-  - mongodb
+- docker
 
 php:
-  - 7.0
   - 7.1
+  - 7.2
+  - nightly
 
 before_install:
+  - cd tests
+  - docker-compose up -d
+  - cd ..
   - composer self-update
   - phpenv config-add tests/php-travis.ini
 
@@ -15,4 +21,7 @@ install:
   - composer install --no-interaction --prefer-source
 
 script:
-  - phpunit
+  - vendor/bin/phpunit --coverage-clover=coverage.xml
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -f coverage.xml

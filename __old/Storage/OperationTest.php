@@ -1,22 +1,22 @@
 <?php
 /**
- * Spiral Framework.
+ * Spiral, Core Components
  *
- * @license   MIT
- * @author    Anton Titov (Wolfy-J)
+ * @author Wolfy-J
  */
 
-namespace Spiral\Storage\Tests;
+namespace Spiral\Tests\Storage;
 
-use Mockery as m;
 use Psr\Http\Message\StreamInterface;
-use Spiral\Storage\ServerInterface;
-use Spiral\Storage\StorageBucket;
 
-abstract class BucketTest extends BaseTest
+abstract class OperationTest extends BaseTest
 {
     public function tearDown()
     {
+        if ($this->skipped) {
+            return;
+        }
+
         $this->getBucket()->exists('target') && $this->getBucket()->delete('target');
         $this->getBucket()->exists('targetB') && $this->getBucket()->delete('targetB');
         $this->getBucket()->exists('targetDir/targetName') && $this->getBucket()->delete('targetDir/targetName');
@@ -35,6 +35,7 @@ abstract class BucketTest extends BaseTest
 
         $content = random_bytes(mt_rand(100, 100000));
         $bucket->put('target', $content);
+        $this->assertTrue($bucket->exists('target'));
     }
 
     public function testPutEmptyString()
@@ -54,7 +55,7 @@ abstract class BucketTest extends BaseTest
 
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
         $bucket->put('target', $content);
 
         $this->assertTrue($bucket->exists('target'));
@@ -66,7 +67,7 @@ abstract class BucketTest extends BaseTest
 
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
         $bucket->put('targetDir/targetName', $content);
 
         $this->assertTrue($bucket->exists('targetDir/targetName'));
@@ -102,7 +103,7 @@ abstract class BucketTest extends BaseTest
 
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
         $address = $bucket->put('target', $content);
 
         $this->assertNotNull($address);
@@ -115,7 +116,7 @@ abstract class BucketTest extends BaseTest
 
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
         $bucket->put('target', $content);
 
         $content->rewind();
@@ -155,7 +156,7 @@ abstract class BucketTest extends BaseTest
         $bucket = $this->getBucket();
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
         $bucket->put('target', $content);
 
         $this->assertTrue($bucket->exists('target'));
@@ -174,7 +175,7 @@ abstract class BucketTest extends BaseTest
         $bucket = $this->getBucket();
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
 
         $bucket->put('target', $content);
         $this->assertTrue($bucket->exists('target'));
@@ -195,7 +196,7 @@ abstract class BucketTest extends BaseTest
         $bucket = $this->getBucket();
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
 
         $bucket->put('target', $content);
         $this->assertTrue($bucket->exists('target'));
@@ -215,7 +216,7 @@ abstract class BucketTest extends BaseTest
         $bucket = $this->getBucket();
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
 
         $bucket->put('target', $content);
         $this->assertTrue($bucket->exists('target'));
@@ -243,7 +244,7 @@ abstract class BucketTest extends BaseTest
         $bucket = $this->getBucket();
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
 
         $bucket->put('target', $content);
         $this->assertTrue($bucket->exists('target'));
@@ -256,7 +257,7 @@ abstract class BucketTest extends BaseTest
         $this->assertSame($content->getSize(), $stream->getSize());
         $this->assertSame($content->getContents(), $stream->getContents());
 
-        $newContent = $this->generateStream();
+        $newContent = $this->getStreamSource();
 
         $bucket->put('target', $newContent);
         $this->assertTrue($bucket->exists('target'));
@@ -275,7 +276,7 @@ abstract class BucketTest extends BaseTest
         $bucket = $this->getBucket();
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
 
         $bucket->put('target', $content);
         $this->assertTrue($bucket->exists('target'));
@@ -304,7 +305,7 @@ abstract class BucketTest extends BaseTest
 
         $this->assertFalse($bucket->exists('target'));
 
-        $content = $this->generateStream();
+        $content = $this->getStreamSource();
 
         $bucket->put('target', $content);
         $this->assertTrue($bucket->exists('target'));
@@ -322,21 +323,5 @@ abstract class BucketTest extends BaseTest
 
         $this->assertFalse($bucket->exists('target'));
         $bucket->delete('target');
-    }
-
-    public function testWithOptions()
-    {
-        $bucket = new StorageBucket(
-            m::mock(ServerInterface::class),
-            'bucket',
-            'bucket:',
-            ['name' => 'value']
-        );
-
-        $this->assertSame('value', $bucket->getOption('name'));
-
-        $bucket1 = $bucket->withOption('name', 'value1');
-        $this->assertSame('value', $bucket->getOption('name'));
-        $this->assertSame('value1', $bucket1->getOption('name'));
     }
 }

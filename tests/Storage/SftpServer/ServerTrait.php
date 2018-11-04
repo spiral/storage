@@ -1,29 +1,34 @@
 <?php
 /**
- * Spiral, Core Components
+ * Spiral Framework.
  *
- * @author Wolfy-J
+ * @license   MIT
+ * @author    Anton Titov (Wolfy-J)
  */
-namespace Spiral\Tests\Storage\SftpServer;
+
+namespace Spiral\Storage\Tests\SftpServer;
 
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Entities\StorageBucket;
+use Spiral\Storage\Server\SftpServer;
 use Spiral\Storage\ServerInterface;
-use Spiral\Storage\Servers\SftpServer;
+use Spiral\Storage\StorageBucket;
 
 trait ServerTrait
 {
+    protected static $server;
     protected $bucket;
     protected $secondary;
-    protected $server;
 
-    public function setUp()
+    protected function getServer(): ServerInterface
     {
-        if (empty(env('STORAGE_SFTP_USERNAME'))) {
-            $this->skipped = true;
-            $this->markTestSkipped('SFTP credentials are not set');
-        }
+        return self::$server ?? self::$server = new SftpServer([
+                'host'     => self::$OPTS['sftp']['host'],
+                'port'     => 2222,
+                'username' => self::$OPTS['sftp']['username'],
+                'password' => self::$OPTS['sftp']['password'],
+                'home'     => '/upload',
+            ]);
     }
 
     protected function getBucket(): BucketInterface
@@ -33,13 +38,13 @@ trait ServerTrait
         }
 
         $bucket = new StorageBucket(
+            $this->getServer(),
             'sftp',
-            env('STORAGE_SFTP_PREFIX'),
+            'sftp:',
             [
-                'directory' => env('STORAGE_SFTP_DIRECTORY'),
+                'directory' => '/',
                 'mode'      => FilesInterface::READONLY
-            ],
-            $this->getServer()
+            ]
         );
 
         $bucket->setLogger($this->makeLogger());
@@ -47,34 +52,24 @@ trait ServerTrait
         return $this->bucket = $bucket;
     }
 
-    protected function secondaryBucket(): BucketInterface
+    protected function getSecondaryBucket(): BucketInterface
     {
         if (!empty($this->secondary)) {
             return $this->secondary;
         }
 
         $bucket = new StorageBucket(
+            $this->getServer(),
             'sftp-2',
-            env('STORAGE_SFTP_PREFIX_2'),
+            'sftp2:',
             [
-                'directory' => env('STORAGE_SFTP_DIRECTORY_2'),
+                'directory' => '/sftp2/',
                 'mode'      => FilesInterface::READONLY
-            ],
-            $this->getServer()
+            ]
         );
 
         $bucket->setLogger($this->makeLogger());
 
         return $this->secondary = $bucket;
-    }
-
-    protected function getServer(): ServerInterface
-    {
-        return $this->server ?? $this->server = new SftpServer([
-                'host'     => env('STORAGE_SFTP_HOST'),
-                'username' => env('STORAGE_SFTP_USERNAME'),
-                'password' => env('STORAGE_SFTP_PASSWORD'),
-                'home'     => env('STORAGE_SFTP_HOME'),
-            ]);
     }
 }
