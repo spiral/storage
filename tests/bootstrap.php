@@ -28,4 +28,9 @@ require dirname(__DIR__) . '/vendor/autoload.php';
         'username' => 'phpunit',
         'password' => 'phpunit'
     ],
+    'amazon'  => [
+        'server' => 'http://localhost:9090',
+        'key'    => '',
+        'secret' => ''
+    ],
 ];

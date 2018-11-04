@@ -12,6 +12,7 @@ namespace Spiral\Storage\Server;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\RequestInterface;
@@ -33,10 +34,10 @@ class AmazonServer extends AbstractServer
      * @var array
      */
     protected $options = [
-        'server'    => 'https://s3.amazonaws.com',
-        'timeout'   => 0,
-        'accessKey' => '',
-        'secretKey' => ''
+        'server'  => 'https://s3.amazonaws.com',
+        'timeout' => 240,
+        'key'     => '',
+        'secret'  => ''
     ];
 
     /**
@@ -49,17 +50,24 @@ class AmazonServer extends AbstractServer
      * @param array               $options
      * @param FilesInterface|null $files
      */
-    public function __construct(array $options, FilesInterface $files)
+    public function __construct(array $options, FilesInterface $files = null)
     {
         parent::__construct($options, $files);
         $this->client = new Client($this->options);
     }
 
     /**
+     * @inheritdoc
+     */
+    public function disconnect()
+    {
+        // TODO: Implement disconnect() method.
+    }
+
+    /**
      * Version of driver with alternative client being set up.
      *
      * @param ClientInterface $client
-     *
      * @return self
      */
     public function withClient(ClientInterface $client): AmazonServer
@@ -74,7 +82,6 @@ class AmazonServer extends AbstractServer
      * {@inheritdoc}
      *
      * @param ResponseInterface $response Reference.
-     *
      * @return bool|ResponseInterface
      */
     public function exists(
@@ -83,18 +90,14 @@ class AmazonServer extends AbstractServer
         ResponseInterface &$response = null
     ): bool {
         try {
-            $response = $this->client->send($this->buildRequest(
-                'HEAD',
-                $bucket,
-                $name
-            ));
-        } catch (ClientException $e) {
+            $response = $this->client->send($this->buildRequest('HEAD', $bucket, $name));
+        } catch (GuzzleException $e) {
             if ($e->getCode() == 404) {
                 return false;
             }
 
             //Something wrong with connection
-            throw $e;
+            throw new ServerException($e->getMessage(), $e->getCode(), $e);
         }
 
         if ($response->getStatusCode() !== 200) {
@@ -340,10 +343,10 @@ class AmazonServer extends AbstractServer
 
         return $request->withAddedHeader(
             'Authorization',
-            'AWS ' . $this->options['accessKey'] . ':' . base64_encode(hash_hmac(
+            'AWS ' . $this->options['key'] . ':' . base64_encode(hash_hmac(
                 'sha1',
                 join("\n", $signature),
-                $this->options['secretKey'],
+                $this->options['secret'],
                 true
             ))
         );

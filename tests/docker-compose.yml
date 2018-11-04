@@ -29,5 +29,8 @@ services:
     image: adobe/s3mock
     restart: always
     ports:
-    - "9190:9190"
+    - "9090:9090"
     - "9191:9191"
+    environment:
+    - "initialBuckets=aws1,aws2"
+    - "validKmsKeys=arn:aws:kms:us-east-1:47110815:key/c51fdeea-f623-4a2b-90b5-15d72963cf9d,arn:aws:kms:us-east-1:47110815:key/c4353c4c-3318-460a-bdcc-b0a57bd8d9d8"
