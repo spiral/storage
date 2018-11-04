@@ -21,32 +21,15 @@ use Spiral\Streams\StreamableInterface;
  */
 interface StorageInterface
 {
-    public function disconnect();
-
     /**
-     * Register new bucket using it's options, server and prefix.
-     *
-     * @param string                 $name
-     * @param string                 $prefix
-     * @param ServerInterface|string $server  Instance of alias.
-     * @param array                  $options Server specific options.
-     *
-     * @return BucketInterface
-     *
-     * @throws StorageException
+     * Disconnect all the storage servers.
      */
-    public function createBucket(
-        string $name,
-        string $prefix,
-        $server,
-        array $options = []
-    ): BucketInterface;
+    public function disconnect();
 
     /**
      * Get bucket by it's name.
      *
      * @param string $bucket
-     *
      * @return BucketInterface
      *
      * @throws StorageException
@@ -54,22 +37,9 @@ interface StorageInterface
     public function getBucket(string $bucket): BucketInterface;
 
     /**
-     * Find bucket instance by object address.
-     *
-     * @param string $address
-     * @param string $name Name stripped from address.
-     *
-     * @return BucketInterface
-     *
-     * @throws StorageException
-     */
-    public function locateBucket(string $address, string &$name = null): BucketInterface;
-
-    /**
      * Get or create instance of storage server.
      *
      * @param string $server
-     *
      * @return ServerInterface
      *
      * @throws StorageException
@@ -83,7 +53,6 @@ interface StorageInterface
      * @param string|BucketInterface                    $bucket
      * @param string                                    $name
      * @param mixed|StreamInterface|StreamableInterface $source
-     *
      * @return ObjectInterface
      *
      * @throws StorageException
@@ -96,7 +65,6 @@ interface StorageInterface
      * Create instance of storage object using it's address.
      *
      * @param string $address
-     *
      * @return ObjectInterface
      *
      * @throws StorageException

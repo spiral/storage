@@ -66,6 +66,14 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     /**
      * {@inheritdoc}
      */
+    public function getPrefix(): string
+    {
+        return $this->prefix;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getServer(): ServerInterface
     {
         return $this->server;
@@ -88,27 +96,6 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     public function getOption(string $name, $default = null)
     {
         return isset($this->options[$name]) ? $this->options[$name] : $default;
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPrefix(): string
-    {
-        return $this->prefix;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasAddress(string $address)
-    {
-        if (strpos($address, $this->prefix) === 0) {
-            return strlen($this->prefix);
-        }
-
-        return false;
     }
 
     /**

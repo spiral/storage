@@ -9,9 +9,9 @@
 namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
-use Spiral\Streams\StreamableInterface;
 use Spiral\Storage\Exception\BucketException;
 use Spiral\Storage\Exception\StorageException;
+use Spiral\Streams\StreamableInterface;
 
 /**
  * Abstraction level between remote storage and local filesystem. Provides set of generic file
@@ -27,6 +27,13 @@ interface BucketInterface
     public function getName(): string;
 
     /**
+     * Get bucket prefix.
+     *
+     * @return string
+     */
+    public function getPrefix(): string;
+
+    /**
      * Associated storage server instance.
      *
      * @return ServerInterface
@@ -34,7 +41,6 @@ interface BucketInterface
      * @throws StorageException
      */
     public function getServer(): ServerInterface;
-
 
     /**
      * Get bucket version with some options changed.
@@ -58,22 +64,6 @@ interface BucketInterface
      * @return mixed
      */
     public function getOption(string $name, $default = null);
-
-    /**
-     * Get bucket prefix.
-     *
-     * @return string
-     */
-    public function getPrefix(): string;
-
-    /**
-     * Check if address be found in bucket namespace defined by bucket prefix.
-     *
-     * @param string $address
-     *
-     * @return bool|int Should return matched address length (change in future).
-     */
-    public function hasAddress(string $address);
 
     /**
      * Build object address using object name and bucket prefix. While using URL like prefixes

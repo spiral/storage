@@ -10,10 +10,13 @@ namespace Spiral\Storage\Config;
 
 use Spiral\Core\Container\Autowire;
 use Spiral\Core\InjectableConfig;
+use Spiral\Core\Traits\Config\AliasTrait;
 use Spiral\Storage\Exception\ConfigException;
 
 class StorageConfig extends InjectableConfig
 {
+    use AliasTrait;
+
     const CONFIG = 'storage';
 
     /** @var array */
@@ -21,6 +24,23 @@ class StorageConfig extends InjectableConfig
         'servers' => [],
         'buckets' => []
     ];
+
+    /**
+     * @return BucketResolver
+     */
+    public function getResolver(): BucketResolver
+    {
+        $prefixes = [];
+        foreach ($this->config['buckets'] as $name => $options) {
+            if (empty($options['prefix'])) {
+                continue;
+            }
+
+            $prefixes[$name] = $options['prefix'];
+        }
+
+        return new BucketResolver($prefixes);
+    }
 
     /**
      * @param string $server
@@ -58,12 +78,42 @@ class StorageConfig extends InjectableConfig
     }
 
     /**
-     * Every available bucket with it's config.
-     *
-     * @return array
+     * @param string $name
+     * @return bool
      */
-    public function getBuckets(): array
+    public function hasBucket(string $name): bool
     {
-        return $this->config['buckets'];
+        return isset($this->config['buckets'][$name]);
+    }
+
+    /**
+     * Get bucket options.
+     *
+     * @param string $name
+     * @return array
+     *
+     * @throws ConfigException
+     */
+    public function getBucket(string $name): array
+    {
+        if (!$this->hasBucket($name)) {
+            throw new ConfigException("Undefined bucket `{$name}`.");
+        }
+
+        $bucket = $this->config['buckets'][$name];
+
+        if (!array_key_exists('options', $bucket)) {
+            throw new ConfigException("Bucket `{$name}` must specify `options`.");
+        }
+
+        if (!array_key_exists('prefix', $bucket)) {
+            throw new ConfigException("Bucket `{$name}` must specify `prefix`.");
+        }
+
+        if (!array_key_exists('server', $bucket)) {
+            throw new ConfigException("Bucket `{$name}` must specify `server` name.");
+        }
+
+        return $bucket;
     }
 }
