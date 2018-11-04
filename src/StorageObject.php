@@ -9,8 +9,6 @@
 namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
-use Spiral\Storage\Exception\BucketException;
-use Spiral\Storage\Exception\ObjectException;
 
 /**
  * Default implementation of storage object. This is immutable class.
@@ -78,11 +76,7 @@ final class StorageObject implements ObjectInterface
      */
     public function localFilename(): string
     {
-        try {
-            return $this->bucket->allocateFilename($this->name);
-        } catch (BucketException $e) {
-            throw new ObjectException($e->getMessage(), $e->getCode(), $e);
-        }
+        return $this->bucket->allocateFilename($this->name);
     }
 
     /**
@@ -90,11 +84,7 @@ final class StorageObject implements ObjectInterface
      */
     public function getStream(): StreamInterface
     {
-        try {
-            return $this->bucket->allocateStream($this->name);
-        } catch (BucketException $e) {
-            throw new ObjectException($e->getMessage(), $e->getCode(), $e);
-        }
+        return $this->bucket->allocateStream($this->name);
     }
 
     /**
@@ -102,11 +92,7 @@ final class StorageObject implements ObjectInterface
      */
     public function delete()
     {
-        try {
-            $this->bucket->delete($this->name);
-        } catch (BucketException $e) {
-            throw new ObjectException($e->getMessage(), $e->getCode(), $e);
-        }
+        $this->bucket->delete($this->name);
     }
 
     /**
@@ -114,12 +100,8 @@ final class StorageObject implements ObjectInterface
      */
     public function rename(string $newName): ObjectInterface
     {
-        try {
-            $this->bucket->rename($this->name, $newName);
-            $this->name = $newName;
-        } catch (BucketException $e) {
-            throw new ObjectException($e->getMessage(), $e->getCode(), $e);
-        }
+        $this->bucket->rename($this->name, $newName);
+        $this->name = $newName;
 
         return $this;
     }
@@ -132,11 +114,7 @@ final class StorageObject implements ObjectInterface
         $object = clone $this;
         $object->bucket = $destination;
 
-        try {
-            $this->bucket->copy($destination, $this->name);
-        } catch (BucketException $e) {
-            throw new ObjectException($e->getMessage(), $e->getCode(), $e);
-        }
+        $this->bucket->copy($destination, $this->name);
 
         return $object;
     }
@@ -146,12 +124,8 @@ final class StorageObject implements ObjectInterface
      */
     public function replace(BucketInterface $destination): ObjectInterface
     {
-        try {
-            $this->bucket->replace($destination, $this->name);
-            $this->bucket = $destination;
-        } catch (BucketException $e) {
-            throw new ObjectException($e->getMessage(), $e->getCode(), $e);
-        }
+        $this->bucket->replace($destination, $this->name);
+        $this->bucket = $destination;
 
         return $this;
     }

@@ -8,7 +8,7 @@
 
 namespace Spiral\Storage;
 
-use Spiral\Storage\Exception\ObjectException;
+use Spiral\Storage\Exception\BucketException;
 use Spiral\Streams\StreamableInterface;
 
 /**
@@ -42,7 +42,8 @@ interface ObjectInterface extends StreamableInterface
      * Check if object exists.
      *
      * @return bool
-     * @throws ObjectException
+     *
+     * @throws BucketException
      */
     public function exists(): bool;
 
@@ -50,7 +51,8 @@ interface ObjectInterface extends StreamableInterface
      * Get object size or return false of object does not exists.
      *
      * @return int|bool
-     * @throws ObjectException
+     *
+     * @throws BucketException
      */
     public function getSize(): ?int;
 
@@ -60,14 +62,15 @@ interface ObjectInterface extends StreamableInterface
      * between sessions. You must never write anything to this file.
      *
      * @return string
-     * @throws ObjectException
+     *
+     * @throws BucketException
      */
     public function localFilename(): string;
 
     /**
      * Delete object from associated bucket.
      *
-     * @throws ObjectException
+     * @throws BucketException
      */
     public function delete();
 
@@ -75,9 +78,9 @@ interface ObjectInterface extends StreamableInterface
      * Rename storage object without changing it's bucket.
      *
      * @param string $newName
-     *
      * @return self
-     * @throws ObjectException
+     *
+     * @throws BucketException
      */
     public function rename(string $newName): ObjectInterface;
 
@@ -86,9 +89,9 @@ interface ObjectInterface extends StreamableInterface
      * new storage object.
      *
      * @param BucketInterface $destination
-     *
      * @return self
-     * @throws ObjectException
+     *
+     * @throws BucketException
      */
     public function copy(BucketInterface $destination): ObjectInterface;
 
@@ -96,9 +99,9 @@ interface ObjectInterface extends StreamableInterface
      * Move storage object data to another bucket.
      *
      * @param BucketInterface $destination
-     *
      * @return self
-     * @throws ObjectException
+     *
+     * @throws BucketException
      */
     public function replace(BucketInterface $destination): ObjectInterface;
 
