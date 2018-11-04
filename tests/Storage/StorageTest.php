@@ -27,13 +27,6 @@ class StorageTest extends TestCase
     protected static $storage;
     protected static $c;
 
-    public function tearDown()
-    {
-        if (self::$c != null) {
-            self::$c->get(FinalizerInterface::class)->finalize();
-        }
-    }
-
     protected function generateStream(): StreamInterface
     {
         $content = random_bytes(mt_rand(100, 100000));
