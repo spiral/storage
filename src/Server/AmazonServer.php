@@ -61,7 +61,6 @@ class AmazonServer extends AbstractServer
      */
     public function disconnect()
     {
-        // TODO: Implement disconnect() method.
     }
 
     /**
@@ -305,6 +304,26 @@ class AmazonServer extends AbstractServer
         }
 
         return $headers;
+    }
+
+    /**
+     * Wrap guzzle errors into
+     *
+     * @param RequestInterface $request
+     * @param array            $skipCodes Method should return null if code matched.
+     * @return ResponseInterface
+     */
+    private function run(RequestInterface $request, array $skipCodes = []): ?ResponseInterface
+    {
+        try {
+            return $this->client->send($request);
+        } catch (GuzzleException $e) {
+            if (in_array($e->getCode(), $skipCodes)) {
+                return null;
+            }
+
+            throw new ServerException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
