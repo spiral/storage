@@ -24,10 +24,10 @@ trait ServerTrait
     {
         return self::$server ?? self::$server = new SftpServer([
                 'host'     => self::$OPTS['sftp']['host'],
-                'port'     => 2222,
+                'port'     => self::$OPTS['sftp']['port'],
                 'username' => self::$OPTS['sftp']['username'],
                 'password' => self::$OPTS['sftp']['password'],
-                'home'     => '/upload',
+                'home'     => self::$OPTS['sftp']['home'],
             ]);
     }
 

@@ -17,9 +17,17 @@ abstract class BucketTest extends BaseTest
 {
     public function tearDown()
     {
-        $this->getBucket()->exists('target') && $this->getBucket()->delete('target');
-        $this->getBucket()->exists('targetB') && $this->getBucket()->delete('targetB');
-        $this->getBucket()->exists('targetDir/targetName') && $this->getBucket()->delete('targetDir/targetName');
+        if ($this->getBucket()->exists('target')) {
+            $this->getBucket()->delete('target');
+        }
+
+        if ($this->getBucket()->exists('targetB')) {
+            $this->getBucket()->delete('targetB');
+        }
+
+        if ($this->getBucket()->exists('targetDir/targetName')) {
+            $this->getBucket()->delete('targetDir/targetName');
+        }
     }
 
     /**

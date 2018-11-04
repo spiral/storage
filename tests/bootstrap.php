@@ -25,6 +25,8 @@ require dirname(__DIR__) . '/vendor/autoload.php';
     ],
     'sftp'    => [
         'host'     => 'localhost',
+        'port'     => 2222,
+        'home'     => '/upload',
         'username' => 'phpunit',
         'password' => 'phpunit'
     ],

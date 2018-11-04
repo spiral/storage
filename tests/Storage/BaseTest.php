@@ -8,7 +8,6 @@
 
 namespace Spiral\Storage\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -17,7 +16,7 @@ use Psr\Log\NullLogger;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\ServerInterface;
 
-abstract class BaseTest extends TestCase
+abstract class BaseTest extends StorageTest
 {
     public static $OPTS = [];
 
@@ -32,6 +31,11 @@ abstract class BaseTest extends TestCase
         $content = random_bytes(mt_rand(100, 100000));
 
         return \GuzzleHttp\Psr7\stream_for($content);
+    }
+
+    protected function makeAddress(string $name): string
+    {
+        return $this->getBucket()->getPrefix() . $name;
     }
 
     protected function makeLogger()
