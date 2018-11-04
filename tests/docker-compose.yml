@@ -6,22 +6,18 @@ services:
     ports:
     - "21:21"
     - "30000-30009:30000-30009"
-    command: "/run.sh -l puredb:/etc/pure-ftpd/pureftpd.pdb -E -j -P localhost -s -A -j -Z -H -4 -E -X -x"
     environment:
     - "FTP_USER_NAME=phpunit"
     - "FTP_USER_PASS=phpunit"
     - "FTP_USER_HOME=/home/phpunit"
+    command: "/run.sh -l puredb:/etc/pure-ftpd/pureftpd.pdb -E -j -P localhost -s -A -j -Z -H -4 -E -X -x"
 
-  #  sftp_storage:
-  #    image: mysql:latest
-  #    restart: 'always'
-  #    command: --default-authentication-plugin=mysql_native_password
-  #    ports:
-  #    - "13306:3306"
-  #    environment:
-  #      MYSQL_DATABASE: "spiral"
-  #      MYSQL_ROOT_PASSWORD: "root"
-  #      MYSQL_ROOT_HOST: "%"
+  sftp_storage:
+    image: atmoz/sftp
+    restart: 'always'
+    ports:
+    - "2222:22"
+    command: phpunit:phpunit:::upload
 
   mongo_storage:
     image: mongo

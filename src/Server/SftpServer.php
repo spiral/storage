@@ -10,9 +10,9 @@ namespace Spiral\Storage\Server;
 
 use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
-use Spiral\Streams\StreamWrapper;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exception\ServerException;
+use Spiral\Streams\StreamWrapper;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**
@@ -23,9 +23,9 @@ class SftpServer extends AbstractServer
     /**
      * Authorization methods.
      */
-    const NONE     = 'none';
-    const PASSWORD = 'password';
-    const PUB_KEY  = 'pubkey';
+    public const NONE     = 'none';
+    public const PASSWORD = 'password';
+    public const PUB_KEY  = 'pubkey';
 
     /**
      * @var array
@@ -49,17 +49,13 @@ class SftpServer extends AbstractServer
         'secret'     => null
     ];
 
-    /**
-     * SFTP connection resource.
-     *
-     * @var resource
-     */
-    protected $sftp = null;
+    /** @var resource */
+    protected $conn = null;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $options, FilesInterface $files )
+    public function __construct(array $options, FilesInterface $files = null)
     {
         parent::__construct($options, $files);
 
@@ -143,7 +139,7 @@ class SftpServer extends AbstractServer
             throw new ServerException("Unable to delete object, file not found");
         }
 
-        ssh2_sftp_unlink($this->sftp, $path = $this->castPath($bucket, $name));
+        ssh2_sftp_unlink($this->conn, $path = $this->castPath($bucket, $name));
 
         //Cleaning file cache for removed file
         clearstatcache(false, $path);
@@ -168,7 +164,7 @@ class SftpServer extends AbstractServer
             $this->delete($bucket, $newName);
         }
 
-        if (!ssh2_sftp_rename($this->sftp, $this->castPath($bucket, $oldName), $location)) {
+        if (!ssh2_sftp_rename($this->conn, $this->castPath($bucket, $oldName), $location)) {
             throw new ServerException(
                 "Unable to rename storage object '{$oldName}' to '{$newName}'"
             );
@@ -184,7 +180,7 @@ class SftpServer extends AbstractServer
      */
     protected function connect()
     {
-        if (!empty($this->sftp)) {
+        if (!empty($this->conn)) {
             return;
         }
 
@@ -225,7 +221,7 @@ class SftpServer extends AbstractServer
                 break;
         }
 
-        $this->sftp = ssh2_sftp($session);
+        $this->conn = ssh2_sftp($session);
     }
 
     /**
@@ -239,7 +235,7 @@ class SftpServer extends AbstractServer
      */
     protected function castRemoteFilename(BucketInterface $bucket, string $name): string
     {
-        return 'ssh2.sftp://' . $this->sftp . $this->castPath($bucket, $name);
+        return 'ssh2.sftp://' . $this->conn . $this->castPath($bucket, $name);
     }
 
     /**
@@ -271,9 +267,9 @@ class SftpServer extends AbstractServer
         $directory = dirname($this->castPath($bucket, $name));
 
         $mode = $bucket->getOption('mode', FilesInterface::RUNTIME);
-        if (file_exists('ssh2.sftp://' . $this->sftp . $directory)) {
+        if (file_exists('ssh2.sftp://' . $this->conn . $directory)) {
             if (function_exists('ssh2_sftp_chmod')) {
-                ssh2_sftp_chmod($this->sftp, $directory, $mode | 0111);
+                ssh2_sftp_chmod($this->conn, $directory, $mode | 0111);
             }
 
             return $this->castPath($bucket, $name);
@@ -289,15 +285,15 @@ class SftpServer extends AbstractServer
 
             $location .= '/' . $directory;
 
-            if (!file_exists('ssh2.sftp://' . $this->sftp . $location)) {
-                if (!ssh2_sftp_mkdir($this->sftp, $location)) {
+            if (!file_exists('ssh2.sftp://' . $this->conn . $location)) {
+                if (!ssh2_sftp_mkdir($this->conn, $location)) {
                     throw new ServerException(
                         "Unable to create directory {$location} using sftp connection"
                     );
                 }
 
                 if (function_exists('ssh2_sftp_chmod')) {
-                    ssh2_sftp_chmod($this->sftp, $directory, $mode | 0111);
+                    ssh2_sftp_chmod($this->conn, $directory, $mode | 0111);
                 }
             }
         }
@@ -320,7 +316,7 @@ class SftpServer extends AbstractServer
         }
 
         return ssh2_sftp_chmod(
-            $this->sftp,
+            $this->conn,
             $this->castPath($bucket, $name),
             $bucket->getOption('mode', FilesInterface::RUNTIME)
         );

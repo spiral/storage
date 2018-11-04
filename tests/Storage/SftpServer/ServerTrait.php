@@ -6,11 +6,11 @@
  * @author    Anton Titov (Wolfy-J)
  */
 
-namespace Spiral\Storage\Tests\FtpServer;
+namespace Spiral\Storage\Tests\SftpServer;
 
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
-use Spiral\Storage\Server\FtpServer;
+use Spiral\Storage\Server\SftpServer;
 use Spiral\Storage\ServerInterface;
 use Spiral\Storage\StorageBucket;
 
@@ -22,10 +22,12 @@ trait ServerTrait
 
     protected function getServer(): ServerInterface
     {
-        return self::$server ?? self::$server = new FtpServer([
-                'host'     => self::$OPTS['ftp']['host'],
-                'username' => self::$OPTS['ftp']['username'],
-                'password' => self::$OPTS['ftp']['password']
+        return self::$server ?? self::$server = new SftpServer([
+                'host'     => self::$OPTS['sftp']['host'],
+                'port'     => 2222,
+                'username' => self::$OPTS['sftp']['username'],
+                'password' => self::$OPTS['sftp']['password'],
+                'home'     => '/upload',
             ]);
     }
 
@@ -37,8 +39,8 @@ trait ServerTrait
 
         $bucket = new StorageBucket(
             $this->getServer(),
-            'ftp',
-            'ftp:',
+            'sftp',
+            'sftp:',
             [
                 'directory' => '/',
                 'mode'      => FilesInterface::READONLY
@@ -58,10 +60,10 @@ trait ServerTrait
 
         $bucket = new StorageBucket(
             $this->getServer(),
-            'ftp-2',
-            'ftp2:',
+            'sftp-2',
+            'sftp2:',
             [
-                'directory' => 'ftp2/',
+                'directory' => '/sftp2/',
                 'mode'      => FilesInterface::READONLY
             ]
         );
