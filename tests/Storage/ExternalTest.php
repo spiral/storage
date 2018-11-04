@@ -12,6 +12,8 @@ use Psr\Http\Message\StreamInterface;
 use Spiral\Boot\FinalizerInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\ObjectInterface;
+use Spiral\Storage\Server\AmazonServer;
+use Spiral\Storage\StorageBucket;
 
 class ExternalTest extends StorageTest
 {
@@ -163,6 +165,76 @@ class ExternalTest extends StorageTest
         $sftpObject->delete();
 
         self::$c->get(FinalizerInterface::class)->finalize();
+    }
+
+    public function testGetServer()
+    {
+        $this->assertInstanceOf(AmazonServer::class, $this->getStorage()->getServer('amazon'));
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\StorageException
+     */
+    public function testGetServerEx()
+    {
+        $this->getStorage()->getServer('other');
+    }
+
+    public function testGetBucket()
+    {
+        $this->assertInstanceOf(
+            AmazonServer::class,
+            $this->getStorage()->getBucket('amazon')->getServer()
+        );
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\StorageException
+     */
+    public function testGetBucketEx()
+    {
+        $this->getStorage()->getBucket('other');
+    }
+
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\StorageException
+     */
+    public function testGetBucketEx2()
+    {
+        $this->getStorage()->getBucket('');
+    }
+
+    public function testAddBucket()
+    {
+        $this->getStorage()->addBucket(new StorageBucket(
+            $this->getStorage()->getServer('amazon'),
+            'aws-3',
+            'aws3:',
+            [
+                'bucket' => 'aws-1'
+            ]
+        ));
+
+        $this->assertInstanceOf(
+            AmazonServer::class,
+            $this->getStorage()->getBucket('aws-3')->getServer()
+        );
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\StorageException
+     */
+    public function testAddBucketEx()
+    {
+        $this->getStorage()->addBucket(new StorageBucket(
+            $this->getStorage()->getServer('amazon'),
+            'amazon',
+            'aws3:',
+            [
+                'bucket' => 'aws-1'
+            ]
+        ));
     }
 
     protected function assertContent(StreamInterface $stream, ObjectInterface $object)
