@@ -20,7 +20,7 @@ trait ServerTrait
 
     protected function getServer(): ServerInterface
     {
-        return $this->server ?? $this->server = new LocalServer(['home' => self::$DIR]);
+        return $this->server ?? $this->server = new LocalServer(['home' => self::$OPTS['home']]);
     }
 
     protected function getBucket(): BucketInterface

@@ -19,8 +19,7 @@ use Spiral\Storage\ServerInterface;
 
 abstract class BaseTest extends TestCase
 {
-    public static $PROFILING = false;
-    public static $DIR = '';
+    public static $OPTS = [];
 
     abstract protected function getServer(): ServerInterface;
 
@@ -37,7 +36,7 @@ abstract class BaseTest extends TestCase
 
     protected function makeLogger()
     {
-        if (self::$PROFILING) {
+        if (self::$OPTS['profile']) {
             return new class implements LoggerInterface
             {
                 use LoggerTrait;
