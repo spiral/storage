@@ -9,6 +9,7 @@
 namespace Spiral\Storage\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
 use Spiral\Core\Container;
 use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Server;
@@ -18,6 +19,13 @@ use Spiral\Storage\StorageManager;
 class StorageTest extends TestCase
 {
     private static $storage;
+
+    protected function generateStream(): StreamInterface
+    {
+        $content = random_bytes(mt_rand(100, 100000));
+
+        return \GuzzleHttp\Psr7\stream_for($content);
+    }
 
     public function getStorage(): StorageInterface
     {

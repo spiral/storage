@@ -26,13 +26,6 @@ abstract class BaseTest extends StorageTest
 
     abstract protected function getSecondaryBucket(): BucketInterface;
 
-    protected function generateStream(): StreamInterface
-    {
-        $content = random_bytes(mt_rand(100, 100000));
-
-        return \GuzzleHttp\Psr7\stream_for($content);
-    }
-
     protected function makeAddress(string $name): string
     {
         return $this->getBucket()->getPrefix() . $name;
