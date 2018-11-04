@@ -10,9 +10,7 @@ namespace Spiral\Storage;
 
 use Spiral\Core\Container\InjectorInterface;
 use Spiral\Core\FactoryInterface;
-use Spiral\Storage\Configs\StorageConfig;
-use Spiral\Storage\Entity\StorageBucket;
-use Spiral\Storage\Entity\StorageObject;
+use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Exception\StorageException;
 
 /**
@@ -23,20 +21,17 @@ use Spiral\Storage\Exception\StorageException;
  */
 class StorageManager implements StorageInterface, InjectorInterface
 {
+    /** @var StorageConfig */
+    private $config;
+
     /**  @var BucketInterface[] */
     private $buckets = [];
 
     /** @var ServerInterface[] */
     private $servers = [];
 
-    /** @var StorageConfig */
-    protected $config;
-
-    /**
-     * @invisible
-     * @var FactoryInterface
-     */
-    protected $factory;
+    /** @var FactoryInterface */
+    private $factory;
 
     /**
      * @param StorageConfig    $config
@@ -46,13 +41,9 @@ class StorageManager implements StorageInterface, InjectorInterface
     {
         $this->config = $config;
         $this->factory = $factory;
-
-        //Loading buckets (we need all instances to properly allocate bucket name by address) (really?)
-        foreach ($this->config->getBuckets() as $name => $bucket) {
-            //Using default implementation
-            $this->buckets[$name] = $this->makeBucket($name, $bucket);
-        }
     }
+
+    // todo: work it out
 
     /**
      * @param BucketInterface $bucket

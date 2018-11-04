@@ -60,6 +60,23 @@ class ConfigTest extends TestCase
         $this->assertSame($this, $aws->resolve($c));
     }
 
+
+    public function testServerWired()
+    {
+        $config = new StorageConfig([
+            'servers' => [
+                'amazon' => new Container\Autowire('aws')
+            ]
+        ]);
+
+        $aws = $config->getServer('amazon');
+        $c = new Container();
+        $c->bind('aws', $this);
+
+        $this->assertSame($this, $aws->resolve($c));
+    }
+
+
     /**
      * @expectedException \Spiral\Storage\Exception\ConfigException
      */
