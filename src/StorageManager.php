@@ -96,19 +96,6 @@ class StorageManager implements StorageInterface, InjectorInterface
     }
 
     /**
-     * @param string          $name
-     * @param ServerInterface $server
-     */
-    public function addServer(string $name, ServerInterface $server)
-    {
-        if (isset($this->servers[$name])) {
-            throw new StorageException("Server `{$name}` already exists.");
-        }
-
-        $this->servers[$name] = $server;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getServer(string $server): ServerInterface
