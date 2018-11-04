@@ -44,7 +44,7 @@ final class StorageObject implements ObjectInterface
      */
     public function getAddress(): string
     {
-        return $this->bucket->buildAddress($this->name);
+        return $this->bucket->getAddress($this->name);
     }
 
     /**
@@ -135,6 +135,6 @@ final class StorageObject implements ObjectInterface
      */
     public function __toString(): string
     {
-        return $this->bucket->buildAddress($this->name);
+        return $this->bucket->getAddress($this->name);
     }
 }

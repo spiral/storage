@@ -101,7 +101,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     /**
      * {@inheritdoc}
      */
-    public function buildAddress(string $name): string
+    public function getAddress(string $name): string
     {
         return $this->prefix . $name;
     }
@@ -113,13 +113,13 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     {
         $this->getLogger()->info(sprintf(
             "check existence of '%s' in '%s' bucket.",
-            $this->buildAddress($name),
+            $this->getAddress($name),
             $this->getName()
         ));
 
         $benchmark = $this->benchmark(
             $this->getName(),
-            "exists::{$this->buildAddress($name)}"
+            "exists::{$this->getAddress($name)}"
         );
 
         try {
@@ -138,13 +138,13 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     {
         $this->getLogger()->info(sprintf(
             "get size of '%s' in '%s' bucket.",
-            $this->buildAddress($name),
+            $this->getAddress($name),
             $this->getName()
         ));
 
         $benchmark = $this->benchmark(
             $this->getName(),
-            "size::{$this->buildAddress($name)}"
+            "size::{$this->getAddress($name)}"
         );
 
         try {
@@ -163,7 +163,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     {
         $this->getLogger()->info(sprintf(
             "put '%s' in '%s' bucket.",
-            $this->buildAddress($name),
+            $this->getAddress($name),
             $this->getName()
         ));
 
@@ -178,14 +178,14 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
         $benchmark = $this->benchmark(
             $this->getName(),
-            "put::{$this->buildAddress($name)}"
+            "put::{$this->getAddress($name)}"
         );
 
         try {
             $this->server->put($this, $name, $source);
 
             //Reopening
-            return $this->buildAddress($name);
+            return $this->getAddress($name);
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
@@ -200,13 +200,13 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     {
         $this->getLogger()->info(sprintf(
             "allocate filename of '%s' in '%s' bucket.",
-            $this->buildAddress($name),
+            $this->getAddress($name),
             $this->getName()
         ));
 
         $benchmark = $this->benchmark(
             $this->getName(),
-            "filename::{$this->buildAddress($name)}"
+            "filename::{$this->getAddress($name)}"
         );
 
         try {
@@ -225,13 +225,13 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     {
         $this->getLogger()->info(sprintf(
             "get stream for '%s' in '%s' bucket.",
-            $this->buildAddress($name),
+            $this->getAddress($name),
             $this->getName()
         ));
 
         $benchmark = $this->benchmark(
             $this->getName(),
-            "stream::{$this->buildAddress($name)}"
+            "stream::{$this->getAddress($name)}"
         );
 
         try {
@@ -250,13 +250,13 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     {
         $this->getLogger()->info(sprintf(
             "delete '%s' in '%s' bucket.",
-            $this->buildAddress($name),
+            $this->getAddress($name),
             $this->getName()
         ));
 
         $benchmark = $this->benchmark(
             $this->getName(),
-            "delete::{$this->buildAddress($name)}"
+            "delete::{$this->getAddress($name)}"
         );
 
         try {
@@ -279,20 +279,20 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
         $this->getLogger()->info(sprintf(
             "rename '%s' to '%s' in '%s' bucket.",
-            $this->buildAddress($oldName),
-            $this->buildAddress($newName),
+            $this->getAddress($oldName),
+            $this->getAddress($newName),
             $this->getName()
         ));
 
         $benchmark = $this->benchmark(
             $this->getName(),
-            "rename::{$this->buildAddress($oldName)}"
+            "rename::{$this->getAddress($oldName)}"
         );
 
         try {
             $this->server->rename($this, $oldName, $newName);
 
-            return $this->buildAddress($newName);
+            return $this->getAddress($newName);
         } catch (ServerException$e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
@@ -306,21 +306,21 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     public function copy(BucketInterface $destination, string $name): string
     {
         if ($destination === $this) {
-            return $this->buildAddress($name);
+            return $this->getAddress($name);
         }
 
         //Internal copying
         if ($this->getServer() === $destination->getServer()) {
             $this->getLogger()->info(sprintf(
                 "internal copy of '%s' to '%s' from '%s' bucket.",
-                $this->buildAddress($name),
-                $destination->buildAddress($name),
+                $this->getAddress($name),
+                $destination->getAddress($name),
                 $this->getName()
             ));
 
             $benchmark = $this->benchmark(
                 $this->getName(),
-                "copy::{$this->buildAddress($name)}"
+                "copy::{$this->getAddress($name)}"
             );
 
             try {
@@ -335,16 +335,16 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
             $this->getLogger()->info(sprintf(
                 "external copy of '%s'.'%s' to '%s'.'%s'.",
                 $this->getName(),
-                $this->buildAddress($name),
+                $this->getAddress($name),
                 $destination->getName(),
-                $destination->buildAddress($name)
+                $destination->getAddress($name)
             ));
 
             $destination->put($name, $stream = $this->allocateStream($name));
             $stream->detach();
         }
 
-        return $destination->buildAddress($name);
+        return $destination->getAddress($name);
     }
 
     /**
@@ -353,21 +353,21 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     public function replace(BucketInterface $destination, string $name): string
     {
         if ($destination === $this) {
-            return $this->buildAddress($name);
+            return $this->getAddress($name);
         }
 
         //Internal copying
         if ($this->getServer() === $destination->getServer()) {
             $this->getLogger()->info(sprintf(
                 "internal move of '%s' to '%s' from '%s' bucket.",
-                $this->buildAddress($name),
-                $destination->buildAddress($name),
+                $this->getAddress($name),
+                $destination->getAddress($name),
                 $this->getName()
             ));
 
             $benchmark = $this->benchmark(
                 $this->getName(),
-                "replace::{$this->buildAddress($name)}"
+                "replace::{$this->getAddress($name)}"
             );
 
             try {
@@ -381,9 +381,9 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
             $this->getLogger()->info(sprintf(
                 "external move of '%s'.'%s' to '%s'.'%s'.",
                 $this->getName(),
-                $this->buildAddress($name),
+                $this->getAddress($name),
                 $destination->getName(),
-                $destination->buildAddress($name)
+                $destination->getAddress($name)
             ));
 
             //Copying using temporary stream (buffer)
@@ -395,6 +395,6 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
             }
         }
 
-        return $destination->buildAddress($name);
+        return $destination->getAddress($name);
     }
 }

@@ -73,7 +73,7 @@ interface BucketInterface
      *
      * @return string
      */
-    public function buildAddress(string $name): string;
+    public function getAddress(string $name): string;
 
     /**
      * Check if given name points to valid and existed location in bucket server.
