@@ -27,24 +27,20 @@ class FtpServer extends AbstractServer
         'host'     => '',
         'port'     => 21,
         'timeout'  => 60,
-        'login'    => '',
+        'username' => '',
         'password' => '',
         'home'     => '/',
         'passive'  => true,
         'chmod'    => false
     ];
 
-    /**
-     * FTP Connection.
-     *
-     * @var resource
-     */
-    protected $connection = null;
+    /**  @var resource */
+    protected $conn = null;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $options, FilesInterface $files)
+    public function __construct(array $options, FilesInterface $files = null)
     {
         parent::__construct($options, $files);
 
@@ -62,7 +58,7 @@ class FtpServer extends AbstractServer
     {
         $this->connect();
 
-        return ftp_size($this->connection, $this->getPath($bucket, $name)) != -1;
+        return ftp_size($this->conn, $this->getPath($bucket, $name)) !== -1;
     }
 
     /**
@@ -71,7 +67,8 @@ class FtpServer extends AbstractServer
     public function size(BucketInterface $bucket, string $name): ?int
     {
         $this->connect();
-        if (($size = ftp_size($this->connection, $this->getPath($bucket, $name))) != -1) {
+
+        if (($size = ftp_size($this->conn, $this->getPath($bucket, $name))) != -1) {
             return $size;
         }
 
@@ -84,8 +81,9 @@ class FtpServer extends AbstractServer
     public function put(BucketInterface $bucket, string $name, $source): bool
     {
         $this->connect();
+
         $location = $this->ensureLocation($bucket, $name);
-        if (!ftp_put($this->connection, $location, $this->castFilename($source), FTP_BINARY)) {
+        if (!ftp_put($this->conn, $location, $this->castFilename($source), FTP_BINARY)) {
             throw new ServerException("Unable to put '{$name}' to FTP server");
         }
 
@@ -98,6 +96,7 @@ class FtpServer extends AbstractServer
     public function allocateFilename(BucketInterface $bucket, string $name): string
     {
         $this->connect();
+
         if (!$this->exists($bucket, $name)) {
             throw new ServerException(
                 "Unable to create local filename for '{$name}', object does not exists"
@@ -108,7 +107,7 @@ class FtpServer extends AbstractServer
         $tempFilename = $this->files->tempFilename($this->files->extension($name));
 
         if (!ftp_get(
-            $this->connection,
+            $this->conn,
             $tempFilename,
             $this->getPath($bucket, $name),
             FTP_BINARY
@@ -125,6 +124,7 @@ class FtpServer extends AbstractServer
     public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
     {
         $this->connect();
+
         if (!$filename = $this->allocateFilename($bucket, $name)) {
             throw new ServerException(
                 "Unable to create stream for '{$name}', object does not exists"
@@ -141,11 +141,12 @@ class FtpServer extends AbstractServer
     public function delete(BucketInterface $bucket, string $name)
     {
         $this->connect();
+
         if (!$this->exists($bucket, $name)) {
             throw new ServerException("Unable to delete object, file not found");
         }
 
-        ftp_delete($this->connection, $this->getPath($bucket, $name));
+        ftp_delete($this->conn, $this->getPath($bucket, $name));
     }
 
     /**
@@ -154,13 +155,18 @@ class FtpServer extends AbstractServer
     public function rename(BucketInterface $bucket, string $oldName, string $newName): bool
     {
         $this->connect();
+
         if (!$this->exists($bucket, $oldName)) {
             throw new ServerException("Unable to rename '{$oldName}', object does not exists");
         }
 
         $location = $this->ensureLocation($bucket, $newName);
-        if (!ftp_rename($this->connection, $this->getPath($bucket, $oldName), $location)) {
-            throw new ServerException("Unable to rename '{$oldName}' to '{$newName}'.");
+        try {
+            if (!ftp_rename($this->conn, $this->getPath($bucket, $oldName), $location)) {
+                throw new \ErrorException("Unable to rename '{$oldName}' to '{$newName}'.");
+            }
+        } catch (\Throwable $e) {
+            throw new ServerException($e->getMessage(), $e->getCode(), $e);
         }
 
         return $this->refreshPermissions($bucket, $newName);
@@ -175,13 +181,18 @@ class FtpServer extends AbstractServer
         string $name
     ): bool {
         $this->connect();
+
         if (!$this->exists($bucket, $name)) {
             throw new ServerException("Unable to replace '{$name}', object does not exists");
         }
 
         $location = $this->ensureLocation($destination, $name);
-        if (!ftp_rename($this->connection, $this->getPath($bucket, $name), $location)) {
-            throw new ServerException("Unable to replace '{$name}'.");
+        try {
+            if (!ftp_rename($this->conn, $this->getPath($bucket, $name), $location)) {
+                throw new \ErrorException("Unable to replace '{$name}'.");
+            }
+        } catch (\Throwable $e) {
+            throw new ServerException($e->getMessage(), $e->getCode(), $e);
         }
 
         return $this->refreshPermissions($bucket, $name);
@@ -194,35 +205,35 @@ class FtpServer extends AbstractServer
      */
     protected function connect()
     {
-        if (!empty($this->connection)) {
+        if (!empty($this->conn)) {
             return;
         }
 
-        $connection = ftp_connect(
+        $conn = ftp_connect(
             $this->options['host'],
             $this->options['port'],
             $this->options['timeout']
         );
 
-        if (empty($this->connection)) {
+        if (empty($conn)) {
             throw new ServerException(
                 "Unable to connect to remote FTP server '{$this->options['host']}'"
             );
         }
 
-        if (!ftp_login($this->connection, $this->options['login'], $this->options['password'])) {
+        if (!ftp_login($conn, $this->options['username'], $this->options['password'])) {
             throw new ServerException(
-                "Unable to connect to remote FTP server '{$this->options['host']}'"
+                "Unable to authorize on remote FTP server '{$this->options['host']}'"
             );
         }
 
-        if (!ftp_pasv($this->connection, $this->options['passive'])) {
+        if (!ftp_pasv($conn, $this->options['passive'])) {
             throw new ServerException(
                 "Unable to set passive mode at remote FTP server '{$this->options['host']}'"
             );
         }
 
-        $this->connection = $connection;
+        $this->conn = $conn;
     }
 
     /**
@@ -240,8 +251,8 @@ class FtpServer extends AbstractServer
         $mode = $bucket->getOption('mode', FilesInterface::RUNTIME);
 
         try {
-            if (ftp_chdir($this->connection, $directory)) {
-                ftp_chmod($this->connection, $mode | 0111, $directory);
+            if (ftp_chdir($this->conn, $directory)) {
+                ftp_chmod($this->conn, $mode | 0111, $directory);
 
                 return $this->getPath($bucket, $name);
             }
@@ -249,7 +260,7 @@ class FtpServer extends AbstractServer
             //Directory has to be created
         }
 
-        ftp_chdir($this->connection, $this->options['home']);
+        ftp_chdir($this->conn, $this->options['home']);
 
         $directories = explode('/', substr($directory, strlen($this->options['home'])));
         foreach ($directories as $directory) {
@@ -258,11 +269,11 @@ class FtpServer extends AbstractServer
             }
 
             try {
-                ftp_chdir($this->connection, $directory);
+                ftp_chdir($this->conn, $directory);
             } catch (\Exception $e) {
-                ftp_mkdir($this->connection, $directory);
-                ftp_chmod($this->connection, $mode | 0111, $directory);
-                ftp_chdir($this->connection, $directory);
+                ftp_mkdir($this->conn, $directory);
+                ftp_chmod($this->conn, $mode | 0111, $directory);
+                ftp_chdir($this->conn, $directory);
             }
         }
 
@@ -301,7 +312,7 @@ class FtpServer extends AbstractServer
 
         $mode = $bucket->getOption('mode', FilesInterface::RUNTIME);
 
-        return ftp_chmod($this->connection, $mode, $this->getPath($bucket, $name)) !== false;
+        return ftp_chmod($this->conn, $mode, $this->getPath($bucket, $name)) !== false;
     }
 
     /**
@@ -309,9 +320,9 @@ class FtpServer extends AbstractServer
      */
     public function __destruct()
     {
-        if (!empty($this->connection)) {
-            ftp_close($this->connection);
-            $this->connection = null;
+        if (!empty($this->conn)) {
+            ftp_close($this->conn);
+            $this->conn = null;
         }
     }
 }

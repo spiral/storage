@@ -35,7 +35,6 @@ abstract class BucketTest extends BaseTest
 
         $content = random_bytes(mt_rand(100, 100000));
         $bucket->put('target', $content);
-        $this->assertTrue($bucket->exists('target'));
     }
 
     public function testPutEmptyString()

@@ -4,7 +4,13 @@ services:
   ftp_storage:
     image: stilliard/pure-ftpd:hardened
     ports:
-    - "11433:1433"
+    - "21:21"
+    - "30000-30009:30000-30009"
+    command: "/run.sh -l puredb:/etc/pure-ftpd/pureftpd.pdb -E -j -P localhost -s -A -j -Z -H -4 -E -X -x"
+    environment:
+    - "FTP_USER_NAME=phpunit"
+    - "FTP_USER_PASS=phpunit"
+    - "FTP_USER_HOME=/home/phpunit"
 
   #  sftp_storage:
   #    image: mysql:latest
@@ -16,7 +22,7 @@ services:
   #      MYSQL_DATABASE: "spiral"
   #      MYSQL_ROOT_PASSWORD: "root"
   #      MYSQL_ROOT_HOST: "%"
-  #
+
   mongo_storage:
     image: mongo
     restart: 'always'

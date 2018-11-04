@@ -17,5 +17,10 @@ require dirname(__DIR__) . '/vendor/autoload.php';
     'mongodb' => [
         'conn'     => 'mongodb://localhost:27017',
         'database' => 'phpunit'
+    ],
+    'ftp'     => [
+        'host'     => 'localhost',
+        'username' => 'phpunit',
+        'password' => 'phpunit'
     ]
 ];
