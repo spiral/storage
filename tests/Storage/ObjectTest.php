@@ -14,6 +14,8 @@ abstract class ObjectTest extends BaseTest
 {
     public function tearDown()
     {
+        parent::tearDown();
+
         if ($this->getBucket()->exists('target')) {
             $this->getBucket()->delete('target');
         }

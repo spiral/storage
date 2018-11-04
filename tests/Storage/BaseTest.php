@@ -8,7 +8,6 @@
 
 namespace Spiral\Storage\Tests;
 
-use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;

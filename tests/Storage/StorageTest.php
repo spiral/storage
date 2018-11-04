@@ -8,9 +8,15 @@
 
 namespace Spiral\Storage\Tests;
 
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
+use Spiral\Boot\Finalizer;
+use Spiral\Boot\FinalizerInterface;
+use Spiral\Config\ConfiguratorInterface;
+use Spiral\Core\BootloadManager;
 use Spiral\Core\Container;
+use Spiral\Storage\Bootloader\StorageBootloader;
 use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Server;
 use Spiral\Storage\StorageInterface;
@@ -19,6 +25,14 @@ use Spiral\Storage\StorageManager;
 class StorageTest extends TestCase
 {
     private static $storage;
+    private static $c;
+
+    public function tearDown()
+    {
+        if (self::$c != null) {
+            self::$c->get(FinalizerInterface::class)->finalize();
+        }
+    }
 
     protected function generateStream(): StreamInterface
     {
@@ -114,6 +128,19 @@ class StorageTest extends TestCase
             ]
         ]);
 
-        return self::$storage = new StorageManager($config, new Container());
+        $configurator = m::mock(ConfiguratorInterface::class);
+        $configurator->expects('setDefaults');
+
+        $c = new Container();
+        $c->bind(StorageConfig::class, $config);
+        $c->bind(ConfiguratorInterface::class, $configurator);
+        $c->bindSingleton(FinalizerInterface::class, new Finalizer());
+
+        $b = new BootloadManager($c);
+        $b->bootload([StorageBootloader::class]);
+
+        self::$storage = $c->get(StorageManager::class);
+
+        return self::$storage;
     }
 }
