@@ -9,11 +9,11 @@
 namespace Spiral\Storage;
 
 use Psr\Http\Message\StreamInterface;
-use Spiral\Streams\StreamableInterface;
 use Spiral\Storage\Exception\BucketException;
 use Spiral\Storage\Exception\ObjectException;
 use Spiral\Storage\Exception\ServerException;
 use Spiral\Storage\Exception\StorageException;
+use Spiral\Streams\StreamableInterface;
 
 /**
  * Abstraction level to work with local and remote files represented using storage objects and
@@ -21,6 +21,8 @@ use Spiral\Storage\Exception\StorageException;
  */
 interface StorageInterface
 {
+    public function disconnect();
+
     /**
      * Register new bucket using it's options, server and prefix.
      *
