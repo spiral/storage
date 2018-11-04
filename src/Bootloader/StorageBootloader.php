@@ -8,7 +8,7 @@
 
 namespace Spiral\Storage\Bootloader;
 
-use Spiral\Core\Bootloaders\Bootloader;
+use Spiral\Core\Bootloader\Bootloader;
 
 class StorageBootloader extends Bootloader
 {

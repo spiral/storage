@@ -11,12 +11,11 @@
   ],
   "require": {
     "php": ">=7.1",
-    "spiral/core": "^1.0",
+    "spiral/boot": "^1.0",
     "spiral/debug": "^1.0",
-    "spiral/files": "^2.0",
+    "spiral/logger": "^1.1",
     "spiral/streams": "^1.0",
-    "guzzlehttp/guzzle": "^6.3",
-    "spiral/logger": "^1.1"
+    "guzzlehttp/guzzle": "^6.3"
   },
   "require-dev": {
     "mongodb/mongodb": "^1.1",

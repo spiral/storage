@@ -25,9 +25,9 @@ services:
     ports:
     - "27017:27017"
 
-  #s3_storage:
-  #  image: adobe/s3mock
-  #  restart: always
-  #  ports:
-  #  - "9190:9190"
-  #  - "9191:9191"
+  s3_storage:
+    image: adobe/s3mock
+    restart: always
+    ports:
+    - "9190:9190"
+    - "9191:9191"
