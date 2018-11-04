@@ -146,6 +146,57 @@ class ConfigTest extends TestCase
         $config->getBucket('amazon');
     }
 
+    /**
+     * @expectedException \Spiral\Storage\Exception\ConfigException
+     */
+    public function testBucketOptionsE3()
+    {
+        $config = new StorageConfig([
+            'buckets' => [
+                'amazon' => [
+                    'server' => AmazonServer::class,
+                    'prefix' => 'aws:'
+                ],
+            ]
+        ]);
+
+        $config->getBucket('other');
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\ConfigException
+     */
+    public function testBucketOptionsE4()
+    {
+        $config = new StorageConfig([
+            'buckets' => [
+                'amazon' => [
+                    'server'  => AmazonServer::class,
+                    'options' => []
+                ],
+            ]
+        ]);
+
+        $config->getBucket('other');
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\ConfigException
+     */
+    public function testBucketOptionsE5()
+    {
+        $config = new StorageConfig([
+            'buckets' => [
+                'amazon' => [
+                    'prefix'  => 'prefix',
+                    'options' => []
+                ],
+            ]
+        ]);
+
+        $config->getBucket('other');
+    }
+
     public function testBucketOptions()
     {
         $config = new StorageConfig([
@@ -188,6 +239,7 @@ class ConfigTest extends TestCase
                 'amazon'       => ['prefix' => 'aws:'],
                 'ftp'          => ['prefix' => 'ftp:'],
                 'amazon-clone' => ['prefix' => 'aws:clone:'],
+                'other'        => []
             ]
         ]);
 
