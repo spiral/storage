@@ -308,6 +308,50 @@ abstract class BucketTest extends BaseTest
         $this->assertSame($content->getContents(), $stream->getContents());
     }
 
+    public function testInternalCopy()
+    {
+        $bucket = $this->getBucket();
+        $bucketB = $this->getSecondaryBucket();
+
+        $this->assertFalse($bucket->exists('target'));
+        $this->assertFalse($bucketB->exists('target'));
+
+        $content = $this->generateStream();
+
+        $bucket->put('target', $content);
+        $bucket->copy($bucketB, 'target');
+
+        $this->assertTrue($bucket->exists('target'));
+        $this->assertTrue($bucketB->exists('target'));
+
+
+        $bucket->delete('target');
+        $bucketB->delete('target');
+
+        $this->assertFalse($bucket->exists('target'));
+        $this->assertFalse($bucketB->exists('target'));
+    }
+
+    public function testInternalReplace()
+    {
+        $bucket = $this->getBucket();
+        $bucketB = $this->getSecondaryBucket();
+
+        $this->assertFalse($bucket->exists('target'));
+        $this->assertFalse($bucketB->exists('target'));
+
+        $content = $this->generateStream();
+
+        $bucket->put('target', $content);
+        $bucket->replace($bucketB, 'target');
+
+        $this->assertFalse($bucket->exists('target'));
+        $this->assertTrue($bucketB->exists('target'));
+
+        $bucketB->delete('target');
+        $this->assertFalse($bucketB->exists('target'));
+    }
+
     public function testDelete()
     {
         $bucket = $this->getBucket();
