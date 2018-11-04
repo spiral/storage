@@ -124,7 +124,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
         try {
             return (bool)$this->server->exists($this, $name);
-        } catch (ServerException$e) {
+        } catch (ServerException $e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
             $benchmark->complete();
@@ -149,7 +149,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
         try {
             return $this->server->size($this, $name);
-        } catch (ServerException$e) {
+        } catch (ServerException $e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
             $benchmark->complete();
@@ -186,7 +186,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
             //Reopening
             return $this->getAddress($name);
-        } catch (ServerException$e) {
+        } catch (ServerException $e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
             $benchmark->complete();
@@ -211,7 +211,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
         try {
             return $this->getServer()->allocateFilename($this, $name);
-        } catch (ServerException$e) {
+        } catch (ServerException $e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
             $benchmark->complete();
@@ -236,7 +236,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
         try {
             return $this->getServer()->allocateStream($this, $name);
-        } catch (ServerException$e) {
+        } catch (ServerException $e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
             $benchmark->complete();
@@ -261,7 +261,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
         try {
             $this->server->delete($this, $name);
-        } catch (ServerException$e) {
+        } catch (ServerException $e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
             $benchmark->complete();
@@ -293,7 +293,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
             $this->server->rename($this, $oldName, $newName);
 
             return $this->getAddress($newName);
-        } catch (ServerException$e) {
+        } catch (ServerException $e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
             $benchmark->complete();
@@ -325,7 +325,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
             try {
                 $this->getServer()->copy($this, $destination, $name);
-            } catch (ServerException$e) {
+            } catch (ServerException $e) {
                 throw new BucketException($e->getMessage(), $e->getCode(), $e);
             } finally {
                 $benchmark->complete();
@@ -372,7 +372,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
             try {
                 $this->getServer()->replace($this, $destination, $name);
-            } catch (ServerException$e) {
+            } catch (ServerException $e) {
                 throw new BucketException($e->getMessage(), $e->getCode(), $e);
             } finally {
                 $benchmark->complete();

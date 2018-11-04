@@ -49,7 +49,6 @@ interface BucketInterface
      *
      * @param string $name
      * @param mixed  $value
-     *
      * @return self
      */
     public function withOption(string $name, $value): BucketInterface;
@@ -58,9 +57,7 @@ interface BucketInterface
      * Get server specific bucket option or return default value.
      *
      * @param string $name
-     *
      * @param null   $default
-     *
      * @return mixed
      */
     public function getOption(string $name, $default = null);
@@ -70,7 +67,6 @@ interface BucketInterface
      * address can appear valid URI which can be used directly at frontend.
      *
      * @param string $name
-     *
      * @return string
      */
     public function getAddress(string $name): string;
@@ -79,7 +75,6 @@ interface BucketInterface
      * Check if given name points to valid and existed location in bucket server.
      *
      * @param string $name
-     *
      * @return bool
      *
      * @throws BucketException
@@ -90,7 +85,6 @@ interface BucketInterface
      * Get object size or return false if object not found.
      *
      * @param string $name
-     *
      * @return int|null
      *
      * @throws BucketException
@@ -104,7 +98,6 @@ interface BucketInterface
      * @param string                                              $name
      * @param string|StreamInterface|StreamableInterface|resource $source String can only be
      *                                                                    filename.
-     *
      * @return string Return inserted object address.
      *
      * @throws BucketException
@@ -117,7 +110,6 @@ interface BucketInterface
      * between sessions.
      *
      * @param string $name
-     *
      * @return string
      *
      * @throws BucketException
@@ -128,7 +120,6 @@ interface BucketInterface
      * Return PSR7 stream associated with bucket object content or trow and exception.
      *
      * @param string $name Storage object name.
-     *
      * @return StreamInterface
      *
      * @throws BucketException
@@ -149,7 +140,6 @@ interface BucketInterface
      *
      * @param string $oldName
      * @param string $newName
-     *
      * @return string
      *
      * @throws StorageException
@@ -163,7 +153,6 @@ interface BucketInterface
      *
      * @param BucketInterface $destination
      * @param string          $name
-     *
      * @return string
      *
      * @throws BucketException
@@ -175,7 +164,6 @@ interface BucketInterface
      *
      * @param BucketInterface $destination
      * @param string          $name
-     *
      * @return string
      *
      * @throws BucketException

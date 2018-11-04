@@ -10,6 +10,7 @@ namespace Spiral\Storage\Tests;
 
 use Mockery as m;
 use Psr\Http\Message\StreamInterface;
+use Spiral\Storage\Exception\ServerException;
 use Spiral\Storage\ServerInterface;
 use Spiral\Storage\StorageBucket;
 
@@ -392,5 +393,91 @@ abstract class BucketTest extends BaseTest
         $bucket1 = $bucket->withOption('name', 'value1');
         $this->assertSame('value', $bucket->getOption('name'));
         $this->assertSame('value1', $bucket1->getOption('name'));
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\BucketException
+     */
+    public function testBypassEx1()
+    {
+        $s = m::mock(ServerInterface::class);
+        $s->expects('exists')->andThrows(ServerException::class);
+
+        $b = new StorageBucket($s, '', '', []);
+        $b->exists('name');
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\BucketException
+     */
+    public function testBypassEx2()
+    {
+        $s = m::mock(ServerInterface::class);
+        $s->expects('size')->andThrows(ServerException::class);
+
+        $b = new StorageBucket($s, '', '', []);
+        $b->size('name');
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\BucketException
+     */
+    public function testBypassEx3()
+    {
+        $s = m::mock(ServerInterface::class);
+        $s->expects('allocateFilename')->andThrows(ServerException::class);
+
+        $b = new StorageBucket($s, '', '', []);
+        $b->allocateFilename('name');
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\BucketException
+     */
+    public function testBypassEx4()
+    {
+        $s = m::mock(ServerInterface::class);
+        $s->expects('allocateStream')->andThrows(ServerException::class);
+
+        $b = new StorageBucket($s, '', '', []);
+        $b->allocateStream('name');
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\BucketException
+     */
+    public function testBypassEx5()
+    {
+        $s = m::mock(ServerInterface::class);
+        $s->expects('rename')->andThrows(ServerException::class);
+
+        $b = new StorageBucket($s, '', '', []);
+        $b->rename('name', 'newName');
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\BucketException
+     */
+    public function testBypassEx6()
+    {
+        $s = m::mock(ServerInterface::class);
+        $s->expects('copy')->andThrows(ServerException::class);
+
+        $b = new StorageBucket($s, '', '', []);
+        $b->copy($b, 'name');
+        $b->copy(clone $b, 'name2');
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\BucketException
+     */
+    public function testBypassEx7()
+    {
+        $s = m::mock(ServerInterface::class);
+        $s->expects('replace')->andThrows(ServerException::class);
+
+        $b = new StorageBucket($s, '', '', []);
+        $b->replace($b, 'name');
+        $b->replace(clone $b, 'name2');
     }
 }
