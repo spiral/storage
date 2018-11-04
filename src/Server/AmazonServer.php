@@ -11,7 +11,6 @@ namespace Spiral\Storage\Server;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
@@ -40,10 +39,7 @@ class AmazonServer extends AbstractServer
         'secret'  => ''
     ];
 
-    /**
-     * @invisible
-     * @var ClientInterface
-     */
+    /** @var ClientInterface */
     protected $client = null;
 
     /**
@@ -79,27 +75,14 @@ class AmazonServer extends AbstractServer
 
     /**
      * {@inheritdoc}
-     *
-     * @param ResponseInterface $response Reference.
-     * @return bool|ResponseInterface
      */
     public function exists(
         BucketInterface $bucket,
         string $name,
         ResponseInterface &$response = null
     ): bool {
-        try {
-            $response = $this->client->send($this->buildRequest('HEAD', $bucket, $name));
-        } catch (GuzzleException $e) {
-            if ($e->getCode() == 404) {
-                return false;
-            }
-
-            //Something wrong with connection
-            throw new ServerException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        if ($response->getStatusCode() !== 200) {
+        $response = $this->run($this->buildRequest('HEAD', $bucket, $name), [404]);
+        if (empty($response) || $response->getStatusCode() !== 200) {
             return false;
         }
 
@@ -115,9 +98,7 @@ class AmazonServer extends AbstractServer
             return null;
         }
 
-        /**
-         * @var ResponseInterface $response
-         */
+        /** @var ResponseInterface $response */
         return (int)$response->getHeaderLine('Content-Length');
     }
 
@@ -141,12 +122,7 @@ class AmazonServer extends AbstractServer
             ]
         );
 
-        $response = $this->client->send($request->withBody($this->castStream($source)));
-        if ($response->getStatusCode() != 200) {
-            throw new ServerException("Unable to put '{$name}' to Amazon server");
-        }
-
-        return true;
+        return $this->run($request->withBody($this->castStream($source))) !== null;
     }
 
     /**
@@ -154,18 +130,7 @@ class AmazonServer extends AbstractServer
      */
     public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
     {
-        try {
-            $response = $this->client->send($this->buildRequest('GET', $bucket, $name));
-        } catch (ClientException $e) {
-            if ($e->getCode() != 404) {
-                //Some authorization or other error
-                throw $e;
-            }
-
-            throw new ServerException($e->getMessage(), $e->getCode(), $e);
-        }
-
-        return $response->getBody();
+        return $this->run($this->buildRequest('GET', $bucket, $name))->getBody();
     }
 
     /**
@@ -177,7 +142,7 @@ class AmazonServer extends AbstractServer
             throw new ServerException("Unable to delete object, file not found");
         }
 
-        $this->client->send($this->buildRequest('DELETE', $bucket, $name));
+        $this->run($this->buildRequest('DELETE', $bucket, $name));
     }
 
     /**
@@ -185,28 +150,18 @@ class AmazonServer extends AbstractServer
      */
     public function rename(BucketInterface $bucket, string $oldName, string $newName): bool
     {
-        try {
-            $request = $this->buildRequest(
-                'PUT',
-                $bucket,
-                $newName,
-                [],
-                [
-                    'Acl'         => $bucket->getOption('public') ? 'public-read' : 'private',
-                    'Copy-Source' => $this->buildUri($bucket, $oldName)->getPath()
-                ]
-            );
+        $request = $this->buildRequest(
+            'PUT',
+            $bucket,
+            $newName,
+            [],
+            [
+                'Acl'         => $bucket->getOption('public') ? 'public-read' : 'private',
+                'Copy-Source' => $this->buildUri($bucket, $oldName)->getPath()
+            ]
+        );
 
-            $this->client->send($request);
-        } catch (ClientException $e) {
-            if ($e->getCode() != 404) {
-                //Some authorization or other error
-                throw $e;
-            }
-
-            throw new ServerException($e->getMessage(), $e->getCode(), $e);
-        }
-
+        $this->run($request);
         $this->delete($bucket, $oldName);
 
         return true;
@@ -217,27 +172,18 @@ class AmazonServer extends AbstractServer
      */
     public function copy(BucketInterface $bucket, BucketInterface $destination, string $name): bool
     {
-        try {
-            $request = $this->buildRequest(
-                'PUT',
-                $destination,
-                $name,
-                [],
-                [
-                    'Acl'         => $destination->getOption('public') ? 'public-read' : 'private',
-                    'Copy-Source' => $this->buildUri($bucket, $name)->getPath()
-                ]
-            );
+        $request = $this->buildRequest(
+            'PUT',
+            $destination,
+            $name,
+            [],
+            [
+                'Acl'         => $destination->getOption('public') ? 'public-read' : 'private',
+                'Copy-Source' => $this->buildUri($bucket, $name)->getPath()
+            ]
+        );
 
-            $this->client->send($request);
-        } catch (ClientException $e) {
-            if ($e->getCode() != 404) {
-                //Some authorization or other error
-                throw $e;
-            }
-
-            throw new ServerException($e->getMessage(), $e->getCode(), $e);
-        }
+        $this->run($request);
 
         return true;
     }
