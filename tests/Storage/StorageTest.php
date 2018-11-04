@@ -24,8 +24,8 @@ use Spiral\Storage\StorageManager;
 
 class StorageTest extends TestCase
 {
-    private static $storage;
-    private static $c;
+    protected static $storage;
+    protected static $c;
 
     public function tearDown()
     {

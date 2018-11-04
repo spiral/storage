@@ -9,6 +9,7 @@
 namespace Spiral\Storage\Tests;
 
 use Psr\Http\Message\StreamInterface;
+use Spiral\Storage\BucketInterface;
 use Spiral\Storage\ObjectInterface;
 
 class ExternalTest extends StorageTest
@@ -19,6 +20,21 @@ class ExternalTest extends StorageTest
     public function testFailBucketLocation()
     {
         $this->assertFalse($this->getStorage()->open('invalid')->exists());
+    }
+
+    public function testInjections()
+    {
+        $b = self::$c->get(BucketInterface::class, 'amazon');
+        $this->assertSame('amazon', $b->getName());
+    }
+
+    /**
+     * @expectedException \Spiral\Storage\Exception\StorageException
+     */
+    public function testInjectionsEx()
+    {
+        $b = self::$c->get(BucketInterface::class);
+        print_r($b);
     }
 
     public function testBucketAccess()
