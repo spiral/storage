@@ -15,8 +15,8 @@ require dirname(__DIR__) . '/vendor/autoload.php';
     'profile' => false,
     'home'    => __DIR__ . '/fixtures/',
     'mongodb' => [
-        'conn'     => 'mongodb://localhost:27017',
-        'database' => 'phpunit'
+        'connection' => 'mongodb://localhost:27017',
+        'database'   => 'phpunit'
     ],
     'ftp'     => [
         'host'     => 'localhost',

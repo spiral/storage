@@ -9,6 +9,7 @@
 namespace Spiral\Storage\Server;
 
 use MongoDB\Database;
+use MongoDB\Driver\Manager;
 use MongoDB\GridFS\Bucket;
 use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
@@ -22,17 +23,26 @@ use function GuzzleHttp\Psr7\stream_for;
  */
 class GridFSServer extends AbstractServer
 {
+
+    /**
+     * @invisible
+     * @var array
+     */
+    protected $options = [
+        'connection' => 'mongodb://localhost:27017',
+        'database'   => ''
+    ];
+
     /** @var Database */
     private $database;
 
     /**
-     * @param Database            $database
+     * @param array               $options
      * @param FilesInterface|null $files
      */
-    public function __construct(Database $database, FilesInterface $files = null)
+    public function __construct(array $options, FilesInterface $files = null)
     {
-        parent::__construct([], $files);
-        $this->database = $database;
+        parent::__construct($options, $files);
     }
 
     /**
@@ -40,7 +50,7 @@ class GridFSServer extends AbstractServer
      */
     public function disconnect()
     {
-
+        $this->database = null;
     }
 
     /**
@@ -154,6 +164,13 @@ class GridFSServer extends AbstractServer
      */
     protected function gridFS(BucketInterface $bucket): Bucket
     {
+        if (empty($this->database)) {
+            $this->database = new Database(
+                new Manager($this->options['connection']),
+                $this->options['database']
+            );
+        }
+
         return $this->database->selectGridFSBucket([
             'bucketName' => $bucket->getOption('bucket')
         ]);

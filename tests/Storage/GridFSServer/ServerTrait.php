@@ -7,8 +7,6 @@
 
 namespace Spiral\Storage\Tests\GridFSServer;
 
-use MongoDB\Database;
-use MongoDB\Driver\Manager;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Server\GridFSServer;
 use Spiral\Storage\ServerInterface;
@@ -22,12 +20,7 @@ trait ServerTrait
 
     protected function getServer(): ServerInterface
     {
-        return $this->server ?? $this->server = new GridFSServer(
-                new Database(
-                    new Manager(self::$OPTS['mongodb']['conn']),
-                    self::$OPTS['mongodb']['database']
-                )
-            );
+        return $this->server ?? $this->server = new GridFSServer(self::$OPTS['mongodb']);
     }
 
     protected function getBucket(): BucketInterface
