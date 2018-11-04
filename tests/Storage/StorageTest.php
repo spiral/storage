@@ -139,6 +139,7 @@ class StorageTest extends TestCase
         $b = new BootloadManager($c);
         $b->bootload([StorageBootloader::class]);
 
+        self::$c = $c;
         self::$storage = $c->get(StorageManager::class);
 
         return self::$storage;
