@@ -38,6 +38,14 @@ class GridFSServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
+    public function disconnect()
+    {
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function exists(BucketInterface $bucket, string $name): bool
     {
         return $this->gridFS($bucket)->findOne(['filename' => $name]) !== null;

@@ -40,14 +40,11 @@ class FtpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $options, FilesInterface $files = null)
+    public function disconnect()
     {
-        parent::__construct($options, $files);
-
-        if (!extension_loaded('ftp')) {
-            throw new ServerException(
-                "Unable to initialize ftp storage server, extension 'ftp' not found"
-            );
+        if (!empty($this->conn)) {
+            ftp_close($this->conn);
+            $this->conn = null;
         }
     }
 
@@ -209,6 +206,12 @@ class FtpServer extends AbstractServer
             return;
         }
 
+        if (!extension_loaded('ftp')) {
+            throw new ServerException(
+                "Unable to initialize ftp storage server, extension 'ftp' not found"
+            );
+        }
+
         $conn = ftp_connect(
             $this->options['host'],
             $this->options['port'],
@@ -313,16 +316,5 @@ class FtpServer extends AbstractServer
         $mode = $bucket->getOption('mode', FilesInterface::RUNTIME);
 
         return ftp_chmod($this->conn, $mode, $this->getPath($bucket, $name)) !== false;
-    }
-
-    /**
-     * Drop FTP connection.
-     */
-    public function __destruct()
-    {
-        if (!empty($this->conn)) {
-            ftp_close($this->conn);
-            $this->conn = null;
-        }
     }
 }

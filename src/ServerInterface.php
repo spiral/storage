@@ -20,6 +20,13 @@ use Spiral\Storage\Exception\ServerException;
 interface ServerInterface
 {
     /**
+     * Close server connection, server must stay usable till next call.
+     *
+     * @throws ServerException
+     */
+    public function disconnect();
+
+    /**
      * Check if object exists at server under specified bucket. Must return false if object does not
      * exists.
      *

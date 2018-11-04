@@ -179,4 +179,12 @@ abstract class AbstractServer implements ServerInterface
 
         return file_exists($source);
     }
+
+    /**
+     * Destroy the server and close the connection.
+     */
+    public function __debugInfo()
+    {
+        $this->disconnect();
+    }
 }

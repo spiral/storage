@@ -55,15 +55,9 @@ class SftpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $options, FilesInterface $files = null)
+    public function disconnect()
     {
-        parent::__construct($options, $files);
-
-        if (!extension_loaded('ssh2')) {
-            throw new ServerException(
-                "Unable to initialize sftp storage server, extension 'ssh2' not found"
-            );
-        }
+        $this->conn = null;
     }
 
     /**
@@ -182,6 +176,12 @@ class SftpServer extends AbstractServer
     {
         if (!empty($this->conn)) {
             return;
+        }
+
+        if (!extension_loaded('ssh2')) {
+            throw new ServerException(
+                "Unable to initialize sftp storage server, extension 'ssh2' not found"
+            );
         }
 
         $session = ssh2_connect(
