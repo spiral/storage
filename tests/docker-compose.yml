@@ -17,19 +17,18 @@ services:
 #      MYSQL_ROOT_PASSWORD: "root"
 #      MYSQL_ROOT_HOST: "%"
 #
-#  mongodb_storage:
-#    image: mysql:5.5
-#    restart: 'always'
-#    ports:
-#    - "13305:3306"
-#    environment:
-#      MYSQL_DATABASE: "spiral"
-#      MYSQL_ROOT_PASSWORD: "root"
-#      MYSQL_ROOT_HOST: "%"
-
-  s3_storage:
-    image: adobe/s3mock
-    restart: always
+  mongo_storage:
+    image: mongo
+    restart: 'always'
     ports:
-    - "9190:9190"
-    - "9191:9191"
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+
+  #s3_storage:
+  #  image: adobe/s3mock
+  #  restart: always
+  #  ports:
+  #  - "9190:9190"
+  #  - "9191:9191"
