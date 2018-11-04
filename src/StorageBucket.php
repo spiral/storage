@@ -28,14 +28,14 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
     const INJECTOR = StorageManager::class;
 
-    /** @var string */
-    private $name = '';
-
-    /** @var string */
-    private $prefix = '';
-
     /** @var ServerInterface */
-    private $server = null;
+    private $server;
+
+    /** @var string */
+    private $name;
+
+    /** @var string */
+    private $prefix;
 
     /** @var array */
     private $options = [];
@@ -44,15 +44,15 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
      * {@inheritdoc}
      */
     public function __construct(
+        ServerInterface $server,
         string $name,
         string $prefix,
-        array $options,
-        ServerInterface $server
+        array $options
     ) {
+        $this->server = $server;
         $this->name = $name;
         $this->prefix = $prefix;
         $this->options = $options;
-        $this->server = $server;
     }
 
     /**

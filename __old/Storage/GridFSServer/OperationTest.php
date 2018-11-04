@@ -11,7 +11,7 @@ namespace Spiral\Tests\Storage\GridFSServer;
  * @see https://github.com/slimphp/Slim/issues/2112
  * @see https://jira.mongodb.org/browse/PHPLIB-213
  */
-class OperationsTest extends \Spiral\Tests\Storage\OperationsTest
+class OperationTest extends \Spiral\Tests\Storage\OperationTest
 {
     use ServerTrait;
 }

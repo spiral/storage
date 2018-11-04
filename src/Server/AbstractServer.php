@@ -11,12 +11,13 @@ namespace Spiral\Storage\Server;
 
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
+use Spiral\Files\Files;
 use Spiral\Files\FilesInterface;
-use Spiral\Streams\StreamableInterface;
-use Spiral\Streams\StreamWrapper;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exception\ServerException;
 use Spiral\Storage\ServerInterface;
+use Spiral\Streams\StreamableInterface;
+use Spiral\Streams\StreamWrapper;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**
@@ -39,9 +40,9 @@ abstract class AbstractServer implements ServerInterface
      * @param array          $options Server specific options.
      * @param FilesInterface $files   Required for operations with local filesystem.
      */
-    public function __construct(array $options, FilesInterface $files)
+    public function __construct(array $options, FilesInterface $files = null)
     {
-        $this->files = $files;
+        $this->files = $files ?? new Files();
         $this->options = $options + $this->options;
     }
 

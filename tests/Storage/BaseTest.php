@@ -1,11 +1,14 @@
 <?php
 /**
- * Spiral, Core Components
+ * Spiral Framework.
  *
- * @author Wolfy-J
+ * @license   MIT
+ * @author    Anton Titov (Wolfy-J)
  */
-namespace Spiral\Tests\Storage;
 
+namespace Spiral\Storage\Tests;
+
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -14,28 +17,27 @@ use Psr\Log\NullLogger;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\ServerInterface;
 
-abstract class BaseTest extends \PHPUnit_Framework_TestCase
+abstract class BaseTest extends TestCase
 {
-    const PROFILING = ENABLE_PROFILING;
+    public static $PROFILING = false;
+    public static $DIR = '';
 
-    protected $skipped = false;
+    abstract protected function getServer(): ServerInterface;
 
-    protected function getStreamSource(): StreamInterface
+    abstract protected function getBucket(): BucketInterface;
+
+    abstract protected function getSecondaryBucket(): BucketInterface;
+
+    protected function generateStream(): StreamInterface
     {
         $content = random_bytes(mt_rand(100, 100000));
 
         return \GuzzleHttp\Psr7\stream_for($content);
     }
 
-    abstract protected function getBucket(): BucketInterface;
-
-    abstract protected function secondaryBucket(): BucketInterface;
-
-    abstract protected function getServer(): ServerInterface;
-
     protected function makeLogger()
     {
-        if (static::PROFILING) {
+        if (self::$PROFILING) {
             return new class implements LoggerInterface
             {
                 use LoggerTrait;

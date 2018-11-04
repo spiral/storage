@@ -6,7 +6,7 @@
  */
 namespace Spiral\Tests\Storage\FtpServer;
 
-class OperationsTest extends \Spiral\Tests\Storage\OperationsTest
+class OperationTest extends \Spiral\Tests\Storage\OperationTest
 {
     use ServerTrait;
 }

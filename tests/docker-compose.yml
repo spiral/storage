@@ -5,8 +5,6 @@ services:
     image: stilliard/pure-ftpd:hardened
     ports:
     - "11433:1433"
-    environment:
-
 
 #  sftp_storage:
 #    image: mysql:latest
@@ -28,13 +26,10 @@ services:
 #      MYSQL_DATABASE: "spiral"
 #      MYSQL_ROOT_PASSWORD: "root"
 #      MYSQL_ROOT_HOST: "%"
-#
-#  s3_storage:
-#    image: postgres:11
-#    restart: always
-#    ports:
-#    - "15432:5432"
-#    environment:
-#      POSTGRES_DB: "spiral"
-#      POSTGRES_USER: "postgres"
-#      POSTGRES_PASSWORD: "postgres"
+
+  s3_storage:
+    image: adobe/s3mock
+    restart: always
+    ports:
+    - "9190:9190"
+    - "9191:9191"

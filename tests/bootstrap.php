@@ -10,6 +10,9 @@ ini_set('display_errors', true);
 
 //Composer
 require dirname(__DIR__) . '/vendor/autoload.php';
+
+\Spiral\Storage\Tests\BaseTest::$DIR = __DIR__ . '/fixtures/';
+
 //
 //if (!function_exists('env')) {
 //    function env(string $key, $default = null)
