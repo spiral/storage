@@ -13,6 +13,7 @@ use Psr\Http\Message\StreamInterface;
 use Spiral\Storage\Exception\ServerException;
 use Spiral\Storage\ServerInterface;
 use Spiral\Storage\StorageBucket;
+use Spiral\Storage\StorageObject;
 
 abstract class BucketTest extends BaseTest
 {
@@ -93,6 +94,23 @@ abstract class BucketTest extends BaseTest
         $bucket->put('target', $content);
 
         $this->assertTrue($bucket->exists('target'));
+    }
+
+    public function testPutObject()
+    {
+        $bucket = $this->getBucket();
+
+        $this->assertFalse($bucket->exists('target'));
+
+        $content = __FILE__;
+        $bucket->put('target', $content);
+        $this->assertTrue($bucket->exists('target'));
+
+        $object = new StorageObject($bucket, 'target');
+
+        $bucket->put('target4', $object);
+        $this->assertTrue($bucket->exists('target4'));
+        $bucket->delete('target4');
     }
 
     public function testPutResource()
@@ -452,6 +470,7 @@ abstract class BucketTest extends BaseTest
         $s->expects('rename')->andThrows(ServerException::class);
 
         $b = new StorageBucket($s, '', '', []);
+        $b->rename('name', 'name');
         $b->rename('name', 'newName');
     }
 
