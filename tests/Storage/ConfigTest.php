@@ -137,8 +137,8 @@ class ConfigTest extends TestCase
         $config = new StorageConfig([
             'buckets' => [
                 'amazon' => [
-                    'server' => AmazonServer::class,
-                    'prefix' => 'aws:'
+                    'options' => [],
+                    'prefix'  => 'aws:'
                 ],
             ]
         ]);
@@ -154,13 +154,13 @@ class ConfigTest extends TestCase
         $config = new StorageConfig([
             'buckets' => [
                 'amazon' => [
-                    'server' => AmazonServer::class,
-                    'prefix' => 'aws:'
+                    'server'  => AmazonServer::class,
+                    'options' => []
                 ],
             ]
         ]);
 
-        $config->getBucket('other');
+        $config->getBucket('amazon');
     }
 
     /**
@@ -194,7 +194,7 @@ class ConfigTest extends TestCase
             ]
         ]);
 
-        $config->getBucket('other');
+        $config->getBucket('amazon');
     }
 
     public function testBucketOptions()
