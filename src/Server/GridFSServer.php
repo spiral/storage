@@ -12,9 +12,9 @@ use MongoDB\Database;
 use MongoDB\GridFS\Bucket;
 use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
-use Spiral\Streams\StreamWrapper;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exception\ServerException;
+use Spiral\Streams\StreamWrapper;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**
@@ -23,13 +23,13 @@ use function GuzzleHttp\Psr7\stream_for;
 class GridFSServer extends AbstractServer
 {
     /** @var Database */
-    protected $database;
+    private $database;
 
     /**
      * @param Database            $database
      * @param FilesInterface|null $files
      */
-    public function __construct(Database $database, FilesInterface $files)
+    public function __construct(Database $database, FilesInterface $files = null)
     {
         parent::__construct([], $files);
         $this->database = $database;
@@ -37,8 +37,6 @@ class GridFSServer extends AbstractServer
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool|\MongoGridFSFile
      */
     public function exists(BucketInterface $bucket, string $name): bool
     {
@@ -148,6 +146,8 @@ class GridFSServer extends AbstractServer
      */
     protected function gridFS(BucketInterface $bucket): Bucket
     {
-        return $this->database->selectGridFSBucket(['bucketName' => $bucket->getOption('bucket')]);
+        return $this->database->selectGridFSBucket([
+            'bucketName' => $bucket->getOption('bucket')
+        ]);
     }
 }

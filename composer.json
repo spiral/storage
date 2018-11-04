@@ -19,6 +19,8 @@
     "spiral/logger": "^1.1"
   },
   "require-dev": {
+    "ext-mongodb": "^1.1",
+    "mongodb/mongodb": "^1.4",
     "phpunit/phpunit": "~7.0",
     "mockery/mockery": "^1.1"
   },
