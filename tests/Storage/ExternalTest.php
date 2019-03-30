@@ -9,7 +9,6 @@
 namespace Spiral\Storage\Tests;
 
 use Psr\Http\Message\StreamInterface;
-use Spiral\Boot\FinalizerInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\ObjectInterface;
 use Spiral\Storage\Server\AmazonServer;
@@ -163,8 +162,6 @@ class ExternalTest extends StorageTest
         $gridObject->delete();
         $localObject->delete();
         $sftpObject->delete();
-
-        self::$c->get(FinalizerInterface::class)->finalize();
     }
 
     public function testGetServer()

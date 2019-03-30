@@ -105,7 +105,7 @@ class SftpServer extends AbstractServer
         try {
             $size = stream_copy_to_stream($resource, $destination);
         } finally {
-            StreamWrapper::releaseUri($resource);
+            StreamWrapper::release($resource);
             fclose($resource);
             fclose($destination);
         }

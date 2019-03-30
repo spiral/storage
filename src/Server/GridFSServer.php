@@ -87,7 +87,7 @@ class GridFSServer extends AbstractServer
         try {
             $result = $this->gridFS($bucket)->uploadFromStream($name, $resource);
         } finally {
-            StreamWrapper::releaseUri($resource);
+            StreamWrapper::release($resource);
             fclose($resource);
         }
 

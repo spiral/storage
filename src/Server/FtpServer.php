@@ -82,13 +82,13 @@ class FtpServer extends AbstractServer
 
         $location = $this->ensureLocation($bucket, $name);
 
-        $filename = StreamWrapper::localFilename($stream);
+        $filename = StreamWrapper::getFilename($stream);
         try {
             if (!ftp_put($this->conn, $location, $filename, FTP_BINARY)) {
                 throw new ServerException("Unable to put '{$name}' to FTP server");
             }
         } finally {
-            StreamWrapper::releaseUri($filename);
+            StreamWrapper::release($filename);
         }
 
         return $this->refreshPermissions($bucket, $name);

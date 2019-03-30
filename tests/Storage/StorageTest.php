@@ -8,7 +8,6 @@
 
 namespace Spiral\Storage\Tests;
 
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Spiral\Boot\Finalizer;
@@ -123,13 +122,8 @@ class StorageTest extends TestCase
             ]
         ]);
 
-        $configurator = m::mock(ConfiguratorInterface::class);
-        $configurator->expects('setDefaults');
-
         $c = new Container();
         $c->bind(StorageConfig::class, $config);
-        $c->bind(ConfiguratorInterface::class, $configurator);
-        $c->bindSingleton(FinalizerInterface::class, new Finalizer());
 
         $b = new BootloadManager($c);
         $b->bootload([StorageBootloader::class]);
@@ -140,7 +134,6 @@ class StorageTest extends TestCase
         return self::$storage;
     }
 }
-
 
 class StorageBootloader extends Bootloader
 {

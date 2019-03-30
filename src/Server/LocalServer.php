@@ -67,7 +67,7 @@ class LocalServer extends AbstractServer
                 throw new ServerException("Unable to put to '{$path}'");
             }
         } finally {
-            StreamWrapper::releaseUri($resource);
+            StreamWrapper::release($resource);
             fclose($resource);
         }
 
