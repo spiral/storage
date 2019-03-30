@@ -13,9 +13,9 @@
     "php": ">=7.1",
     "spiral/debug": "^1.0",
     "spiral/logger": "^1.1",
+    "spiral/files": "^2.0",
     "spiral/streams": "^1.0",
-    "guzzlehttp/guzzle": "^6.3",
-    "spiral/files": "^2.0"
+    "guzzlehttp/guzzle": "^6.3"
   },
   "require-dev": {
     "ext-ftp": "*",
