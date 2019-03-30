@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework, SpiralScout LLC.
  *
@@ -50,37 +50,19 @@ class LocalServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function put(BucketInterface $bucket, string $name, $source): bool
+    public function put(BucketInterface $bucket, string $name, $stream): bool
     {
         return $this->internalCopy(
             $bucket,
-            $this->castFilename($source),
+            $this->castFilename($stream),
             $this->getPath($bucket, $name)
         );
     }
 
     /**
      * {@inheritdoc}
-     *
-     * Note, this method will return real filename, DO NOT remove or write into it! User streams
-     * instead as more safer method.
      */
-    public function allocateFilename(BucketInterface $bucket, string $name): string
-    {
-        if (!$this->exists($bucket, $name)) {
-            throw new ServerException(
-                "Unable to create local filename for '{$name}', object does not exists"
-            );
-        }
-
-        //localFilename call is required to mock filesystem operations (clone file in a future?)
-        return $this->getPath($bucket, $name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
+    public function getStream(BucketInterface $bucket, string $name): StreamInterface
     {
         if (!$this->exists($bucket, $name)) {
             throw new ServerException(
@@ -89,7 +71,7 @@ class LocalServer extends AbstractServer
         }
 
         //Getting readonly stream
-        return stream_for(fopen($this->allocateFilename($bucket, $name), 'rb'));
+        return stream_for(fopen($this->getPath($bucket, $name), 'rb'));
     }
 
     /**

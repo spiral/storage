@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -20,7 +20,7 @@ use Spiral\Storage\Exception\StorageException;
  * listings and features specific to storage adapter (however such functionality can be added at
  * server level).
  */
-class StorageManager implements StorageInterface, InjectorInterface
+final class StorageManager implements StorageInterface, InjectorInterface
 {
     /** @var StorageConfig */
     private $config;

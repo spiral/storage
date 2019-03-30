@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework, SpiralScout LLC.
  *
@@ -9,16 +9,11 @@
 
 namespace Spiral\Storage\Server;
 
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UploadedFileInterface;
 use Spiral\Files\Files;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exception\ServerException;
 use Spiral\Storage\ServerInterface;
-use Spiral\Streams\StreamableInterface;
-use Spiral\Streams\StreamWrapper;
-use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * AbstractServer implementation with different naming.
@@ -38,7 +33,7 @@ abstract class AbstractServer implements ServerInterface
 
     /**
      * @param array          $options Server specific options.
-     * @param FilesInterface $files   Required for operations with local filesystem.
+     * @param FilesInterface $files Required for operations with local filesystem.
      */
     public function __construct(array $options, FilesInterface $files = null)
     {
@@ -49,33 +44,16 @@ abstract class AbstractServer implements ServerInterface
     /**
      * {@inheritdoc}
      */
-    public function allocateFilename(BucketInterface $bucket, string $name): string
-    {
-        if (empty($stream = $this->allocateStream($bucket, $name))) {
-            throw new ServerException("Unable to allocate local filename for '{$name}'");
-        }
-
-        //Default implementation will use stream to create temporary filename, such filename
-        //can't be used outside php scope
-        return StreamWrapper::localFilename($stream);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function copy(BucketInterface $bucket, BucketInterface $destination, string $name): bool
     {
-        return $this->put($destination, $name, $this->allocateStream($bucket, $name));
+        return $this->put($destination, $name, $this->getStream($bucket, $name));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function replace(
-        BucketInterface $bucket,
-        BucketInterface $destination,
-        string $name
-    ): bool {
+    public function replace(BucketInterface $bucket, BucketInterface $destination, string $name): bool
+    {
         if ($this->copy($bucket, $destination, $name)) {
             $this->delete($bucket, $name);
 
@@ -86,104 +64,9 @@ abstract class AbstractServer implements ServerInterface
     }
 
     /**
-     * Cast local filename to be used in file based methods and etc.
-     *
-     * @param string|StreamInterface|resource $source
-     *
-     * @return string
-     *
-     * @throws ServerException
-     */
-    protected function castFilename($source): string
-    {
-        if (empty($source)) {
-            return StreamWrapper::localFilename(stream_for(''));
-        }
-
-        if (is_string($source)) {
-            if ($this->isFilename($source)) {
-                $source = stream_for(fopen($source, 'rb'));
-            } else {
-                throw new ServerException(
-                    "Source must be a valid resource, stream or filename, invalid value given"
-                );
-            }
-        }
-
-        if ($source instanceof UploadedFileInterface || $source instanceof StreamableInterface) {
-            $source = $source->getStream();
-        }
-
-        if ($source instanceof StreamInterface) {
-            return StreamWrapper::localFilename($source);
-        }
-
-        throw new ServerException("Unable to get filename for non Stream instance");
-    }
-
-    /**
-     * Cast stream associated with origin data.
-     *
-     * @param string|StreamInterface|resource $source
-     *
-     * @return StreamInterface
-     */
-    protected function castStream($source): StreamInterface
-    {
-        if ($source instanceof UploadedFileInterface || $source instanceof StreamableInterface) {
-            $source = $source->getStream();
-        }
-
-        if ($source instanceof StreamInterface) {
-            //This step is important to prevent user errors
-            $source->rewind();
-
-            return $source;
-        }
-
-        if (empty($source)) {
-            //Guzzle?
-            return stream_for('');
-        }
-
-        if ($this->isFilename($source)) {
-            //Must never pass user string in here, use Stream
-            return stream_for(fopen($source, 'rb'));
-        }
-
-        //We do not allow source names in a string form
-        throw new ServerException(
-            "Source must be a valid resource, stream or filename, invalid value given"
-        );
-    }
-
-    /**
-     * Check if given string is proper filename.
-     *
-     * @param mixed $source
-     *
-     * @return bool
-     */
-    protected function isFilename($source): bool
-    {
-        if (!is_string($source)) {
-            return false;
-        }
-
-        if (!preg_match('/[^A-Za-z0-9.#\\-$]/', $source)) {
-            return false;
-        }
-
-        //To filter out binary strings
-        $source = strval(str_replace("\0", "", $source));
-
-        return file_exists($source);
-    }
-
-    /**
      * Destroy the server and close the connection.
      */
-    public function __debugInfo()
+    public function __destruct()
     {
         $this->disconnect();
     }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -86,15 +86,14 @@ class SftpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function put(BucketInterface $bucket, string $name, $source): bool
+    public function put(BucketInterface $bucket, string $name, StreamInterface $stream): bool
     {
         $this->connect();
 
-        //Converting into stream
-        $stream = $this->castStream($source);
+        $stream->rewind();
 
         $expectedSize = $stream->getSize();
-        $resource = StreamWrapper::getResource($stream);
+
 
         //Make sure target directory exists
         $this->ensureLocation($bucket, $name);
@@ -102,11 +101,14 @@ class SftpServer extends AbstractServer
         //Remote file
         $destination = fopen($this->castRemoteFilename($bucket, $name), 'w');
 
-        //We can check size here
-        $size = stream_copy_to_stream($resource, $destination);
-
-        fclose($resource);
-        fclose($destination);
+        $resource = StreamWrapper::getResource($stream);
+        try {
+            $size = stream_copy_to_stream($resource, $destination);
+        } finally {
+            StreamWrapper::releaseUri($resource);
+            fclose($resource);
+            fclose($destination);
+        }
 
         return $expectedSize == $size && $this->refreshPermissions($bucket, $name);
     }
@@ -114,7 +116,7 @@ class SftpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
+    public function getStream(BucketInterface $bucket, string $name): StreamInterface
     {
         $this->connect();
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -167,14 +167,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
             $this->getName()
         ));
 
-        if ($source instanceof UploadedFileInterface || $source instanceof StreamableInterface) {
-            //Known simplification for UploadedFile
-            $source = $source->getStream();
-        }
-
-        if (is_resource($source)) {
-            $source = stream_for($source);
-        }
+        $stream = $this->castStream($source);
 
         $benchmark = $this->benchmark(
             $this->getName(),
@@ -182,7 +175,8 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
         );
 
         try {
-            $this->server->put($this, $name, $source);
+            $this->server->put($this, $name, $stream);
+            //    $stream->detach();
 
             //Reopening
             return $this->getAddress($name);
@@ -196,32 +190,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     /**
      * {@inheritdoc}
      */
-    public function allocateFilename(string $name): string
-    {
-        $this->getLogger()->info(sprintf(
-            "allocate filename of '%s' in '%s' bucket.",
-            $this->getAddress($name),
-            $this->getName()
-        ));
-
-        $benchmark = $this->benchmark(
-            $this->getName(),
-            "filename::{$this->getAddress($name)}"
-        );
-
-        try {
-            return $this->getServer()->allocateFilename($this, $name);
-        } catch (ServerException $e) {
-            throw new BucketException($e->getMessage(), $e->getCode(), $e);
-        } finally {
-            $benchmark->complete();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function allocateStream(string $name): StreamInterface
+    public function getStream(string $name): StreamInterface
     {
         $this->getLogger()->info(sprintf(
             "get stream for '%s' in '%s' bucket.",
@@ -235,7 +204,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
         );
 
         try {
-            return $this->getServer()->allocateStream($this, $name);
+            return $this->getServer()->getStream($this, $name);
         } catch (ServerException $e) {
             throw new BucketException($e->getMessage(), $e->getCode(), $e);
         } finally {
@@ -274,7 +243,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
     public function rename(string $oldName, string $newName): string
     {
         if ($oldName == $newName) {
-            return true;
+            return $oldName;
         }
 
         $this->getLogger()->info(sprintf(
@@ -340,7 +309,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
                 $destination->getAddress($name)
             ));
 
-            $destination->put($name, $stream = $this->allocateStream($name));
+            $destination->put($name, $stream = $this->getStream($name));
             $stream->detach();
         }
 
@@ -387,7 +356,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
             ));
 
             //Copying using temporary stream (buffer)
-            $destination->put($name, $stream = $this->allocateStream($name));
+            $destination->put($name, $stream = $this->getStream($name));
 
             if ($stream->detach()) {
                 //Dropping temporary stream
@@ -396,5 +365,68 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
         }
 
         return $destination->getAddress($name);
+    }
+
+    /**
+     * Cast stream associated with origin data.
+     *
+     * @param string|StreamInterface|resource $source
+     *
+     * @return StreamInterface
+     */
+    protected function castStream($source): StreamInterface
+    {
+        if ($source instanceof UploadedFileInterface || $source instanceof StreamableInterface) {
+            $source = $source->getStream();
+        }
+
+        if ($source instanceof StreamInterface) {
+            //This step is important to prevent user errors
+            $source->rewind();
+
+            return $source;
+        }
+
+        if (is_resource($source)) {
+            return stream_for($source);
+        }
+
+        if (empty($source)) {
+            //Guzzle?
+            return stream_for('');
+        }
+
+        if ($this->isFilename($source)) {
+            //Must never pass user string in here, use Stream
+            return stream_for(fopen($source, 'rb'));
+        }
+
+        //We do not allow source names in a string form
+        throw new BucketException(
+            "Source must be a valid resource, stream or filename, invalid value given"
+        );
+    }
+
+    /**
+     * Check if given string is proper filename.
+     *
+     * @param mixed $source
+     *
+     * @return bool
+     */
+    protected function isFilename($source): bool
+    {
+        if (!is_string($source)) {
+            return false;
+        }
+
+        if (!preg_match('/[^A-Za-z0-9.#\\-$]/', $source)) {
+            return false;
+        }
+
+        //To filter out binary strings
+        $source = strval(str_replace("\0", "", $source));
+
+        return file_exists($source);
     }
 }

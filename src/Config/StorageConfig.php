@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -71,7 +71,7 @@ class StorageConfig extends InjectableConfig
         }
 
         if (!isset($wire['class'])) {
-            throw new ConfigException("Invalid server `{$server}` definition, `class` missing.");
+            throw new ConfigException("Invalid server `{$server}` definition, `class` missing");
         }
 
         return new Autowire($wire['class'], $wire);
@@ -97,17 +97,17 @@ class StorageConfig extends InjectableConfig
     public function getBucket(string $name): array
     {
         if (!$this->hasBucket($name)) {
-            throw new ConfigException("Undefined bucket `{$name}`.");
+            throw new ConfigException("Undefined bucket `{$name}`");
         }
 
         $bucket = $this->config['buckets'][$name];
 
         if (!array_key_exists('options', $bucket)) {
-            throw new ConfigException("Bucket `{$name}` must specify `options`.");
+            throw new ConfigException("Bucket `{$name}` must specify `options`");
         }
 
         if (!array_key_exists('prefix', $bucket)) {
-            throw new ConfigException("Bucket `{$name}` must specify `prefix`.");
+            throw new ConfigException("Bucket `{$name}` must specify `prefix`");
         }
 
         if (!array_key_exists('server', $bucket)) {

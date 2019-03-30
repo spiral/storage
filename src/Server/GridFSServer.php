@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -76,17 +76,20 @@ class GridFSServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function put(BucketInterface $bucket, string $name, $source): bool
+    public function put(BucketInterface $bucket, string $name, StreamInterface $stream): bool
     {
         //No updates, only delete and re-upload
         if ($this->exists($bucket, $name)) {
             $this->delete($bucket, $name);
         }
 
-        $result = $this->gridFS($bucket)->uploadFromStream(
-            $name,
-            StreamWrapper::getResource($this->castStream($source))
-        );
+        $resource = StreamWrapper::getResource($stream);
+        try {
+            $result = $this->gridFS($bucket)->uploadFromStream($name, $resource);
+        } finally {
+            StreamWrapper::releaseUri($resource);
+            fclose($resource);
+        }
 
         if (empty($result)) {
             throw new ServerException("Unable to store {$name} at GridFS server");
@@ -104,7 +107,7 @@ class GridFSServer extends AbstractServer
      * @see https://github.com/slimphp/Slim/issues/2112
      * @see https://jira.mongodb.org/browse/PHPLIB-213
      */
-    public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
+    public function getStream(BucketInterface $bucket, string $name): StreamInterface
     {
         $file = $this->gridFS($bucket)->findOne(['filename' => $name]);
         if (empty($file)) {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -74,17 +74,9 @@ final class StorageObject implements ObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function localFilename(): string
-    {
-        return $this->bucket->allocateFilename($this->name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getStream(): StreamInterface
     {
-        return $this->bucket->allocateStream($this->name);
+        return $this->bucket->getStream($this->name);
     }
 
     /**

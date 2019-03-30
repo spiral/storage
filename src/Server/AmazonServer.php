@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework, SpiralScout LLC.
  *
@@ -105,7 +105,7 @@ class AmazonServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function put(BucketInterface $bucket, string $name, $source): bool
+    public function put(BucketInterface $bucket, string $name, StreamInterface $stream): bool
     {
         if (empty($mimetype = mimetype_from_filename($name))) {
             $mimetype = self::DEFAULT_MIMETYPE;
@@ -115,20 +115,22 @@ class AmazonServer extends AbstractServer
             'PUT',
             $bucket,
             $name,
-            $this->createHeaders($bucket, $name, $source),
+            $this->createHeaders($bucket, $name, $stream),
             [
                 'Acl'          => $bucket->getOption('public') ? 'public-read' : 'private',
                 'Content-Type' => $mimetype
             ]
         );
 
-        return $this->run($request->withBody($this->castStream($source))) !== null;
+        $stream->rewind();
+
+        return $this->run($request->withBody($stream)) !== null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
+    public function getStream(BucketInterface $bucket, string $name): StreamInterface
     {
         return $this->run($this->buildRequest('GET', $bucket, $name))->getBody();
     }
@@ -322,11 +324,11 @@ class AmazonServer extends AbstractServer
      *
      * @param BucketInterface $bucket
      * @param string          $name
-     * @param mixed           $source
+     * @param StreamInterface $stream
      *
      * @return array
      */
-    private function createHeaders(BucketInterface $bucket, string $name, $source): array
+    private function createHeaders(BucketInterface $bucket, string $name, StreamInterface $stream): array
     {
         if (empty($mimetype = mimetype_from_filename($name))) {
             $mimetype = self::DEFAULT_MIMETYPE;
@@ -344,8 +346,10 @@ class AmazonServer extends AbstractServer
             );
         }
 
+        $stream->rewind();
+
         return $headers + [
-                'Content-MD5'  => base64_encode(md5_file($this->castFilename($source), true)),
+                'Content-MD5'  => base64_encode(md5($stream->__toString(), true)),
                 'Content-Type' => $mimetype
             ];
     }

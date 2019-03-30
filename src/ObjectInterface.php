@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -8,6 +8,7 @@
 
 namespace Spiral\Storage;
 
+use Psr\Http\Message\StreamInterface;
 use Spiral\Storage\Exception\BucketException;
 use Spiral\Streams\StreamableInterface;
 
@@ -57,15 +58,12 @@ interface ObjectInterface extends StreamableInterface
     public function getSize(): ?int;
 
     /**
-     * Must return filename which is valid in associated FilesInterface instance. Must trow an
-     * exception if object does not exists. Filename can be temporary and should not be used
-     * between sessions. You must never write anything to this file.
+     * Return stream associated with the object content. All streams must be closed!
      *
-     * @return string
-     *
+     * @return StreamInterface
      * @throws BucketException
      */
-    public function localFilename(): string;
+    public function getStream(): StreamInterface;
 
     /**
      * Delete object from associated bucket.

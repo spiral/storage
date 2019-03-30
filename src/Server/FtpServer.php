@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework, SpiralScout LLC.
  *
@@ -13,6 +13,7 @@ use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exception\ServerException;
+use Spiral\Streams\StreamWrapper;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**
@@ -75,13 +76,19 @@ class FtpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function put(BucketInterface $bucket, string $name, $source): bool
+    public function put(BucketInterface $bucket, string $name, StreamInterface $stream): bool
     {
         $this->connect();
 
         $location = $this->ensureLocation($bucket, $name);
-        if (!ftp_put($this->conn, $location, $this->castFilename($source), FTP_BINARY)) {
-            throw new ServerException("Unable to put '{$name}' to FTP server");
+
+        $filename = StreamWrapper::localFilename($stream);
+        try {
+            if (!ftp_put($this->conn, $location, $filename, FTP_BINARY)) {
+                throw new ServerException("Unable to put '{$name}' to FTP server");
+            }
+        } finally {
+            StreamWrapper::releaseUri($filename);
         }
 
         return $this->refreshPermissions($bucket, $name);
@@ -118,7 +125,7 @@ class FtpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function allocateStream(BucketInterface $bucket, string $name): StreamInterface
+    public function getStream(BucketInterface $bucket, string $name): StreamInterface
     {
         $this->connect();
 

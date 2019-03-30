@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -105,18 +105,6 @@ interface BucketInterface
     public function put(string $name, $source): string;
 
     /**
-     * Must return filename which is valid in associated FilesInterface instance. Must trow an
-     * exception if object does not exists. Filename can be temporary and should not be used
-     * between sessions.
-     *
-     * @param string $name
-     * @return string
-     *
-     * @throws BucketException
-     */
-    public function allocateFilename(string $name): string;
-
-    /**
      * Return PSR7 stream associated with bucket object content or trow and exception.
      *
      * @param string $name Storage object name.
@@ -124,7 +112,7 @@ interface BucketInterface
      *
      * @throws BucketException
      */
-    public function allocateStream(string $name): StreamInterface;
+    public function getStream(string $name): StreamInterface;
 
     /**
      * Delete bucket object if it exists.

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -12,8 +12,8 @@ use Psr\Container\ContainerInterface;
 use Spiral\Boot\FinalizerInterface;
 use Spiral\Config\ConfiguratorInterface;
 use Spiral\Core\Bootloader\Bootloader;
-use Spiral\Storage\BucketInterface;
 use Spiral\Storage\StorageBucket;
+use Spiral\Storage\BucketInterface;
 use Spiral\Storage\StorageInterface;
 use Spiral\Storage\StorageManager;
 
@@ -45,8 +45,10 @@ class StorageBootloader extends Bootloader
             'buckets' => [],
         ]);
 
-        $finalizer->addFinalizer(function () use ($container) {
-            $container->get(StorageInterface::class)->disconnect();
+        $finalizer->addFinalizer(function (bool $terminate) use ($container) {
+            if ($terminate) {
+                $container->get(StorageInterface::class)->disconnect();
+            }
         });
     }
 }

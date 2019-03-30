@@ -18,6 +18,9 @@
     "guzzlehttp/guzzle": "^6.3"
   },
   "require-dev": {
+    "ext-ftp": "*",
+    "ext-ssh2": "*",
+    "ext-mongodb": "*",
     "mongodb/mongodb": "^1.1",
     "phpunit/phpunit": "~7.0",
     "mockery/mockery": "^1.1"

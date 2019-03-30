@@ -30,6 +30,12 @@ abstract class BaseTest extends StorageTest
         return $this->getBucket()->getPrefix() . $name;
     }
 
+    public function tearDown()
+    {
+        parent::tearDown();
+        clearstatcache();
+    }
+
     protected function makeLogger()
     {
         if (self::$OPTS['profile']) {

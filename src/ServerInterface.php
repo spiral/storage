@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Spiral Framework.
  *
@@ -52,27 +52,14 @@ interface ServerInterface
     /**
      * Put object data into specified bucket under given name, must replace existed data.
      *
-     * @param BucketInterface                 $bucket
-     * @param string                          $name
-     * @param string|StreamInterface|resource $source
+     * @param BucketInterface $bucket
+     * @param string          $name
+     * @param StreamInterface $stream
      *
      * @return bool
      * @throws ServerException
      */
-    public function put(BucketInterface $bucket, string $name, $source): bool;
-
-    /**
-     * Must return filename which is valid in associated FilesInterface instance. Must trow an
-     * exception if object does not exists. Filename can be temporary and should not be used
-     * between sessions.
-     *
-     * @param BucketInterface $bucket
-     * @param string          $name
-     *
-     * @return string
-     * @throws ServerException
-     */
-    public function allocateFilename(BucketInterface $bucket, string $name): string;
+    public function put(BucketInterface $bucket, string $name, StreamInterface $stream): bool;
 
     /**
      * Return PSR7 stream associated with bucket object content or trow and exception.
@@ -83,7 +70,7 @@ interface ServerInterface
      * @return StreamInterface
      * @throws ServerException
      */
-    public function allocateStream(BucketInterface $bucket, string $name): StreamInterface;
+    public function getStream(BucketInterface $bucket, string $name): StreamInterface;
 
     /**
      * Delete bucket object if it exists.
