@@ -13,6 +13,7 @@ use Psr\Http\Message\StreamInterface;
 use Spiral\Files\FilesInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Exception\ServerException;
+use Spiral\Streams\StreamWrapper;
 use function GuzzleHttp\Psr7\stream_for;
 
 /**
@@ -50,13 +51,27 @@ class LocalServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function put(BucketInterface $bucket, string $name, $stream): bool
+    public function put(BucketInterface $bucket, string $name, StreamInterface $stream): bool
     {
-        return $this->internalCopy(
-            $bucket,
-            $this->castFilename($stream),
-            $this->getPath($bucket, $name)
-        );
+        $path = $this->getPath($bucket, $name);
+
+        $mode = $bucket->getOption('mode', FilesInterface::RUNTIME);
+
+        //Pre-ensuring location
+        $this->files->ensureDirectory(dirname($path), $mode);
+
+        $resource = StreamWrapper::getResource($stream);
+        try {
+            $target = fopen($path, 'w');
+            if (stream_copy_to_stream($resource, $target) === false) {
+                throw new ServerException("Unable to put to '{$path}'");
+            }
+        } finally {
+            StreamWrapper::releaseUri($resource);
+            fclose($resource);
+        }
+
+        return $this->files->setPermissions($path, $mode);
     }
 
     /**

@@ -349,7 +349,7 @@ class AmazonServer extends AbstractServer
         $stream->rewind();
 
         return $headers + [
-                'Content-MD5'  => base64_encode(md5($stream->__toString(), true)),
+                'Content-MD5'  => base64_encode(md5($stream->getContents(), true)),
                 'Content-Type' => $mimetype
             ];
     }

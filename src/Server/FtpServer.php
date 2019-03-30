@@ -97,39 +97,11 @@ class FtpServer extends AbstractServer
     /**
      * {@inheritdoc}
      */
-    public function allocateFilename(BucketInterface $bucket, string $name): string
-    {
-        $this->connect();
-
-        if (!$this->exists($bucket, $name)) {
-            throw new ServerException(
-                "Unable to create local filename for '{$name}', object does not exists"
-            );
-        }
-
-        //File should be removed after processing
-        $tempFilename = $this->files->tempFilename($this->files->extension($name));
-
-        if (!ftp_get(
-            $this->conn,
-            $tempFilename,
-            $this->getPath($bucket, $name),
-            FTP_BINARY
-        )) {
-            throw new ServerException("Unable to create local filename for '{$name}'");
-        }
-
-        return $tempFilename;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getStream(BucketInterface $bucket, string $name): StreamInterface
     {
         $this->connect();
 
-        if (!$filename = $this->allocateFilename($bucket, $name)) {
+        if (!$filename = $this->localFilename($bucket, $name)) {
             throw new ServerException(
                 "Unable to create stream for '{$name}', object does not exists"
             );
@@ -289,6 +261,35 @@ class FtpServer extends AbstractServer
 
         return $this->getPath($bucket, $name);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function localFilename(BucketInterface $bucket, string $name): string
+    {
+        $this->connect();
+
+        if (!$this->exists($bucket, $name)) {
+            throw new ServerException(
+                "Unable to create local filename for '{$name}', object does not exists"
+            );
+        }
+
+        //File should be removed after processing
+        $tempFilename = $this->files->tempFilename($this->files->extension($name));
+
+        if (!ftp_get(
+            $this->conn,
+            $tempFilename,
+            $this->getPath($bucket, $name),
+            FTP_BINARY
+        )) {
+            throw new ServerException("Unable to create local filename for '{$name}'");
+        }
+
+        return $tempFilename;
+    }
+
 
     /**
      * Get full file location on server including homedir.

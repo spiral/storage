@@ -167,6 +167,7 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
             $this->getName()
         ));
 
+        $casted = !($source instanceof StreamInterface);
         $stream = $this->castStream($source);
 
         $benchmark = $this->benchmark(
@@ -176,7 +177,9 @@ final class StorageBucket implements BucketInterface, LoggerAwareInterface, Inje
 
         try {
             $this->server->put($this, $name, $stream);
-            //    $stream->detach();
+            if ($casted) {
+                $stream->detach();
+            }
 
             //Reopening
             return $this->getAddress($name);
