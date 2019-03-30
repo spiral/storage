@@ -11,7 +11,6 @@
   ],
   "require": {
     "php": ">=7.1",
-    "spiral/boot": "^1.0",
     "spiral/debug": "^1.0",
     "spiral/logger": "^1.1",
     "spiral/streams": "^1.0",

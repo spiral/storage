@@ -14,11 +14,13 @@ use Psr\Http\Message\StreamInterface;
 use Spiral\Boot\Finalizer;
 use Spiral\Boot\FinalizerInterface;
 use Spiral\Config\ConfiguratorInterface;
+use Spiral\Core\Bootloader\Bootloader;
 use Spiral\Core\BootloadManager;
 use Spiral\Core\Container;
-use Spiral\Storage\Bootloader\StorageBootloader;
+use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Server;
+use Spiral\Storage\StorageBucket;
 use Spiral\Storage\StorageInterface;
 use Spiral\Storage\StorageManager;
 
@@ -137,4 +139,19 @@ class StorageTest extends TestCase
 
         return self::$storage;
     }
+}
+
+
+class StorageBootloader extends Bootloader
+{
+    const BOOT = true;
+
+    const SINGLETONS = [
+        StorageInterface::class => StorageManager::class,
+        StorageManager::class   => StorageManager::class
+    ];
+
+    const BINDINGS = [
+        BucketInterface::class => StorageBucket::class
+    ];
 }
