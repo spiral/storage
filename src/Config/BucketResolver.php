@@ -11,7 +11,7 @@ namespace Spiral\Storage\Config;
 
 use Spiral\Storage\Exception\ResolveException;
 
-class BucketResolver
+final class BucketResolver
 {
     /**
      * Bucket names associated with prefixes.

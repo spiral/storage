@@ -19,7 +19,7 @@ use function GuzzleHttp\Psr7\stream_for;
 /**
  * Provides abstraction level to work with data located at remove FTP server.
  */
-class FtpServer extends AbstractServer
+final class FtpServer extends AbstractServer
 {
     /**
      * @var array

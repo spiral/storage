@@ -19,7 +19,7 @@ use function GuzzleHttp\Psr7\stream_for;
 /**
  * Provides abstraction level to work with data located at remove SFTP server.
  */
-class SftpServer extends AbstractServer
+final class SftpServer extends AbstractServer
 {
     /**
      * Authorization methods.

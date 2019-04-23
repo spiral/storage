@@ -14,7 +14,7 @@ use Spiral\Core\InjectableConfig;
 use Spiral\Core\Traits\Config\AliasTrait;
 use Spiral\Storage\Exception\ConfigException;
 
-class StorageConfig extends InjectableConfig
+final class StorageConfig extends InjectableConfig
 {
     use AliasTrait;
 

@@ -22,7 +22,7 @@ use function GuzzleHttp\Psr7\stream_for;
 /**
  * Provides abstraction level to work with data located in GridFS storage.
  */
-class GridFSServer extends AbstractServer
+final class GridFSServer extends AbstractServer
 {
 
     /**

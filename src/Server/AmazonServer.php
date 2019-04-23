@@ -26,7 +26,7 @@ use function GuzzleHttp\Psr7\mimetype_from_filename;
 /**
  * Provides abstraction level to work with data located in Amazon S3 cloud.
  */
-class AmazonServer extends AbstractServer
+final class AmazonServer extends AbstractServer
 {
     /**
      * @invisible
