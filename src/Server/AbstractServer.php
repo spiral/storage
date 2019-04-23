@@ -1,11 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 /**
- * Spiral Framework, SpiralScout LLC.
+ * Spiral Framework.
  *
- * @package   spiralFramework
+ * @license   MIT
  * @author    Anton Titov (Wolfy-J)
- * @copyright ©2009-2011
  */
+declare(strict_types=1);
 
 namespace Spiral\Storage\Server;
 
@@ -33,7 +33,7 @@ abstract class AbstractServer implements ServerInterface
 
     /**
      * @param array          $options Server specific options.
-     * @param FilesInterface $files Required for operations with local filesystem.
+     * @param FilesInterface $files   Required for operations with local filesystem.
      */
     public function __construct(array $options, FilesInterface $files = null)
     {
