@@ -125,26 +125,12 @@ class StorageTest extends TestCase
         $c = new Container();
         $c->bind(StorageConfig::class, $config);
 
-        $b = new BootloadManager($c);
-        $b->bootload([StorageBootloader::class]);
+        $c->bindSingleton(StorageInterface::class, StorageManager::class);
+        $c->bind(BucketInterface::class, StorageBucket::class);
 
         self::$c = $c;
         self::$storage = $c->get(StorageManager::class);
 
         return self::$storage;
     }
-}
-
-class StorageBootloader extends Bootloader
-{
-    const BOOT = true;
-
-    const SINGLETONS = [
-        StorageInterface::class => StorageManager::class,
-        StorageManager::class   => StorageManager::class
-    ];
-
-    const BINDINGS = [
-        BucketInterface::class => StorageBucket::class
-    ];
 }

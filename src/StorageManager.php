@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Spiral\Storage;
 
 use Spiral\Core\Container\InjectorInterface;
+use Spiral\Core\Container\SingletonInterface;
 use Spiral\Core\FactoryInterface;
 use Spiral\Storage\Config\BucketResolver;
 use Spiral\Storage\Config\StorageConfig;
@@ -21,7 +22,7 @@ use Spiral\Storage\Exception\StorageException;
  * listings and features specific to storage adapter (however such functionality can be added at
  * server level).
  */
-final class StorageManager implements StorageInterface, InjectorInterface
+final class StorageManager implements StorageInterface, InjectorInterface, SingletonInterface
 {
     /** @var StorageConfig */
     private $config;
