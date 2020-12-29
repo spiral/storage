@@ -1,0 +1,26 @@
+{
+  "name": "spiral/storage-engine",
+  "type": "library",
+  "description": "Storage Engine for file storage interaction",
+  "license": "MIT",
+  "require": {
+    "php": "^7.2",
+    "spiral/core": "^2.7",
+    "league/flysystem": "^2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~8.0",
+    "mockery/mockery": "^1.1",
+    "spiral/code-style": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Spiral\\StorageEngine\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Spiral\\StorageEngine\\Tests\\": "tests/StorageEngine"
+    }
+  }
+}

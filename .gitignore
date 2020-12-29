@@ -1,0 +1,6 @@
+.idea
+.env
+vendor
+runtime
+.phpunit.result.cache
+
