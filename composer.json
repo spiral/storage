@@ -3,9 +3,19 @@
   "type": "library",
   "description": "Storage Engine for file storage interaction",
   "license": "MIT",
+  "authors": [
+    {
+      "name": "Evgeny Barinov",
+      "email": "evgeny.barinov@spiralscout.com"
+    },
+    {
+      "name": "Aleksandr Novikov",
+      "email": "aleksandr.novikov@spiralscout.com"
+    }
+  ],
   "require": {
-    "php": "^7.2",
-    "spiral/core": "^2.7",
+    "php": "^7.4",
+    "spiral/framework": "^2.7",
     "league/flysystem": "^2.0"
   },
   "require-dev": {
