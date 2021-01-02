@@ -14,7 +14,7 @@ abstract class ServerInfo implements ServerInfoInterface
 {
     use ClassBasedTrait;
     use OptionsTrait;
-    
+
     protected const OPTIONS_KEY = 'options';
     protected const BUCKETS_KEY = 'buckets';
 
@@ -24,7 +24,7 @@ abstract class ServerInfo implements ServerInfoInterface
 
     public array $buckets = [];
 
-    protected array $requiredOptions = [self::CLASS_KEY];
+    protected array $requiredOptions = [];
 
     protected array $optionalOptions = [];
 
@@ -38,21 +38,45 @@ abstract class ServerInfo implements ServerInfoInterface
     {
         $this->name = $name;
 
-        if (!array_key_exists(self::CLASS_KEY, $info)) {
+        $this->constructClass($info);
+
+        $this->constructOptions($info);
+
+        $this->constructBuckets($info);
+
+        $this->validate();
+    }
+
+    /**
+     * @param array $info
+     *
+     * @throws StorageException
+     */
+    protected function constructClass(array $info): void
+    {
+        if (!array_key_exists(static::CLASS_KEY, $info)) {
             throw new ConfigException(
-                \sprintf('Server %s needs adapter class defined', $name)
+                \sprintf('Server %s needs adapter class defined', $this->name)
             );
         }
 
-        $this->checkClass($info[self::CLASS_KEY], \sprintf('Server %s class', $name));
+        $this->checkClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
 
+        $this->class = $info[static::CLASS_KEY];
+    }
+
+    protected function constructOptions(array $info): void
+    {
         if (array_key_exists(static::OPTIONS_KEY, $info)) {
             $this->options = $info[static::OPTIONS_KEY];
         }
+    }
 
+    protected function constructBuckets(array $info): void
+    {
         if (array_key_exists(static::BUCKETS_KEY, $info)) {
-            foreach ($info[self::BUCKETS_KEY] as $bucketName => $bucketInfo) {
-                $this->buckets[] = new BucketInfo($bucketName, $name, $bucketInfo);
+            foreach ($info[static::BUCKETS_KEY] as $bucketName => $bucketInfo) {
+                $this->buckets[] = new BucketInfo($bucketName, $this->name, $bucketInfo);
             }
         }
     }
@@ -67,4 +91,9 @@ abstract class ServerInfo implements ServerInfoInterface
 
         return true;
     }
+
+    /**
+     * @throws StorageException
+     */
+    abstract protected function validate(): void;
 }

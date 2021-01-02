@@ -3,4 +3,5 @@
 vendor
 runtime
 .phpunit.result.cache
+composer.lock
 

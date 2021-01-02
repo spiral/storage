@@ -23,7 +23,7 @@ class BucketInfo
         $this->name = $name;
 
         $this->server = $server;
-        
+
         if (array_key_exists(static::OPTIONS_KEY, $info)) {
             $this->options = $info[static::OPTIONS_KEY];
         }

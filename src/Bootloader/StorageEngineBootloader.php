@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Bootloader;
 
+use League\Flysystem\Filesystem;
 use Spiral\Boot\Bootloader\Bootloader;
+use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\StorageConfig;
+use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\StorageEngine;
 
 class StorageEngineBootloader extends Bootloader
 {
@@ -16,10 +20,24 @@ class StorageEngineBootloader extends Bootloader
         $this->config = $config;
     }
 
-    public function boot(): void
+    /**
+     * @param StorageEngine $storageEngine
+     *
+     * @throws StorageException
+     */
+    public function boot(StorageEngine $storageEngine): void
     {
         foreach ($this->config->getServersKeys() as $serverLabel) {
-            $serverInfo = $this->config->buildServerInfo($serverLabel);
+            if ($storageEngine->hasServer($serverLabel)) {
+                continue;
+            }
+
+            $storageEngine->addServer(
+                $serverLabel,
+                new Filesystem(
+                    AdapterFactory::build($this->config->buildServerInfo($serverLabel))
+                )
+            );
         }
     }
 }

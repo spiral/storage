@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 abstract class AbstractUnitTest extends TestCase
 {
     /**
-     * @param mixed $object
+     * @param string|object $object
      * @param string $constName
      *
      * @return mixed
@@ -35,12 +35,30 @@ abstract class AbstractUnitTest extends TestCase
      */
     protected function getProtectedProperty($object, string $property)
     {
-        $refClass = new \ReflectionClass(get_class($object));
+        $class = is_string($object) ? $object : get_class($object);
+
+        $refClass = new \ReflectionClass($class);
 
         $protectedProperty = $refClass->getProperty($property);
         $protectedProperty->setAccessible(true);
 
         return $protectedProperty->getValue($object);
+    }
+
+    /**
+     * @param object $object
+     * @param string $property
+     * @param mixed $value
+     *
+     * @throws \ReflectionException
+     */
+    protected function setProtectedProperty($object, string $property, $value): void
+    {
+        $refClass = new \ReflectionClass(get_class($object));
+
+        $protectedProperty = $refClass->getProperty($property);
+        $protectedProperty->setAccessible(true);
+        $protectedProperty->setValue($object, $value);
     }
 
     /**

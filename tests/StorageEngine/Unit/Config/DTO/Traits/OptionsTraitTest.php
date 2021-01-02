@@ -7,6 +7,9 @@ use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class OptionsTraitTest extends AbstractUnitTest
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testGetOption(): void
     {
         $option1 = 'option1';
@@ -30,6 +33,9 @@ class OptionsTraitTest extends AbstractUnitTest
         $this->assertNull($trait->getOption('missedOption'));
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testHasOption(): void
     {
         $option1 = 'option1';

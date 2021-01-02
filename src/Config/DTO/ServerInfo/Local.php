@@ -8,13 +8,12 @@ use Spiral\Core\Exception\ConfigException;
 
 class Local extends ServerInfo
 {
-    protected const ROOT_DIR_OPTION = 'rootDir';
-    protected const VISIBILITY = 'visibility';
-    protected const WRITE_FLAGS = 'write-flags';
-    protected const LINK_HANDLING = 'link-handling';
+    public const ROOT_DIR_OPTION = 'rootDir';
+    public const VISIBILITY = 'visibility';
+    public const WRITE_FLAGS = 'write-flags';
+    public const LINK_HANDLING = 'link-handling';
 
     protected array $requiredOptions = [
-        self::CLASS_KEY,
         self::ROOT_DIR_OPTION,
     ];
 
@@ -30,7 +29,7 @@ class Local extends ServerInfo
     public function validate(): void
     {
         if (!$this->checkRequiredOptions()) {
-            if ($this->hasOption(static::ROOT_DIR_OPTION)) {
+            if (!$this->hasOption(static::ROOT_DIR_OPTION)) {
                 throw new ConfigException('Local server needs rootDir defined');
             }
 
@@ -43,13 +42,13 @@ class Local extends ServerInfo
             if ($this->hasOption($optionLabel)) {
                 $option = $this->getOption($optionLabel);
                 switch ($optionLabel) {
-                    case self::VISIBILITY:
+                    case static::VISIBILITY:
                         if (!empty($option) && !is_array($option)) {
                             throw new ConfigException('Visibility specification should be defined as array');
                         }
                         break;
-                    case self::WRITE_FLAGS:
-                    case self::LINK_HANDLING:
+                    case static::WRITE_FLAGS:
+                    case static::LINK_HANDLING:
                         if (!is_numeric($option)) {
                             throw new ConfigException($optionLabel . ' should be defined as integer');
                         }
@@ -57,5 +56,16 @@ class Local extends ServerInfo
                 }
             }
         }
+    }
+
+    public function isAdvancedUsage(): bool
+    {
+        foreach ($this->optionalOptions as $optionalOption) {
+            if ($this->hasOption($optionalOption)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

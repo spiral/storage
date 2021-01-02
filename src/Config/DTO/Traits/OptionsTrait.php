@@ -7,7 +7,7 @@ namespace Spiral\StorageEngine\Config\DTO\Traits;
 trait OptionsTrait
 {
     protected array $options = [];
-    
+
     public function hasOption(string $key): bool
     {
         return array_key_exists($key, $this->options);
@@ -15,7 +15,7 @@ trait OptionsTrait
 
     /**
      * @param string $key
-     * 
+     *
      * @return mixed|null
      */
     public function getOption(string $key)

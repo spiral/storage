@@ -25,12 +25,12 @@ class StorageConfig extends InjectableConfig
 
     public function getServersKeys(): array
     {
-        return array_keys($this->config[self::SERVERS_KEY]);
+        return array_keys($this->config[static::SERVERS_KEY]);
     }
 
     public function hasServer(string $key): bool
     {
-        return array_key_exists($key, $this->config[self::SERVERS_KEY]);
+        return array_key_exists($key, $this->config[static::SERVERS_KEY]);
     }
 
     /**
@@ -53,7 +53,7 @@ class StorageConfig extends InjectableConfig
             );
         }
 
-        $serverInfo = $this->config[self::SERVERS_KEY][$serverLabel];
+        $serverInfo = $this->config[static::SERVERS_KEY][$serverLabel];
 
         if (
             !array_key_exists(static::DRIVER_KEY, $serverInfo)

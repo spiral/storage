@@ -10,7 +10,7 @@ use Spiral\StorageEngine\Exception\StorageException;
 trait ClassBasedTrait
 {
     public string $class;
-    
+
     public function getClass(): string
     {
         return $this->class;
