@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;

@@ -12,7 +12,9 @@ class LocalBuilder extends AbstractBuilder
 {
     public function buildSimple(): FilesystemAdapter
     {
-        return new ($this->getAdapterClass())(
+        $adapterClass = $this->getAdapterClass();
+
+        return new $adapterClass(
             $this->serverInfo->getOption(Local::ROOT_DIR_OPTION)
         );
     }

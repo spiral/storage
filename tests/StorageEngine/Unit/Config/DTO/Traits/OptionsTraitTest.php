@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\Traits;
 
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
