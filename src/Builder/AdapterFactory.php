@@ -39,7 +39,7 @@ class AdapterFactory
         $adapterClass = $info->getClass();
         $rootDir = $info->getOption(ServerInfoDTO\Local::ROOT_DIR_OPTION);
 
-        if ($info->isAdvancedUsage()) {
+        if (!$info->isAdvancedUsage()) {
             $adapter = new $adapterClass($rootDir);
         } else {
             $adapter = new $adapterClass(
