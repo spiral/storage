@@ -27,17 +27,14 @@ class StorageEngineBootloader extends Bootloader
      */
     public function boot(StorageEngine $storageEngine): void
     {
-        foreach ($this->config->getServersKeys() as $serverLabel) {
-            if ($storageEngine->hasServer($serverLabel)) {
-                continue;
-            }
+        $servers = [];
 
-            $storageEngine->addServer(
-                $serverLabel,
-                new Filesystem(
-                    AdapterFactory::build($this->config->buildServerInfo($serverLabel))
-                )
+        foreach ($this->config->getServersKeys() as $serverLabel) {
+            $servers[$serverLabel] = new Filesystem(
+                AdapterFactory::build($this->config->buildServerInfo($serverLabel))
             );
         }
+
+        $storageEngine->init($servers);
     }
 }

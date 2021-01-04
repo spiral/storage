@@ -4,30 +4,24 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\MountManager;
+use Spiral\Core\Container\SingletonInterface;
 
-class StorageEngine
+class StorageEngine implements SingletonInterface
 {
-    private ArrayCollection $servers;
+    private ?MountManager $manager = null;
 
-    public function __construct()
+    /**
+     * @param array<string, FilesystemOperator> $servers
+     */
+    public function init(array $servers): void
     {
-        $this->servers = new ArrayCollection();
+        $this->manager = new MountManager($servers);
     }
 
-    public function hasServer(string $server): bool
+    public function isInitiated(): bool
     {
-        return $this->servers->containsKey($server);
-    }
-
-    public function addServer(string $server, Filesystem $filesystem): void
-    {
-        $this->servers->set($server, $filesystem);
-    }
-
-    public function getServer(string $server): ?Filesystem
-    {
-        return $this->hasServer($server) ? $this->servers->get($server) : null;
+        return $this->manager instanceof MountManager;
     }
 }
