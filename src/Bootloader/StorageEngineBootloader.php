@@ -31,7 +31,7 @@ class StorageEngineBootloader extends Bootloader
 
         foreach ($this->config->getServersKeys() as $serverLabel) {
             $servers[$serverLabel] = new Filesystem(
-                AdapterFactory::build($this->config->buildServerInfo($serverLabel))
+                AdapterFactory::build($this->config->buildServerInfo($serverLabel, true))
             );
         }
 

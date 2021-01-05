@@ -12,6 +12,7 @@ class Local extends ServerInfo
     public const VISIBILITY = 'visibility';
     public const WRITE_FLAGS = 'write-flags';
     public const LINK_HANDLING = 'link-handling';
+    public const HOST = 'host';
 
     protected array $requiredOptions = [
         self::ROOT_DIR_OPTION,
@@ -21,6 +22,7 @@ class Local extends ServerInfo
         self::VISIBILITY,
         self::WRITE_FLAGS,
         self::LINK_HANDLING,
+        self::HOST,
     ];
 
     /**
@@ -61,6 +63,10 @@ class Local extends ServerInfo
     public function isAdvancedUsage(): bool
     {
         foreach ($this->optionalOptions as $optionalOption) {
+            if ($optionalOption === self::HOST) {
+                continue;
+            }
+
             if ($this->hasOption($optionalOption)) {
                 return true;
             }

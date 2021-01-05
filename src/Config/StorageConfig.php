@@ -23,6 +23,11 @@ class StorageConfig extends InjectableConfig
         self::SERVERS_KEY   => [],
     ];
 
+    /**
+     * @var ServerInfoInterface[]
+     */
+    protected array $serversInfo = [];
+
     public function getServersKeys(): array
     {
         return array_keys($this->config[static::SERVERS_KEY]);
@@ -35,13 +40,13 @@ class StorageConfig extends InjectableConfig
 
     /**
      * @param string $serverLabel
+     * @param bool|null $force
      *
-     * @return \Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo
+     * @return ServerInfoInterface
      *
-     * @throws ConfigException
      * @throws StorageException
      */
-    public function buildServerInfo(string $serverLabel): ServerInfoInterface
+    public function buildServerInfo(string $serverLabel, ?bool $force = false): ServerInfoInterface
     {
         if (!$this->hasServer($serverLabel)) {
             throw new ConfigException(
@@ -51,6 +56,10 @@ class StorageConfig extends InjectableConfig
                 ),
                 HttpStatusCode::NOT_FOUND
             );
+        }
+
+        if (!$force && array_key_exists($serverLabel, $this->serversInfo)) {
+            return $this->serversInfo[$serverLabel];
         }
 
         $serverInfo = $this->config[static::SERVERS_KEY][$serverLabel];
@@ -70,9 +79,14 @@ class StorageConfig extends InjectableConfig
 
         switch ($serverInfo[static::DRIVER_KEY]) {
             case AdapterName::LOCAL:
-                return new Local($serverLabel, $serverInfo);
+                $serverInfoDTO = new Local($serverLabel, $serverInfo);
+                break;
             default:
                 throw new ConfigException('Driver info can\'t be built for driver ' . $serverLabel);
         }
+
+        $this->serversInfo[$serverLabel] = $serverInfoDTO;
+
+        return $serverInfoDTO;
     }
 }

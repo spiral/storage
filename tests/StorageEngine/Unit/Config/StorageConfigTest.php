@@ -46,6 +46,35 @@ class StorageConfigTest extends AbstractUnitTest
      * @throws \ReflectionException
      * @throws StorageException
      */
+    public function testBuildServerInfoForLocalCheckForce(): void
+    {
+        $localServer = 'local';
+        $rootDir = '/debug/root';
+
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    $localServer => [
+                        $this->getDriverConstKey() => AdapterName::LOCAL,
+                        $this->getClassConstKey() => LocalFilesystemAdapter::class,
+                        $this->getOptionsConstKey() => [
+                            Local::ROOT_DIR_OPTION => $rootDir,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $serverInfo = $config->buildServerInfo($localServer);
+
+        $this->assertSame($serverInfo, $config->buildServerInfo($localServer));
+        $this->assertNotSame($serverInfo, $config->buildServerInfo($localServer, true));
+    }
+
+    /**
+     * @throws \ReflectionException
+     * @throws StorageException
+     */
     public function testBuildServerInfoNoDriver(): void
     {
         $localServer = 'local';
