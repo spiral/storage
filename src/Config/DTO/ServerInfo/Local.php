@@ -50,7 +50,7 @@ class Local extends ServerInfo
                     case static::WRITE_FLAGS:
                     case static::LINK_HANDLING:
                         if (!is_numeric($option)) {
-                            throw new ConfigException($optionLabel . ' should be defined as integer');
+                            throw new ConfigException(\sprintf('%s should be defined as integer', $optionLabel));
                         }
                         break;
                 }
