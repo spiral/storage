@@ -60,9 +60,7 @@ abstract class ServerInfo implements ServerInfoInterface
             );
         }
 
-        $this->checkClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
-
-        $this->class = $info[static::CLASS_KEY];
+        $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
     }
 
     protected function constructOptions(array $info): void

@@ -9,7 +9,7 @@ use Spiral\StorageEngine\Exception\StorageException;
 
 trait ClassBasedTrait
 {
-    public string $class;
+    protected string $class;
 
     public function getClass(): string
     {
@@ -18,11 +18,28 @@ trait ClassBasedTrait
 
     /**
      * @param string $class
+     * @param string|null $exceptionMsg
+     *
+     * @return static
+     *
+     * @throws StorageException
+     */
+    public function setClass(string $class, ?string $exceptionMsg = null): self
+    {
+        $this->checkClass($class, $exceptionMsg ?: '');
+
+        $this->class = $class;
+
+        return $this;
+    }
+
+    /**
+     * @param string $class
      * @param string $errorPostfix
      *
      * @throws StorageException
      */
-    public function checkClass(string $class, string $errorPostfix): void
+    protected function checkClass(string $class, string $errorPostfix): void
     {
         if (!class_exists($class)) {
             throw new StorageException(
