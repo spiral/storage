@@ -14,6 +14,7 @@ use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 class AdapterFactoryTest extends AbstractUnitTest
 {
     private const ROOT_DIR = '/testRoot/';
+    private const CONFIG_HOST = 'http://localhost/debug/';
 
     /**
      * @throws StorageException
@@ -26,6 +27,7 @@ class AdapterFactoryTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
                     Local::ROOT_DIR_OPTION => static::ROOT_DIR,
+                    Local::HOST => static::CONFIG_HOST,
                 ],
             ]
         );
@@ -43,6 +45,7 @@ class AdapterFactoryTest extends AbstractUnitTest
     {
         $options = [
             Local::ROOT_DIR_OPTION => static::ROOT_DIR,
+            Local::HOST => static::CONFIG_HOST,
             Local::WRITE_FLAGS => LOCK_NB,
             Local::LINK_HANDLING => LocalFilesystemAdapter::SKIP_LINKS,
             Local::VISIBILITY => [

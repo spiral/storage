@@ -12,6 +12,8 @@ use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class StorageConfigTest extends AbstractUnitTest
 {
+    private const CONFIG_HOST = 'http://localhost/debug/';
+
     /**
      * @throws \ReflectionException
      * @throws StorageException
@@ -29,6 +31,7 @@ class StorageConfigTest extends AbstractUnitTest
                         $this->getClassConstKey() => LocalFilesystemAdapter::class,
                         $this->getOptionsConstKey() => [
                             Local::ROOT_DIR_OPTION => $rootDir,
+                            Local::HOST => static::CONFIG_HOST,
                         ],
                     ],
                 ],
@@ -59,6 +62,7 @@ class StorageConfigTest extends AbstractUnitTest
                         $this->getClassConstKey() => LocalFilesystemAdapter::class,
                         $this->getOptionsConstKey() => [
                             Local::ROOT_DIR_OPTION => $rootDir,
+                            Local::HOST => static::CONFIG_HOST,
                         ],
                     ],
                 ],

@@ -12,15 +12,20 @@ use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class LocalTest extends AbstractUnitTest
 {
+    private const CONFIG_HOST = 'http://localhost/debug/';
+
     /**
      * @throws StorageException
      */
     public function testValidateSimple(): void
     {
         $rootDirOption = Local::ROOT_DIR_OPTION;
+        $hostOption = Local::HOST;
+
         $options = [
             'option1' => 'optionVal1',
             $rootDirOption => '/some/root/',
+            $hostOption => static::CONFIG_HOST,
         ];
 
         $serverInfo = new Local(
@@ -32,19 +37,24 @@ class LocalTest extends AbstractUnitTest
         );
 
         $this->assertEquals(LocalFilesystemAdapter::class, $serverInfo->getClass());
-        $this->assertEquals($options[$rootDirOption], $serverInfo->getOption($rootDirOption));
-        $this->assertEquals($options['option1'], $serverInfo->getOption('option1'));
+
+        foreach ($options as $optionKey => $optionVal) {
+            $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
+        }
     }
 
     /**
+     * @dataProvider getMissedRequiredOptions
+     *
+     * @param array $options
+     * @param string $exceptionMsg
+     *
      * @throws StorageException
      */
-    public function testValidateRequiredOptionsFailed(): void
+    public function testValidateRequiredOptionsFailed(array $options, string $exceptionMsg): void
     {
-        $options = ['option1' => 'optionVal1'];
-
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Local server needs rootDir defined');
+        $this->expectExceptionMessage($exceptionMsg);
 
         new Local(
             'someServer',
@@ -69,6 +79,7 @@ class LocalTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
                     Local::ROOT_DIR_OPTION => '/some/dir/',
+                    Local::HOST => static::CONFIG_HOST,
                     Local::VISIBILITY => 12,
                 ],
             ]
@@ -95,6 +106,7 @@ class LocalTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
                     Local::ROOT_DIR_OPTION => '/some/dir/',
+                    Local::HOST => static::CONFIG_HOST,
                     $label => 'MyFlag',
                 ],
             ]
@@ -106,14 +118,13 @@ class LocalTest extends AbstractUnitTest
      */
     public function testIsAdvancedUsage(): void
     {
-        $rootDirOption = Local::ROOT_DIR_OPTION;
-
         $simpleLocal = new Local(
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    $rootDirOption => '/some/root/',
+                    Local::ROOT_DIR_OPTION => '/some/root/',
+                    Local::HOST => static::CONFIG_HOST,
                 ],
             ]
         );
@@ -125,7 +136,8 @@ class LocalTest extends AbstractUnitTest
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    $rootDirOption => '/some/root/',
+                    Local::ROOT_DIR_OPTION => '/some/root/',
+                    Local::HOST => static::CONFIG_HOST,
                     Local::WRITE_FLAGS => LOCK_EX,
                 ],
             ]
@@ -138,7 +150,8 @@ class LocalTest extends AbstractUnitTest
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    $rootDirOption => '/some/root/',
+                    Local::ROOT_DIR_OPTION => '/some/root/',
+                    Local::HOST => static::CONFIG_HOST,
                     Local::WRITE_FLAGS => LOCK_EX,
                     Local::LINK_HANDLING => LocalFilesystemAdapter::DISALLOW_LINKS,
                     Local::VISIBILITY => [
@@ -156,6 +169,28 @@ class LocalTest extends AbstractUnitTest
         );
 
         $this->assertTrue($baseAdvancedUsage->isAdvancedUsage());
+    }
+
+    public function getMissedRequiredOptions(): array
+    {
+        return [
+            [
+                [],
+                'Local server needs rootDir defined',
+            ],
+            [
+                [
+                    Local::ROOT_DIR_OPTION => '/root/',
+                ],
+                'Local server needs host defined for urls providing',
+            ],
+            [
+                [
+                    Local::HOST => self::CONFIG_HOST,
+                ],
+                'Local server needs rootDir defined'
+            ]
+        ];
     }
 
     public function getOptionalIntOptions(): array

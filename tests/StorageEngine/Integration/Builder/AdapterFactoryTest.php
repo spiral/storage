@@ -19,6 +19,7 @@ class AdapterFactoryTest extends TestCase
 {
     private const VFS_PREFIX = 'vfs://';
     private const ROOT_DIR_NAME = 'testRoot';
+    private const CONFIG_HOST = 'http://localhost/debug/';
 
     private vfsStreamDirectory $rootDir;
 
@@ -169,6 +170,7 @@ class AdapterFactoryTest extends TestCase
                     'class' => LocalFilesystemAdapter::class,
                     'options' => [
                         Local::ROOT_DIR_OPTION => static::VFS_PREFIX . static::ROOT_DIR_NAME,
+                        Local::HOST => static::CONFIG_HOST,
                     ],
                 ]
             )

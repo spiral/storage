@@ -16,13 +16,13 @@ class Local extends ServerInfo
 
     protected array $requiredOptions = [
         self::ROOT_DIR_OPTION,
+        self::HOST,
     ];
 
     protected array $optionalOptions = [
         self::VISIBILITY,
         self::WRITE_FLAGS,
         self::LINK_HANDLING,
-        self::HOST,
     ];
 
     /**
@@ -33,6 +33,10 @@ class Local extends ServerInfo
         if (!$this->checkRequiredOptions()) {
             if (!$this->hasOption(static::ROOT_DIR_OPTION)) {
                 throw new ConfigException('Local server needs rootDir defined');
+            }
+
+            if (!$this->hasOption(static::HOST)) {
+                throw new ConfigException('Local server needs host defined for urls providing');
             }
 
             throw new ConfigException(
@@ -63,10 +67,6 @@ class Local extends ServerInfo
     public function isAdvancedUsage(): bool
     {
         foreach ($this->optionalOptions as $optionalOption) {
-            if ($optionalOption === self::HOST) {
-                continue;
-            }
-
             if ($this->hasOption($optionalOption)) {
                 return true;
             }

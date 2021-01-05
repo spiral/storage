@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 class StorageEngineTest extends TestCase
 {
     private const ROOT_DIR = '/debug/root/';
+    private const CONFIG_HOST = 'http://localhost/debug/';
 
     public function testIsInitiated(): void
     {
@@ -33,6 +34,11 @@ class StorageEngineTest extends TestCase
         $this->assertTrue($engine->isInitiated());
     }
 
+    /**
+     * @return Filesystem
+     *
+     * @throws \Spiral\StorageEngine\Exception\StorageException
+     */
     private function prepareLocalFilesystem(): Filesystem
     {
         $adapter = AdapterFactory::build(
@@ -42,6 +48,7 @@ class StorageEngineTest extends TestCase
                     'class' => LocalFilesystemAdapter::class,
                     'options' => [
                         Local::ROOT_DIR_OPTION => static::ROOT_DIR,
+                        Local::HOST => static::CONFIG_HOST,
                     ],
                 ]
             )
