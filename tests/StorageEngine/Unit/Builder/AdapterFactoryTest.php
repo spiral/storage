@@ -7,7 +7,7 @@ namespace Spiral\StorageEngine\Tests\Unit\Builder;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use Spiral\StorageEngine\Builder\AdapterFactory;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
@@ -21,13 +21,13 @@ class AdapterFactoryTest extends AbstractUnitTest
      */
     public function testBuildSimpleLocalServer(): void
     {
-        $info = new Local(
+        $info = new LocalInfo(
             'debugLocalServer',
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    Local::ROOT_DIR_OPTION => static::ROOT_DIR,
-                    Local::HOST => static::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_OPTION => static::ROOT_DIR,
+                    LocalInfo::HOST => static::CONFIG_HOST,
                 ],
             ]
         );
@@ -44,11 +44,11 @@ class AdapterFactoryTest extends AbstractUnitTest
     public function testBuildAdvancedLocalServer(): void
     {
         $options = [
-            Local::ROOT_DIR_OPTION => static::ROOT_DIR,
-            Local::HOST => static::CONFIG_HOST,
-            Local::WRITE_FLAGS => LOCK_NB,
-            Local::LINK_HANDLING => LocalFilesystemAdapter::SKIP_LINKS,
-            Local::VISIBILITY => [
+            LocalInfo::ROOT_DIR_OPTION => static::ROOT_DIR,
+            LocalInfo::HOST => static::CONFIG_HOST,
+            LocalInfo::WRITE_FLAGS => LOCK_NB,
+            LocalInfo::LINK_HANDLING => LocalFilesystemAdapter::SKIP_LINKS,
+            LocalInfo::VISIBILITY => [
                 'file' => [
                     'public' => 0777,
                     'private' => 0644,
@@ -60,7 +60,7 @@ class AdapterFactoryTest extends AbstractUnitTest
             ],
         ];
 
-        $info = new Local(
+        $info = new LocalInfo(
             'debugLocalServer',
             [
                 'class' => LocalFilesystemAdapter::class,
@@ -74,15 +74,15 @@ class AdapterFactoryTest extends AbstractUnitTest
 
 
         $this->assertEquals(
-            $options[Local::LINK_HANDLING],
+            $options[LocalInfo::LINK_HANDLING],
             $this->getProtectedProperty($adapter, 'linkHandling')
         );
         $this->assertEquals(
-            $options[Local::WRITE_FLAGS],
+            $options[LocalInfo::WRITE_FLAGS],
             $this->getProtectedProperty($adapter, 'writeFlags')
         );
         $this->assertEquals(
-            PortableVisibilityConverter::fromArray($options[Local::VISIBILITY]),
+            PortableVisibilityConverter::fromArray($options[LocalInfo::VISIBILITY]),
             $this->getProtectedProperty($adapter, 'visibility')
         );
     }

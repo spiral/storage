@@ -13,7 +13,7 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 use Spiral\StorageEngine\Builder\AdapterFactory;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 
 class AdapterFactoryTest extends TestCase
 {
@@ -164,13 +164,13 @@ class AdapterFactoryTest extends TestCase
     private function buildLocalServer(): Filesystem
     {
         $adapter = AdapterFactory::build(
-            new Local(
+            new LocalInfo(
                 'debugLocalServer',
                 [
                     'class' => LocalFilesystemAdapter::class,
                     'options' => [
-                        Local::ROOT_DIR_OPTION => static::VFS_PREFIX . static::ROOT_DIR_NAME,
-                        Local::HOST => static::CONFIG_HOST,
+                        LocalInfo::ROOT_DIR_OPTION => static::VFS_PREFIX . static::ROOT_DIR_NAME,
+                        LocalInfo::HOST => static::CONFIG_HOST,
                     ],
                 ]
             )

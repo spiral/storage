@@ -6,7 +6,7 @@ namespace Spiral\StorageEngine\Config;
 
 use Spiral\Core\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Enum\HttpStatusCode;
@@ -79,7 +79,7 @@ class StorageConfig extends InjectableConfig
 
         switch ($serverInfo[static::DRIVER_KEY]) {
             case AdapterName::LOCAL:
-                $serverInfoDTO = new Local($serverLabel, $serverInfo);
+                $serverInfoDTO = new LocalInfo($serverLabel, $serverInfo);
                 break;
             default:
                 throw new ConfigException('Driver info can\'t be built for driver ' . $serverLabel);

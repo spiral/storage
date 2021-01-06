@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 
-class LocalResolver extends AbstractResolver
+class LocalSystemResolver extends AbstractResolver
 {
     private StorageConfig $storageConfig;
 
@@ -33,10 +33,10 @@ class LocalResolver extends AbstractResolver
             if (!empty($fileInfo)) {
                 $serverInfo = $this->storageConfig->buildServerInfo($fileInfo[self::FILE_PATH_SERVER_PART]);
 
-                if ($serverInfo->hasOption(Local::HOST)) {
+                if ($serverInfo->hasOption(LocalInfo::HOST)) {
                     $result[] = \sprintf(
                         '%s%s',
-                        $serverInfo->getOption(Local::HOST),
+                        $serverInfo->getOption(LocalInfo::HOST),
                         $fileInfo[self::FILE_PATH_PATH_PART]
                     );
                 }

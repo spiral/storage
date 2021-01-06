@@ -6,7 +6,7 @@ namespace Spiral\StorageEngine\Builder\Adapter;
 
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 
 class LocalBuilder extends AbstractBuilder
 {
@@ -15,7 +15,7 @@ class LocalBuilder extends AbstractBuilder
         $adapterClass = $this->getAdapterClass();
 
         return new $adapterClass(
-            $this->serverInfo->getOption(Local::ROOT_DIR_OPTION)
+            $this->serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION)
         );
     }
 
@@ -24,15 +24,15 @@ class LocalBuilder extends AbstractBuilder
         $adapterClass = $this->getAdapterClass();
 
         return new $adapterClass(
-            $this->serverInfo->getOption(Local::ROOT_DIR_OPTION),
-            $this->serverInfo->hasOption(Local::VISIBILITY)
-                ? PortableVisibilityConverter::fromArray($this->serverInfo->getOption(Local::VISIBILITY))
+            $this->serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION),
+            $this->serverInfo->hasOption(LocalInfo::VISIBILITY)
+                ? PortableVisibilityConverter::fromArray($this->serverInfo->getOption(LocalInfo::VISIBILITY))
                 : null,
-            $this->serverInfo->hasOption(Local::WRITE_FLAGS)
-                ? $this->serverInfo->getOption(Local::WRITE_FLAGS)
+            $this->serverInfo->hasOption(LocalInfo::WRITE_FLAGS)
+                ? $this->serverInfo->getOption(LocalInfo::WRITE_FLAGS)
                 : LOCK_EX,
-            $this->serverInfo->hasOption(Local::LINK_HANDLING)
-                ? $this->serverInfo->getOption(Local::LINK_HANDLING)
+            $this->serverInfo->hasOption(LocalInfo::LINK_HANDLING)
+                ? $this->serverInfo->getOption(LocalInfo::LINK_HANDLING)
                 : $adapterClass::DISALLOW_LINKS,
         );
     }

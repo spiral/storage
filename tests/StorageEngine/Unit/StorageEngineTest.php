@@ -5,7 +5,7 @@ namespace Spiral\StorageEngine\Tests\Unit;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Builder\AdapterFactory;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\StorageEngine;
 use PHPUnit\Framework\TestCase;
 
@@ -42,13 +42,13 @@ class StorageEngineTest extends TestCase
     private function prepareLocalFilesystem(): Filesystem
     {
         $adapter = AdapterFactory::build(
-            new Local(
+            new LocalInfo(
                 'debugLocalServer',
                 [
                     'class' => LocalFilesystemAdapter::class,
                     'options' => [
-                        Local::ROOT_DIR_OPTION => static::ROOT_DIR,
-                        Local::HOST => static::CONFIG_HOST,
+                        LocalInfo::ROOT_DIR_OPTION => static::ROOT_DIR,
+                        LocalInfo::HOST => static::CONFIG_HOST,
                     ],
                 ]
             )

@@ -6,7 +6,7 @@ namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
 
-class Local extends ServerInfo
+class LocalInfo extends ServerInfo
 {
     public const ROOT_DIR_OPTION = 'rootDir';
     public const VISIBILITY = 'visibility';

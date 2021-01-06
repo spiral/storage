@@ -40,7 +40,7 @@ class AdapterFactory
     private static function detectAdapterBuilder(ServerInfoDTO\ServerInfoInterface $info): AdapterBuilderInterface
     {
         switch (get_class($info)) {
-            case ServerInfoDTO\Local::class:
+            case ServerInfoDTO\LocalInfo::class:
                 return new LocalBuilder($info);
             default:
                 throw new StorageException(

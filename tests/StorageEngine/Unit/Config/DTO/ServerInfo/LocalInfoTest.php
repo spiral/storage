@@ -6,11 +6,11 @@ namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
-class LocalTest extends AbstractUnitTest
+class LocalInfoTest extends AbstractUnitTest
 {
     private const CONFIG_HOST = 'http://localhost/debug/';
 
@@ -19,8 +19,8 @@ class LocalTest extends AbstractUnitTest
      */
     public function testValidateSimple(): void
     {
-        $rootDirOption = Local::ROOT_DIR_OPTION;
-        $hostOption = Local::HOST;
+        $rootDirOption = LocalInfo::ROOT_DIR_OPTION;
+        $hostOption = LocalInfo::HOST;
 
         $options = [
             'option1' => 'optionVal1',
@@ -28,7 +28,7 @@ class LocalTest extends AbstractUnitTest
             $hostOption => static::CONFIG_HOST,
         ];
 
-        $serverInfo = new Local(
+        $serverInfo = new LocalInfo(
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
@@ -56,7 +56,7 @@ class LocalTest extends AbstractUnitTest
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage($exceptionMsg);
 
-        new Local(
+        new LocalInfo(
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
@@ -73,14 +73,14 @@ class LocalTest extends AbstractUnitTest
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('Visibility specification should be defined as array');
 
-        new Local(
+        new LocalInfo(
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    Local::ROOT_DIR_OPTION => '/some/dir/',
-                    Local::HOST => static::CONFIG_HOST,
-                    Local::VISIBILITY => 12,
+                    LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
+                    LocalInfo::HOST => static::CONFIG_HOST,
+                    LocalInfo::VISIBILITY => 12,
                 ],
             ]
         );
@@ -100,13 +100,13 @@ class LocalTest extends AbstractUnitTest
             \sprintf('%s should be defined as integer', $label)
         );
 
-        new Local(
+        new LocalInfo(
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    Local::ROOT_DIR_OPTION => '/some/dir/',
-                    Local::HOST => static::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
+                    LocalInfo::HOST => static::CONFIG_HOST,
                     $label => 'MyFlag',
                 ],
             ]
@@ -118,43 +118,43 @@ class LocalTest extends AbstractUnitTest
      */
     public function testIsAdvancedUsage(): void
     {
-        $simpleLocal = new Local(
+        $simpleLocal = new LocalInfo(
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    Local::ROOT_DIR_OPTION => '/some/root/',
-                    Local::HOST => static::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::HOST => static::CONFIG_HOST,
                 ],
             ]
         );
 
         $this->assertFalse($simpleLocal->isAdvancedUsage());
 
-        $baseAdvancedUsage = new Local(
+        $baseAdvancedUsage = new LocalInfo(
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    Local::ROOT_DIR_OPTION => '/some/root/',
-                    Local::HOST => static::CONFIG_HOST,
-                    Local::WRITE_FLAGS => LOCK_EX,
+                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::HOST => static::CONFIG_HOST,
+                    LocalInfo::WRITE_FLAGS => LOCK_EX,
                 ],
             ]
         );
 
         $this->assertTrue($baseAdvancedUsage->isAdvancedUsage());
 
-        $baseAdvancedUsage = new Local(
+        $baseAdvancedUsage = new LocalInfo(
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
-                    Local::ROOT_DIR_OPTION => '/some/root/',
-                    Local::HOST => static::CONFIG_HOST,
-                    Local::WRITE_FLAGS => LOCK_EX,
-                    Local::LINK_HANDLING => LocalFilesystemAdapter::DISALLOW_LINKS,
-                    Local::VISIBILITY => [
+                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::HOST => static::CONFIG_HOST,
+                    LocalInfo::WRITE_FLAGS => LOCK_EX,
+                    LocalInfo::LINK_HANDLING => LocalFilesystemAdapter::DISALLOW_LINKS,
+                    LocalInfo::VISIBILITY => [
                         'file' => [
                             'public' => 0640,
                             'private' => 0604,
@@ -180,13 +180,13 @@ class LocalTest extends AbstractUnitTest
             ],
             [
                 [
-                    Local::ROOT_DIR_OPTION => '/root/',
+                    LocalInfo::ROOT_DIR_OPTION => '/root/',
                 ],
                 'Local server needs host defined for urls providing',
             ],
             [
                 [
-                    Local::HOST => self::CONFIG_HOST,
+                    LocalInfo::HOST => self::CONFIG_HOST,
                 ],
                 'Local server needs rootDir defined'
             ]
@@ -196,8 +196,8 @@ class LocalTest extends AbstractUnitTest
     public function getOptionalIntOptions(): array
     {
         return [
-            [Local::WRITE_FLAGS],
-            [Local::LINK_HANDLING]
+            [LocalInfo::WRITE_FLAGS],
+            [LocalInfo::LINK_HANDLING]
         ];
     }
 }

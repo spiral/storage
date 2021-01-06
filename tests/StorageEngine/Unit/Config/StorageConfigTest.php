@@ -4,7 +4,7 @@ namespace Spiral\StorageEngine\Tests\Unit\Config;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -30,8 +30,8 @@ class StorageConfigTest extends AbstractUnitTest
                         $this->getDriverConstKey() => AdapterName::LOCAL,
                         $this->getClassConstKey() => LocalFilesystemAdapter::class,
                         $this->getOptionsConstKey() => [
-                            Local::ROOT_DIR_OPTION => $rootDir,
-                            Local::HOST => static::CONFIG_HOST,
+                            LocalInfo::ROOT_DIR_OPTION => $rootDir,
+                            LocalInfo::HOST => static::CONFIG_HOST,
                         ],
                     ],
                 ],
@@ -40,8 +40,8 @@ class StorageConfigTest extends AbstractUnitTest
 
         $serverInfo = $config->buildServerInfo($localServer);
 
-        $this->assertInstanceOf(Local::class, $serverInfo);
-        $this->assertEquals($rootDir, $serverInfo->getOption(Local::ROOT_DIR_OPTION));
+        $this->assertInstanceOf(LocalInfo::class, $serverInfo);
+        $this->assertEquals($rootDir, $serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION));
         $this->assertFalse($serverInfo->isAdvancedUsage());
     }
 
@@ -61,8 +61,8 @@ class StorageConfigTest extends AbstractUnitTest
                         $this->getDriverConstKey() => AdapterName::LOCAL,
                         $this->getClassConstKey() => LocalFilesystemAdapter::class,
                         $this->getOptionsConstKey() => [
-                            Local::ROOT_DIR_OPTION => $rootDir,
-                            Local::HOST => static::CONFIG_HOST,
+                            LocalInfo::ROOT_DIR_OPTION => $rootDir,
+                            LocalInfo::HOST => static::CONFIG_HOST,
                         ],
                     ],
                 ],
@@ -209,7 +209,7 @@ class StorageConfigTest extends AbstractUnitTest
      */
     private function getOptionsConstKey(): string
     {
-        return $this->getProtectedConst(Local::class, 'OPTIONS_KEY');
+        return $this->getProtectedConst(LocalInfo::class, 'OPTIONS_KEY');
     }
 
     /**
@@ -219,6 +219,6 @@ class StorageConfigTest extends AbstractUnitTest
      */
     private function getClassConstKey(): string
     {
-        return $this->getProtectedConst(Local::class, 'CLASS_KEY');
+        return $this->getProtectedConst(LocalInfo::class, 'CLASS_KEY');
     }
 }

@@ -3,27 +3,27 @@
 namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Local;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AbstractResolver;
-use Spiral\StorageEngine\Resolver\LocalResolver;
+use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use PHPUnit\Framework\TestCase;
 
-class LocalResolverTest extends TestCase
+class LocalSystemResolverTest extends TestCase
 {
     private const CONFIG_SERVER_NAME = 'local';
     private const CONFIG_ROOT = '/debug/root/';
     private const CONFIG_HOST = 'http://localhost:8080/debug/';
 
-    private LocalResolver $resolver;
+    private LocalSystemResolver $resolver;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->resolver = new LocalResolver($this->buildConfig());
+        $this->resolver = new LocalSystemResolver($this->buildConfig());
     }
 
     /**
@@ -119,8 +119,8 @@ class LocalResolverTest extends TestCase
                         'driver' => AdapterName::LOCAL,
                         'class' => LocalFilesystemAdapter::class,
                         'options' => [
-                            Local::ROOT_DIR_OPTION => self::CONFIG_ROOT,
-                            Local::HOST => self::CONFIG_HOST,
+                            LocalInfo::ROOT_DIR_OPTION => self::CONFIG_ROOT,
+                            LocalInfo::HOST => self::CONFIG_HOST,
                         ],
                     ],
                 ],
