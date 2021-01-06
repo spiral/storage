@@ -36,7 +36,7 @@ class LocalInfoTest extends AbstractUnitTest
             ]
         );
 
-        $this->assertEquals(LocalFilesystemAdapter::class, $serverInfo->getClass());
+        $this->assertEquals(LocalFilesystemAdapter::class, $serverInfo->getAdapterClass());
 
         foreach ($options as $optionKey => $optionVal) {
             $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));

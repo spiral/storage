@@ -47,6 +47,11 @@ abstract class ServerInfo implements ServerInfoInterface
         $this->validate();
     }
 
+    public function getAdapterClass(): string
+    {
+        return $this->getClass();
+    }
+
     /**
      * @param array $info
      *

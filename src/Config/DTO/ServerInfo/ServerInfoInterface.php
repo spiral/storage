@@ -24,7 +24,12 @@ interface ServerInfoInterface
      */
     public function getOption(string $key);
 
-    public function getClass(): string;
+    /**
+     * Get adapter class
+     *
+     * @return string
+     */
+    public function getAdapterClass(): string;
 
     /**
      * Check if adapter for server should be configured with additional params

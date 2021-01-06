@@ -14,9 +14,4 @@ abstract class AbstractBuilder implements AdapterBuilderInterface
     {
         $this->serverInfo = $serverInfo;
     }
-
-    protected function getAdapterClass(): string
-    {
-        return $this->serverInfo->getClass();
-    }
 }
