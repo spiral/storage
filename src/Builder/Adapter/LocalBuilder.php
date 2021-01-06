@@ -30,7 +30,7 @@ class LocalBuilder extends AbstractBuilder
                 : null,
             $this->serverInfo->hasOption(LocalInfo::WRITE_FLAGS)
                 ? $this->serverInfo->getOption(LocalInfo::WRITE_FLAGS)
-                : LOCK_EX,
+                : \LOCK_EX,
             $this->serverInfo->hasOption(LocalInfo::LINK_HANDLING)
                 ? $this->serverInfo->getOption(LocalInfo::LINK_HANDLING)
                 : $adapterClass::DISALLOW_LINKS,

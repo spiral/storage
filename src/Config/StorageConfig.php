@@ -9,7 +9,6 @@ use Spiral\Core\InjectableConfig;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Enum\AdapterName;
-use Spiral\StorageEngine\Enum\HttpStatusCode;
 use Spiral\StorageEngine\Exception\StorageException;
 
 class StorageConfig extends InjectableConfig
@@ -25,6 +24,8 @@ class StorageConfig extends InjectableConfig
 
     /**
      * @var ServerInfoInterface[]
+     *
+     * Internal list allows to keep once built server info
      */
     protected array $serversInfo = [];
 
@@ -39,6 +40,9 @@ class StorageConfig extends InjectableConfig
     }
 
     /**
+     * Build server info by provided label
+     * Force mode allows to rebuild server info for internal servers info list
+     *
      * @param string $serverLabel
      * @param bool|null $force
      *
@@ -53,8 +57,7 @@ class StorageConfig extends InjectableConfig
                 \sprintf(
                     'Server %s was not found',
                     $serverLabel
-                ),
-                HttpStatusCode::NOT_FOUND
+                )
             );
         }
 
@@ -72,8 +75,7 @@ class StorageConfig extends InjectableConfig
                 \sprintf(
                     'Server driver for %s was not identified',
                     $serverLabel
-                ),
-                HttpStatusCode::ERROR
+                )
             );
         }
 

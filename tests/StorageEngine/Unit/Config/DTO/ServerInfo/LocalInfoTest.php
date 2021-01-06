@@ -127,7 +127,6 @@ class LocalInfoTest extends AbstractUnitTest
         $fileName = 'file.txt';
 
         $options = [
-            'option1' => 'optionVal1',
             LocalInfo::ROOT_DIR_OPTION => '/some/root/',
             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
         ];
@@ -157,6 +156,45 @@ class LocalInfoTest extends AbstractUnitTest
             $options[LocalInfo::ROOT_DIR_OPTION] . $bucketDirectory . $fileName,
             $serverInfo->buildBucketPath($bucketName, $fileName)
         );
+    }
+
+    /**
+     * @throws StorageException
+     * @throws \ReflectionException
+     */
+    public function testBuildBucketPathFailed(): void
+    {
+        $directoryKey = $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY');
+
+        $bucketName = 'debugBucket';
+        $bucketDirectory = 'debug/dir1/';
+
+        $missedBucket = 'missedBucket';
+
+        $options = [
+            LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+        ];
+
+        $serverInfo = new LocalInfo(
+            'someServer',
+            [
+                'class' => LocalFilesystemAdapter::class,
+                'options' => $options,
+                'buckets' => [
+                    $bucketName => [
+                        'options' => [$directoryKey => $bucketDirectory]
+                    ],
+                ],
+            ]
+        );
+
+        $this->expectException(StorageException::class);
+        $this->expectExceptionMessage(
+            \sprintf('Bucket %s is not defined', $missedBucket)
+        );
+
+        $serverInfo->buildBucketPath($missedBucket);
     }
 
     /**

@@ -8,7 +8,8 @@ interface ResolverInterface
 {
     /**
      * @param string[] $files
-     * @return array
+     *
+     * @return \Generator
      */
-    public function buildUrlsList(array $files): array;
+    public function buildUrlsList(array $files): \Generator;
 }

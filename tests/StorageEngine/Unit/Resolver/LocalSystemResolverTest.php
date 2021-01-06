@@ -30,10 +30,24 @@ class LocalSystemResolverTest extends TestCase
      *
      * @param string $filePath
      * @param array|null $expectedArray
+     *
+     * @throws \Spiral\StorageEngine\Exception\UrlProcessingException
      */
     public function testParseFilePath(string $filePath, ?array $expectedArray = null): void
     {
         $this->assertEquals($expectedArray, $this->resolver->parseFilePath($filePath));
+    }
+
+    /**
+     * @throws \Spiral\StorageEngine\Exception\UrlProcessingException
+     */
+    public function testParseFilePathWrongFormat(): void
+    {
+        $this->assertNull(
+            $this->resolver->parseFilePath(
+                \sprintf('%s//%s', ServerTestInterface::LOCAL_SERVER_NAME, 'file.txt')
+            )
+        );
     }
 
     /**
@@ -46,7 +60,11 @@ class LocalSystemResolverTest extends TestCase
      */
     public function testBuildUrlsList(array $filesList, array $expectedUrlsList): void
     {
-        $this->assertEquals($expectedUrlsList, $this->resolver->buildUrlsList($filesList));
+        $urlsList = $this->resolver->buildUrlsList($filesList);
+
+        $this->assertInstanceOf(\Generator::class, $urlsList);
+
+        $this->assertEquals($expectedUrlsList, iterator_to_array($urlsList));
     }
 
     public function getFileLists(): array

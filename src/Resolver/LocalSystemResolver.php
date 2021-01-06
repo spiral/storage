@@ -20,29 +20,21 @@ class LocalSystemResolver extends AbstractResolver
     /**
      * @param string[] $files
      *
-     * @return string[]
+     * @return \Generator
      *
      * @throws StorageException
      */
-    public function buildUrlsList(array $files): array
+    public function buildUrlsList(array $files): \Generator
     {
-        $result = [];
-
         foreach ($files as $filePath) {
             $fileInfo = $this->parseFilePath($filePath);
             if (!empty($fileInfo)) {
                 $serverInfo = $this->storageConfig->buildServerInfo($fileInfo[self::FILE_PATH_SERVER_PART]);
 
                 if ($serverInfo->hasOption(LocalInfo::HOST)) {
-                    $result[] = \sprintf(
-                        '%s%s',
-                        $serverInfo->getOption(LocalInfo::HOST),
-                        $fileInfo[self::FILE_PATH_PATH_PART]
-                    );
+                    yield $serverInfo->getOption(LocalInfo::HOST) .  $fileInfo[self::FILE_PATH_PATH_PART];
                 }
             }
         }
-
-        return $result;
     }
 }

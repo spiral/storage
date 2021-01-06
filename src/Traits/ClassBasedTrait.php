@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Traits;
 
-use Spiral\StorageEngine\Enum\HttpStatusCode;
 use Spiral\StorageEngine\Exception\StorageException;
 
 trait ClassBasedTrait
@@ -43,8 +42,7 @@ trait ClassBasedTrait
     {
         if (!class_exists($class)) {
             throw new StorageException(
-                \sprintf('Class %s not exists. %s', $class, $errorPostfix),
-                HttpStatusCode::NOT_FOUND
+                \sprintf('Class %s not exists. %s', $class, $errorPostfix)
             );
         }
     }
