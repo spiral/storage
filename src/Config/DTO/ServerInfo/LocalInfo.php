@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Config\DTO\BucketInfo;
+use Spiral\StorageEngine\Exception\StorageException;
 
 class LocalInfo extends ServerInfo
 {
@@ -62,6 +64,27 @@ class LocalInfo extends ServerInfo
                 }
             }
         }
+    }
+
+    /**
+     * @param string $bucketName
+     * @param string|null $fileName
+     *
+     * @return string
+     *
+     * @throws StorageException
+     */
+    public function buildBucketPath(string $bucketName, ?string $fileName = null): string
+    {
+        $bucket = $this->getBucket($bucketName);
+
+        if (!$bucket instanceof BucketInfo) {
+            throw new StorageException(
+                \sprintf('Bucket %s is not defined', $bucketName)
+            );
+        }
+
+        return $this->getOption(static::ROOT_DIR_OPTION) . $bucket->getDirectory() . $fileName;
     }
 
     public function isAdvancedUsage(): bool

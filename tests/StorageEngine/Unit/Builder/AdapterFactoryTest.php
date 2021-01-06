@@ -9,28 +9,20 @@ use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Traits\ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class AdapterFactoryTest extends AbstractUnitTest
 {
-    private const ROOT_DIR = '/testRoot/';
-    private const CONFIG_HOST = 'http://localhost/debug/';
+    use ServerBuilderTrait;
 
     /**
      * @throws StorageException
      */
     public function testBuildSimpleLocalServer(): void
     {
-        $info = new LocalInfo(
-            'debugLocalServer',
-            [
-                'class' => LocalFilesystemAdapter::class,
-                'options' => [
-                    LocalInfo::ROOT_DIR_OPTION => static::ROOT_DIR,
-                    LocalInfo::HOST => static::CONFIG_HOST,
-                ],
-            ]
-        );
+        $info = $this->buildLocalInfo();
 
         $adapter = AdapterFactory::build($info);
 
@@ -44,8 +36,8 @@ class AdapterFactoryTest extends AbstractUnitTest
     public function testBuildAdvancedLocalServer(): void
     {
         $options = [
-            LocalInfo::ROOT_DIR_OPTION => static::ROOT_DIR,
-            LocalInfo::HOST => static::CONFIG_HOST,
+            LocalInfo::ROOT_DIR_OPTION => ServerTestInterface::ROOT_DIR,
+            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
             LocalInfo::WRITE_FLAGS => LOCK_NB,
             LocalInfo::LINK_HANDLING => LocalFilesystemAdapter::SKIP_LINKS,
             LocalInfo::VISIBILITY => [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spiral\StorageEngine\Tests\Unit\Config;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -8,12 +10,11 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class StorageConfigTest extends AbstractUnitTest
 {
-    private const CONFIG_HOST = 'http://localhost/debug/';
-
     /**
      * @throws \ReflectionException
      * @throws StorageException
@@ -31,7 +32,7 @@ class StorageConfigTest extends AbstractUnitTest
                         $this->getClassConstKey() => LocalFilesystemAdapter::class,
                         $this->getOptionsConstKey() => [
                             LocalInfo::ROOT_DIR_OPTION => $rootDir,
-                            LocalInfo::HOST => static::CONFIG_HOST,
+                            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                         ],
                     ],
                 ],
@@ -62,7 +63,7 @@ class StorageConfigTest extends AbstractUnitTest
                         $this->getClassConstKey() => LocalFilesystemAdapter::class,
                         $this->getOptionsConstKey() => [
                             LocalInfo::ROOT_DIR_OPTION => $rootDir,
-                            LocalInfo::HOST => static::CONFIG_HOST,
+                            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                         ],
                     ],
                 ],

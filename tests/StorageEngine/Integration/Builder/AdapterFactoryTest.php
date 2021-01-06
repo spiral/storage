@@ -7,19 +7,15 @@ namespace Spiral\StorageEngine\Tests\Integration\Builder;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Local\LocalFilesystemAdapter;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
-use Spiral\StorageEngine\Builder\AdapterFactory;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Traits\ServerBuilderTrait;
 
 class AdapterFactoryTest extends TestCase
 {
-    private const VFS_PREFIX = 'vfs://';
-    private const ROOT_DIR_NAME = 'testRoot';
-    private const CONFIG_HOST = 'http://localhost/debug/';
+    use ServerBuilderTrait;
 
     private vfsStreamDirectory $rootDir;
 
@@ -27,7 +23,7 @@ class AdapterFactoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->rootDir = vfsStream::setup(static::ROOT_DIR_NAME, 777);
+        $this->rootDir = vfsStream::setup(ServerTestInterface::ROOT_DIR_NAME, 777);
     }
 
     /**
@@ -74,7 +70,7 @@ class AdapterFactoryTest extends TestCase
             $this->rootDir
         );
 
-        $fileSystem = $this->buildLocalServer();
+        $fileSystem = $this->buildLocalServer(true);
 
         $listContents = $fileSystem->listContents('/');
 
@@ -151,31 +147,8 @@ class AdapterFactoryTest extends TestCase
             $this->rootDir
         );
 
-        $fileSystem = $this->buildLocalServer();
+        $fileSystem = $this->buildLocalServer(true);
 
         $this->assertEquals($fileContent, $fileSystem->read($file));
-    }
-
-    /**
-     * @return Filesystem
-     *
-     * @throws \Spiral\StorageEngine\Exception\StorageException
-     */
-    private function buildLocalServer(): Filesystem
-    {
-        $adapter = AdapterFactory::build(
-            new LocalInfo(
-                'debugLocalServer',
-                [
-                    'class' => LocalFilesystemAdapter::class,
-                    'options' => [
-                        LocalInfo::ROOT_DIR_OPTION => static::VFS_PREFIX . static::ROOT_DIR_NAME,
-                        LocalInfo::HOST => static::CONFIG_HOST,
-                    ],
-                ]
-            )
-        );
-
-        return new Filesystem($adapter);
     }
 }

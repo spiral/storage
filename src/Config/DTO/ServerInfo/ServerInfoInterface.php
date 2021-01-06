@@ -18,4 +18,6 @@ interface ServerInfoInterface
     public function getClass(): string;
 
     public function isAdvancedUsage(): bool;
+
+    public function buildBucketPath(string $bucketName, ?string $fileName): string;
 }

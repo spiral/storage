@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
@@ -10,13 +12,10 @@ use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AbstractResolver;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use PHPUnit\Framework\TestCase;
+use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
 class LocalSystemResolverTest extends TestCase
 {
-    private const CONFIG_SERVER_NAME = 'local';
-    private const CONFIG_ROOT = '/debug/root/';
-    private const CONFIG_HOST = 'http://localhost:8080/debug/';
-
     private LocalSystemResolver $resolver;
 
     protected function setUp(): void
@@ -58,20 +57,20 @@ class LocalSystemResolverTest extends TestCase
         return [
             [
                 [
-                    \sprintf('%s://%s', self::CONFIG_SERVER_NAME, $specificCsvFile),
+                    \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $specificCsvFile),
                 ],
                 [
-                    \sprintf('%s%s', self::CONFIG_HOST, $specificCsvFile),
+                    \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
                 ]
             ],
             [
                 [
-                    \sprintf('%s://%s', self::CONFIG_SERVER_NAME, $fileTxt),
-                    \sprintf('%s://%s', self::CONFIG_SERVER_NAME, $specificCsvFile),
+                    \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $fileTxt),
+                    \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $specificCsvFile),
                 ],
                 [
-                    \sprintf('%s%s', self::CONFIG_HOST, $fileTxt),
-                    \sprintf('%s%s', self::CONFIG_HOST, $specificCsvFile),
+                    \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $fileTxt),
+                    \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
                 ]
             ],
         ];
@@ -84,27 +83,27 @@ class LocalSystemResolverTest extends TestCase
 
         return [
             [
-                \sprintf('%s://%s', self::CONFIG_SERVER_NAME, $fileTxt),
+                \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $fileTxt),
                 [
-                    0 => \sprintf('%s://%s', self::CONFIG_SERVER_NAME, $fileTxt),
-                    1 => self::CONFIG_SERVER_NAME,
+                    0 => \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $fileTxt),
+                    1 => ServerTestInterface::LOCAL_SERVER_NAME,
                     2 => $fileTxt,
-                    AbstractResolver::FILE_PATH_SERVER_PART => self::CONFIG_SERVER_NAME,
+                    AbstractResolver::FILE_PATH_SERVER_PART => ServerTestInterface::LOCAL_SERVER_NAME,
                     AbstractResolver::FILE_PATH_PATH_PART => $fileTxt,
                 ]
             ],
             [
-                \sprintf('%s://%s', self::CONFIG_SERVER_NAME, $dirFile),
+                \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $dirFile),
                 [
-                    0 => \sprintf('%s://%s', self::CONFIG_SERVER_NAME, $dirFile),
-                    1 => self::CONFIG_SERVER_NAME,
+                    0 => \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $dirFile),
+                    1 => ServerTestInterface::LOCAL_SERVER_NAME,
                     2 => $dirFile,
-                    AbstractResolver::FILE_PATH_SERVER_PART => self::CONFIG_SERVER_NAME,
+                    AbstractResolver::FILE_PATH_SERVER_PART => ServerTestInterface::LOCAL_SERVER_NAME,
                     AbstractResolver::FILE_PATH_PATH_PART => $dirFile,
                 ]
             ],
             [
-                \sprintf('%s:\\some/wrong/format/%s', self::CONFIG_SERVER_NAME, $fileTxt),
+                \sprintf('%s:\\some/wrong/format/%s', ServerTestInterface::LOCAL_SERVER_NAME, $fileTxt),
                 null
             ],
         ];
@@ -115,12 +114,12 @@ class LocalSystemResolverTest extends TestCase
         return new StorageConfig(
             [
                 'servers' => [
-                    self::CONFIG_SERVER_NAME => [
+                    ServerTestInterface::LOCAL_SERVER_NAME => [
                         'driver' => AdapterName::LOCAL,
                         'class' => LocalFilesystemAdapter::class,
                         'options' => [
-                            LocalInfo::ROOT_DIR_OPTION => self::CONFIG_ROOT,
-                            LocalInfo::HOST => self::CONFIG_HOST,
+                            LocalInfo::ROOT_DIR_OPTION => ServerTestInterface::ROOT_DIR,
+                            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                         ],
                     ],
                 ],

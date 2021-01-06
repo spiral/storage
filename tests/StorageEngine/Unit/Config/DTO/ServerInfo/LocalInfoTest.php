@@ -6,14 +6,14 @@ namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class LocalInfoTest extends AbstractUnitTest
 {
-    private const CONFIG_HOST = 'http://localhost/debug/';
-
     /**
      * @throws StorageException
      */
@@ -25,7 +25,7 @@ class LocalInfoTest extends AbstractUnitTest
         $options = [
             'option1' => 'optionVal1',
             $rootDirOption => '/some/root/',
-            $hostOption => static::CONFIG_HOST,
+            $hostOption => ServerTestInterface::CONFIG_HOST,
         ];
 
         $serverInfo = new LocalInfo(
@@ -79,7 +79,7 @@ class LocalInfoTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
-                    LocalInfo::HOST => static::CONFIG_HOST,
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::VISIBILITY => 12,
                 ],
             ]
@@ -106,10 +106,56 @@ class LocalInfoTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
-                    LocalInfo::HOST => static::CONFIG_HOST,
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     $label => 'MyFlag',
                 ],
             ]
+        );
+    }
+
+    /**
+     * @throws StorageException
+     * @throws \ReflectionException
+     */
+    public function testBuildBucketPath(): void
+    {
+        $directoryKey = $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY');
+
+        $bucketName = 'debugBucket';
+        $bucketDirectory = 'debug/dir1/';
+
+        $fileName = 'file.txt';
+
+        $options = [
+            'option1' => 'optionVal1',
+            LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+        ];
+
+        $serverInfo = new LocalInfo(
+            'someServer',
+            [
+                'class' => LocalFilesystemAdapter::class,
+                'options' => $options,
+                'buckets' => [
+                    $bucketName => [
+                        'options' => [$directoryKey => $bucketDirectory]
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertInstanceOf(BucketInfo::class, $serverInfo->getBucket($bucketName));
+        $this->assertEquals($bucketDirectory, $serverInfo->getBucket($bucketName)->getOption($directoryKey));
+
+        $this->assertEquals(
+            $options[LocalInfo::ROOT_DIR_OPTION] . $bucketDirectory,
+            $serverInfo->buildBucketPath($bucketName)
+        );
+
+        $this->assertEquals(
+            $options[LocalInfo::ROOT_DIR_OPTION] . $bucketDirectory . $fileName,
+            $serverInfo->buildBucketPath($bucketName, $fileName)
         );
     }
 
@@ -124,7 +170,7 @@ class LocalInfoTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-                    LocalInfo::HOST => static::CONFIG_HOST,
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
             ]
         );
@@ -137,7 +183,7 @@ class LocalInfoTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-                    LocalInfo::HOST => static::CONFIG_HOST,
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS => LOCK_EX,
                 ],
             ]
@@ -151,7 +197,7 @@ class LocalInfoTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-                    LocalInfo::HOST => static::CONFIG_HOST,
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS => LOCK_EX,
                     LocalInfo::LINK_HANDLING => LocalFilesystemAdapter::DISALLOW_LINKS,
                     LocalInfo::VISIBILITY => [
@@ -186,7 +232,7 @@ class LocalInfoTest extends AbstractUnitTest
             ],
             [
                 [
-                    LocalInfo::HOST => self::CONFIG_HOST,
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
                 'Local server needs rootDir defined'
             ]

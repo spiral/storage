@@ -6,12 +6,14 @@ namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
+use Spiral\StorageEngine\Config\DTO\Traits\BucketsTrait;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Traits\ClassBasedTrait;
 
 abstract class ServerInfo implements ServerInfoInterface
 {
+    use BucketsTrait;
     use ClassBasedTrait;
     use OptionsTrait;
 
@@ -21,8 +23,6 @@ abstract class ServerInfo implements ServerInfoInterface
     protected const CLASS_KEY = 'class';
 
     public string $name;
-
-    public array $buckets = [];
 
     protected array $requiredOptions = [];
 
@@ -74,7 +74,7 @@ abstract class ServerInfo implements ServerInfoInterface
     {
         if (array_key_exists(static::BUCKETS_KEY, $info)) {
             foreach ($info[static::BUCKETS_KEY] as $bucketName => $bucketInfo) {
-                $this->buckets[] = new BucketInfo($bucketName, $this->name, $bucketInfo);
+                $this->addBucket(new BucketInfo($bucketName, $this, $bucketInfo));
             }
         }
     }
