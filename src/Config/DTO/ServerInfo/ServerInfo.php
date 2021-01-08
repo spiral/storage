@@ -11,16 +11,15 @@ use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Traits\ClassBasedTrait;
 
-abstract class ServerInfo implements ServerInfoInterface
+abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, OptionsBasedInterface
 {
     use BucketsTrait;
     use ClassBasedTrait;
     use OptionsTrait;
 
-    protected const OPTIONS_KEY = 'options';
-    protected const BUCKETS_KEY = 'buckets';
+    public const VISIBILITY = 'visibility';
 
-    protected const CLASS_KEY = 'class';
+    protected const BUCKETS_KEY = 'buckets';
 
     public string $name;
 
@@ -45,6 +44,10 @@ abstract class ServerInfo implements ServerInfoInterface
         $this->constructBuckets($info);
 
         $this->validate();
+
+        if ($this instanceof SpecificConfigurableServerInfo) {
+            $this->constructSpecific($info);
+        }
     }
 
     public function getAdapterClass(): string

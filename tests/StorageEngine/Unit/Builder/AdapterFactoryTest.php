@@ -6,16 +6,19 @@ namespace Spiral\StorageEngine\Tests\Unit\Builder;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use PHPUnit\Framework\MockObject\MockObject;
 use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
+use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
-use Spiral\StorageEngine\Tests\Traits\ServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class AdapterFactoryTest extends AbstractUnitTest
 {
-    use ServerBuilderTrait;
+    use LocalServerBuilderTrait;
 
     /**
      * @throws StorageException
@@ -77,5 +80,25 @@ class AdapterFactoryTest extends AbstractUnitTest
             PortableVisibilityConverter::fromArray($options[LocalInfo::VISIBILITY]),
             $this->getProtectedProperty($adapter, 'visibility')
         );
+    }
+
+    public function testWrongServerInfoUsage(): void
+    {
+        $this->expectException(StorageException::class);
+        $this->expectExceptionMessage('Adapter can\'t be built by server info');
+
+        /** @var MockObject|ServerInfo $info */
+        $info = $this->getMockForAbstractClass(
+            ServerInfo::class,
+            [
+                'someName',
+                [
+                    ServerInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                    'driver' => AdapterName::LOCAL,
+                ],
+            ]
+        );
+
+        AdapterFactory::build($info);
     }
 }

@@ -11,7 +11,6 @@ use Spiral\StorageEngine\Exception\StorageException;
 class LocalInfo extends ServerInfo
 {
     public const ROOT_DIR_OPTION = 'rootDir';
-    public const VISIBILITY = 'visibility';
     public const WRITE_FLAGS = 'write-flags';
     public const LINK_HANDLING = 'link-handling';
     public const HOST = 'host';

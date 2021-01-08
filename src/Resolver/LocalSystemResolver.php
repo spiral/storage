@@ -32,7 +32,7 @@ class LocalSystemResolver extends AbstractResolver
                 $serverInfo = $this->storageConfig->buildServerInfo($fileInfo[self::FILE_PATH_SERVER_PART]);
 
                 if ($serverInfo->hasOption(LocalInfo::HOST)) {
-                    yield $serverInfo->getOption(LocalInfo::HOST) .  $fileInfo[self::FILE_PATH_PATH_PART];
+                    yield $serverInfo->getOption(LocalInfo::HOST) . $fileInfo[self::FILE_PATH_PATH_PART];
                 }
             }
         }

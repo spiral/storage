@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Config\DTO;
 
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
-use Spiral\StorageEngine\Tests\Traits\ServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class BucketInfoTest extends AbstractUnitTest
 {
-    use ServerBuilderTrait;
+    use LocalServerBuilderTrait;
 
     /**
      * @throws \ReflectionException

@@ -45,7 +45,7 @@ class LocalSystemResolverTest extends TestCase
     {
         $this->assertNull(
             $this->resolver->parseFilePath(
-                \sprintf('%s//%s', ServerTestInterface::LOCAL_SERVER_NAME, 'file.txt')
+                \sprintf('%s//%s', ServerTestInterface::SERVER_NAME, 'file.txt')
             )
         );
     }
@@ -75,7 +75,7 @@ class LocalSystemResolverTest extends TestCase
         return [
             [
                 [
-                    \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $specificCsvFile),
+                    \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $specificCsvFile),
                 ],
                 [
                     \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
@@ -83,8 +83,8 @@ class LocalSystemResolverTest extends TestCase
             ],
             [
                 [
-                    \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $fileTxt),
-                    \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $specificCsvFile),
+                    \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
+                    \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $specificCsvFile),
                 ],
                 [
                     \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $fileTxt),
@@ -101,27 +101,27 @@ class LocalSystemResolverTest extends TestCase
 
         return [
             [
-                \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $fileTxt),
+                \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
                 [
-                    0 => \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $fileTxt),
-                    1 => ServerTestInterface::LOCAL_SERVER_NAME,
+                    0 => \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
+                    1 => ServerTestInterface::SERVER_NAME,
                     2 => $fileTxt,
-                    AbstractResolver::FILE_PATH_SERVER_PART => ServerTestInterface::LOCAL_SERVER_NAME,
+                    AbstractResolver::FILE_PATH_SERVER_PART => ServerTestInterface::SERVER_NAME,
                     AbstractResolver::FILE_PATH_PATH_PART => $fileTxt,
                 ]
             ],
             [
-                \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $dirFile),
+                \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $dirFile),
                 [
-                    0 => \sprintf('%s://%s', ServerTestInterface::LOCAL_SERVER_NAME, $dirFile),
-                    1 => ServerTestInterface::LOCAL_SERVER_NAME,
+                    0 => \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $dirFile),
+                    1 => ServerTestInterface::SERVER_NAME,
                     2 => $dirFile,
-                    AbstractResolver::FILE_PATH_SERVER_PART => ServerTestInterface::LOCAL_SERVER_NAME,
+                    AbstractResolver::FILE_PATH_SERVER_PART => ServerTestInterface::SERVER_NAME,
                     AbstractResolver::FILE_PATH_PATH_PART => $dirFile,
                 ]
             ],
             [
-                \sprintf('%s:\\some/wrong/format/%s', ServerTestInterface::LOCAL_SERVER_NAME, $fileTxt),
+                \sprintf('%s:\\some/wrong/format/%s', ServerTestInterface::SERVER_NAME, $fileTxt),
                 null
             ],
         ];
@@ -132,7 +132,7 @@ class LocalSystemResolverTest extends TestCase
         return new StorageConfig(
             [
                 'servers' => [
-                    ServerTestInterface::LOCAL_SERVER_NAME => [
+                    ServerTestInterface::SERVER_NAME => [
                         'driver' => AdapterName::LOCAL,
                         'class' => LocalFilesystemAdapter::class,
                         'options' => [

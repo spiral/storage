@@ -13,11 +13,6 @@ trait OptionsTrait
         return array_key_exists($key, $this->options);
     }
 
-    /**
-     * @param string $key
-     *
-     * @return mixed|null
-     */
     public function getOption(string $key)
     {
         return $this->hasOption($key) ? $this->options[$key] : null;

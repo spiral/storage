@@ -44,7 +44,7 @@ interface ServerInfoInterface
      * @param string $bucketName
      * @param string|null $fileName
      *
-     * @return string
+     * @return string|null
      */
-    public function buildBucketPath(string $bucketName, ?string $fileName): string;
+    public function buildBucketPath(string $bucketName, ?string $fileName): ?string;
 }

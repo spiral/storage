@@ -12,7 +12,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
-trait ServerBuilderTrait
+trait LocalServerBuilderTrait
 {
     /**
      * @param bool|null $useVcsPrefix
@@ -37,7 +37,7 @@ trait ServerBuilderTrait
      */
     protected function buildLocalAdapter(?bool $useVcsPrefix = false): FilesystemAdapter
     {
-        return AdapterFactory::build($this->buildLocalInfo(ServerTestInterface::LOCAL_SERVER_NAME, $useVcsPrefix));
+        return AdapterFactory::build($this->buildLocalInfo(ServerTestInterface::SERVER_NAME, $useVcsPrefix));
     }
 
     /**
@@ -49,7 +49,7 @@ trait ServerBuilderTrait
      * @throws StorageException
      */
     protected function buildLocalInfo(
-        ?string $name = ServerTestInterface::LOCAL_SERVER_NAME,
+        ?string $name = ServerTestInterface::SERVER_NAME,
         ?bool $useVcsPrefix = false
     ): LocalInfo {
         return new LocalInfo(

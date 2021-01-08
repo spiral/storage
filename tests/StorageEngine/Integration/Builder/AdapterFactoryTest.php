@@ -11,11 +11,11 @@ use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
-use Spiral\StorageEngine\Tests\Traits\ServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 
 class AdapterFactoryTest extends TestCase
 {
-    use ServerBuilderTrait;
+    use LocalServerBuilderTrait;
 
     private vfsStreamDirectory $rootDir;
 

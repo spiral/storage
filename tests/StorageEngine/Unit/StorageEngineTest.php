@@ -6,11 +6,11 @@ namespace Spiral\StorageEngine\Tests\Unit;
 
 use Spiral\StorageEngine\StorageEngine;
 use PHPUnit\Framework\TestCase;
-use Spiral\StorageEngine\Tests\Traits\ServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 
 class StorageEngineTest extends TestCase
 {
-    use ServerBuilderTrait;
+    use LocalServerBuilderTrait;
 
     public function testIsInitiated(): void
     {
