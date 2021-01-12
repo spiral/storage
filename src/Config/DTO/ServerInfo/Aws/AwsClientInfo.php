@@ -16,6 +16,8 @@ class AwsClientInfo implements ClassBasedInterface, OptionsBasedInterface
     use ClassBasedTrait;
     use OptionsTrait;
 
+    private $client = null;
+
     /**
      * @param array $clientInfo
      *
@@ -23,16 +25,34 @@ class AwsClientInfo implements ClassBasedInterface, OptionsBasedInterface
      */
     public function __construct(array $clientInfo)
     {
-        if (!array_key_exists(self::CLASS_KEY, $clientInfo)) {
+        if (
+            !array_key_exists(static::CLASS_KEY, $clientInfo)
+            || !is_string($clientInfo[static::CLASS_KEY])
+        ) {
             throw new ConfigException('Aws client must be described with s3 client class');
         }
 
-        if (!array_key_exists(self::OPTIONS_KEY, $clientInfo) || empty($clientInfo[static::OPTIONS_KEY])) {
-            throw new ConfigException('Aws client must be described with s3 client options');
+        if (
+            !array_key_exists(static::OPTIONS_KEY, $clientInfo)
+            || empty($clientInfo[static::OPTIONS_KEY])
+            || !is_array($clientInfo[static::OPTIONS_KEY])
+        ) {
+            throw new ConfigException('Aws client must be described with s3 client options list');
         }
 
         $this->setClass($clientInfo[static::CLASS_KEY], $clientInfo[static::CLASS_KEY]);
 
-        $this->options = $clientInfo[self::OPTIONS_KEY];
+        $this->options = $clientInfo[static::OPTIONS_KEY];
+    }
+
+    public function getClient()
+    {
+        $class = $this->getClass();
+
+        if (!$this->client instanceof $class) {
+            $this->client = new $class($this->options);
+        }
+
+        return $this->client;
     }
 }

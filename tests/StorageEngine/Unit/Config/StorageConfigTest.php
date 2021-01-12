@@ -6,7 +6,10 @@ namespace Spiral\StorageEngine\Tests\Unit\Config;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ClassBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -28,9 +31,9 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     $localServer => [
-                        $this->getDriverConstKey() => AdapterName::LOCAL,
-                        $this->getClassConstKey() => LocalFilesystemAdapter::class,
-                        $this->getOptionsConstKey() => [
+                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
+                        OptionsBasedInterface::OPTIONS_KEY => [
                             LocalInfo::ROOT_DIR_OPTION => $rootDir,
                             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                         ],
@@ -59,9 +62,9 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     $localServer => [
-                        $this->getDriverConstKey() => AdapterName::LOCAL,
-                        $this->getClassConstKey() => LocalFilesystemAdapter::class,
-                        $this->getOptionsConstKey() => [
+                        ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
+                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
+                        OptionsBasedInterface::OPTIONS_KEY => [
                             LocalInfo::ROOT_DIR_OPTION => $rootDir,
                             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                         ],
@@ -88,7 +91,7 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     $localServer => [
-                        $this->getClassConstKey() => LocalFilesystemAdapter::class,
+                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]
@@ -96,10 +99,7 @@ class StorageConfigTest extends AbstractUnitTest
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            \sprintf(
-                'Server driver for %s was not identified',
-                $localServer
-            )
+            'Driver can\'t be identified for server ' . $localServer
         );
 
         $config->buildServerInfo($localServer);
@@ -117,8 +117,8 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     $localServer => [
-                        $this->getDriverConstKey() => 'missingAdapter',
-                        $this->getClassConstKey() => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::DRIVER_KEY => 'missingAdapter',
+                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]
@@ -126,10 +126,7 @@ class StorageConfigTest extends AbstractUnitTest
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            \sprintf(
-                'Server driver for %s was not identified',
-                $localServer
-            )
+            'Driver can\'t be identified for server ' . $localServer
         );
 
         $config->buildServerInfo($localServer);
@@ -147,8 +144,8 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     'local' => [
-                        $this->getDriverConstKey() => AdapterName::LOCAL,
-                        $this->getClassConstKey() => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
+                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]
@@ -191,35 +188,5 @@ class StorageConfigTest extends AbstractUnitTest
 
         $this->assertTrue($config->hasServer($localServer));
         $this->assertFalse($config->hasServer('missing'));
-    }
-
-    /**
-     * @return string
-     *
-     * @throws \ReflectionException
-     */
-    private function getDriverConstKey(): string
-    {
-        return $this->getProtectedConst(StorageConfig::class, 'DRIVER_KEY');
-    }
-
-    /**
-     * @return string
-     *
-     * @throws \ReflectionException
-     */
-    private function getOptionsConstKey(): string
-    {
-        return $this->getProtectedConst(LocalInfo::class, 'OPTIONS_KEY');
-    }
-
-    /**
-     * @return string
-     *
-     * @throws \ReflectionException
-     */
-    private function getClassConstKey(): string
-    {
-        return $this->getProtectedConst(LocalInfo::class, 'CLASS_KEY');
     }
 }

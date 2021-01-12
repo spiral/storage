@@ -5,46 +5,38 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AbstractResolver;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
-use PHPUnit\Framework\TestCase;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
-class LocalSystemResolverTest extends TestCase
+class LocalSystemResolverTest extends AbstractUnitTest
 {
-    private LocalSystemResolver $resolver;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->resolver = new LocalSystemResolver($this->buildConfig());
-    }
-
     /**
      * @dataProvider getServerFilePathsList
      *
      * @param string $filePath
      * @param array|null $expectedArray
-     *
-     * @throws \Spiral\StorageEngine\Exception\UrlProcessingException
      */
     public function testParseFilePath(string $filePath, ?array $expectedArray = null): void
     {
-        $this->assertEquals($expectedArray, $this->resolver->parseFilePath($filePath));
+        $resolver = new LocalSystemResolver($this->buildConfig());
+
+        $this->assertEquals($expectedArray, $resolver->parseFilePath($filePath));
     }
 
-    /**
-     * @throws \Spiral\StorageEngine\Exception\UrlProcessingException
-     */
     public function testParseFilePathWrongFormat(): void
     {
+        $resolver = new LocalSystemResolver($this->buildConfig());
+
         $this->assertNull(
-            $this->resolver->parseFilePath(
+            $resolver->parseFilePath(
                 \sprintf('%s//%s', ServerTestInterface::SERVER_NAME, 'file.txt')
             )
         );
@@ -60,11 +52,89 @@ class LocalSystemResolverTest extends TestCase
      */
     public function testBuildUrlsList(array $filesList, array $expectedUrlsList): void
     {
-        $urlsList = $this->resolver->buildUrlsList($filesList);
+        $resolver = new LocalSystemResolver($this->buildConfig());
+
+        $urlsList = $resolver->buildUrlsList($filesList);
 
         $this->assertInstanceOf(\Generator::class, $urlsList);
 
         $this->assertEquals($expectedUrlsList, iterator_to_array($urlsList));
+    }
+
+    /**
+     * @throws StorageException
+     * @throws \ReflectionException
+     */
+    public function testBuildBucketPath(): void
+    {
+        $directoryKey = $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY');
+
+        $serverName = ServerTestInterface::SERVER_NAME . 1232;
+        $bucketName = 'debugBucket';
+        $bucketDirectory = 'debug/dir1/';
+
+        $options = [
+            LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+        ];
+
+        $resolver = new LocalSystemResolver(
+            $this->buildConfig($serverName, [
+                'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
+                'options' => $options,
+                'buckets' => [
+                    $bucketName => [
+                        'options' => [$directoryKey => $bucketDirectory]
+                    ],
+                ],
+            ])
+        );
+
+        $this->assertEquals(
+            $options[LocalInfo::ROOT_DIR_OPTION] . $bucketDirectory,
+            $resolver->buildBucketPath($serverName, $bucketName)
+        );
+    }
+
+    /**
+     * @throws StorageException
+     * @throws \ReflectionException
+     */
+    public function testBuildBucketPathFailed(): void
+    {
+        $directoryKey = $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY');
+
+        $serverName = ServerTestInterface::SERVER_NAME;
+        $bucketName = 'debugBucket';
+        $bucketDirectory = 'debug/dir1/';
+
+        $missedBucket = 'missedBucket';
+
+        $options = [
+            LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+        ];
+
+        $resolver = new LocalSystemResolver(
+            $this->buildConfig($serverName, [
+                'class' => LocalFilesystemAdapter::class,
+                'options' => $options,
+                'driver' => AdapterName::LOCAL,
+                'buckets' => [
+                    $bucketName => [
+                        'options' => [$directoryKey => $bucketDirectory]
+                    ],
+                ],
+            ])
+        );
+
+        $this->expectException(StorageException::class);
+        $this->expectExceptionMessage(
+            \sprintf('Bucket `%s` is not defined for server `%s`', $missedBucket, $serverName)
+        );
+
+        $resolver->buildBucketPath($serverName, $missedBucket);
     }
 
     public function getFileLists(): array
@@ -127,20 +197,24 @@ class LocalSystemResolverTest extends TestCase
         ];
     }
 
-    private function buildConfig(): StorageConfig
-    {
+    private function buildConfig(
+        $serverName = ServerTestInterface::SERVER_NAME,
+        ?array $serverInfo = null
+    ): StorageConfig {
+        if ($serverInfo === null) {
+            $serverInfo = [
+                'driver' => AdapterName::LOCAL,
+                'class' => LocalFilesystemAdapter::class,
+                'options' => [
+                    LocalInfo::ROOT_DIR_OPTION => ServerTestInterface::ROOT_DIR,
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                ],
+            ];
+        }
+
         return new StorageConfig(
             [
-                'servers' => [
-                    ServerTestInterface::SERVER_NAME => [
-                        'driver' => AdapterName::LOCAL,
-                        'class' => LocalFilesystemAdapter::class,
-                        'options' => [
-                            LocalInfo::ROOT_DIR_OPTION => ServerTestInterface::ROOT_DIR,
-                            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                        ],
-                    ],
-                ],
+                'servers' => [$serverName => $serverInfo],
             ]
         );
     }

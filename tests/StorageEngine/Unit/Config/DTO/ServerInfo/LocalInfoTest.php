@@ -6,8 +6,8 @@ namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
@@ -32,6 +32,7 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => $options,
             ]
         );
@@ -60,6 +61,7 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => $options,
             ]
         );
@@ -77,6 +79,7 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
@@ -104,6 +107,7 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
@@ -115,90 +119,6 @@ class LocalInfoTest extends AbstractUnitTest
 
     /**
      * @throws StorageException
-     * @throws \ReflectionException
-     */
-    public function testBuildBucketPath(): void
-    {
-        $directoryKey = $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY');
-
-        $bucketName = 'debugBucket';
-        $bucketDirectory = 'debug/dir1/';
-
-        $fileName = 'file.txt';
-
-        $options = [
-            LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-        ];
-
-        $serverInfo = new LocalInfo(
-            'someServer',
-            [
-                'class' => LocalFilesystemAdapter::class,
-                'options' => $options,
-                'buckets' => [
-                    $bucketName => [
-                        'options' => [$directoryKey => $bucketDirectory]
-                    ],
-                ],
-            ]
-        );
-
-        $this->assertInstanceOf(BucketInfo::class, $serverInfo->getBucket($bucketName));
-        $this->assertEquals($bucketDirectory, $serverInfo->getBucket($bucketName)->getOption($directoryKey));
-
-        $this->assertEquals(
-            $options[LocalInfo::ROOT_DIR_OPTION] . $bucketDirectory,
-            $serverInfo->buildBucketPath($bucketName)
-        );
-
-        $this->assertEquals(
-            $options[LocalInfo::ROOT_DIR_OPTION] . $bucketDirectory . $fileName,
-            $serverInfo->buildBucketPath($bucketName, $fileName)
-        );
-    }
-
-    /**
-     * @throws StorageException
-     * @throws \ReflectionException
-     */
-    public function testBuildBucketPathFailed(): void
-    {
-        $directoryKey = $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY');
-
-        $bucketName = 'debugBucket';
-        $bucketDirectory = 'debug/dir1/';
-
-        $missedBucket = 'missedBucket';
-
-        $options = [
-            LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-        ];
-
-        $serverInfo = new LocalInfo(
-            'someServer',
-            [
-                'class' => LocalFilesystemAdapter::class,
-                'options' => $options,
-                'buckets' => [
-                    $bucketName => [
-                        'options' => [$directoryKey => $bucketDirectory]
-                    ],
-                ],
-            ]
-        );
-
-        $this->expectException(StorageException::class);
-        $this->expectExceptionMessage(
-            \sprintf('Bucket %s is not defined', $missedBucket)
-        );
-
-        $serverInfo->buildBucketPath($missedBucket);
-    }
-
-    /**
-     * @throws StorageException
      */
     public function testIsAdvancedUsage(): void
     {
@@ -206,6 +126,7 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
@@ -219,6 +140,7 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
@@ -233,6 +155,7 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
@@ -260,19 +183,19 @@ class LocalInfoTest extends AbstractUnitTest
         return [
             [
                 [],
-                'Local server needs rootDir defined',
+                'local server needs rootDir defined',
             ],
             [
                 [
                     LocalInfo::ROOT_DIR_OPTION => '/root/',
                 ],
-                'Local server needs host defined for urls providing',
+                'local server needs host defined for urls providing',
             ],
             [
                 [
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
-                'Local server needs rootDir defined'
+                'local server needs rootDir defined'
             ]
         ];
     }

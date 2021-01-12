@@ -9,6 +9,7 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
@@ -56,6 +57,7 @@ trait LocalServerBuilderTrait
             $name,
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => [
                     LocalInfo::ROOT_DIR_OPTION => ($useVcsPrefix ? ServerTestInterface::VFS_PREFIX : '')
                         . ServerTestInterface::ROOT_DIR_NAME,

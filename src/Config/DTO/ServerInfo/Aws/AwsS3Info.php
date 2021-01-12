@@ -6,5 +6,5 @@ namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
 
 class AwsS3Info extends AbstractAwsS3Info
 {
-    protected const SERVER_NAME = 'awsS3';
+    protected const SERVER_INFO_TYPE = 'awsS3';
 }

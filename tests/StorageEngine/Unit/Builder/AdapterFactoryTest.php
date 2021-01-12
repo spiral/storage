@@ -59,6 +59,7 @@ class AdapterFactoryTest extends AbstractUnitTest
             'debugLocalServer',
             [
                 'class' => LocalFilesystemAdapter::class,
+                'driver' => AdapterName::LOCAL,
                 'options' => $options,
             ]
         );

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\BucketInfo;
-use Spiral\StorageEngine\Exception\StorageException;
 
 class LocalInfo extends ServerInfo
 {
@@ -14,6 +12,8 @@ class LocalInfo extends ServerInfo
     public const WRITE_FLAGS = 'write-flags';
     public const LINK_HANDLING = 'link-handling';
     public const HOST = 'host';
+
+    protected const SERVER_INFO_TYPE = 'local';
 
     protected array $requiredOptions = [
         self::ROOT_DIR_OPTION,
@@ -33,15 +33,21 @@ class LocalInfo extends ServerInfo
     {
         if (!$this->checkRequiredOptions()) {
             if (!$this->hasOption(static::ROOT_DIR_OPTION)) {
-                throw new ConfigException('Local server needs rootDir defined');
+                throw new ConfigException(\sprintf('%s server needs rootDir defined', $this->getServerInfoType()));
             }
 
             if (!$this->hasOption(static::HOST)) {
-                throw new ConfigException('Local server needs host defined for urls providing');
+                throw new ConfigException(
+                    \sprintf('%s server needs host defined for urls providing', $this->getServerInfoType())
+                );
             }
 
             throw new ConfigException(
-                'Local server needs all required options defined: ' . implode(',', $this->requiredOptions)
+                \sprintf(
+                    '%s server needs all required options defined: %s',
+                    $this->getServerInfoType(),
+                    implode(',', $this->requiredOptions)
+                )
             );
         }
 
@@ -63,27 +69,6 @@ class LocalInfo extends ServerInfo
                 }
             }
         }
-    }
-
-    /**
-     * @param string $bucketName
-     * @param string|null $fileName
-     *
-     * @return string
-     *
-     * @throws StorageException
-     */
-    public function buildBucketPath(string $bucketName, ?string $fileName = null): string
-    {
-        $bucket = $this->getBucket($bucketName);
-
-        if (!$bucket instanceof BucketInfo) {
-            throw new StorageException(
-                \sprintf('Bucket %s is not defined', $bucketName)
-            );
-        }
-
-        return $this->getOption(static::ROOT_DIR_OPTION) . $bucket->getDirectory() . $fileName;
     }
 
     public function isAdvancedUsage(): bool

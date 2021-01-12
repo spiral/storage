@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
 
-use League\Flysystem\Visibility;
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\SpecificConfigurableServerInfo;
@@ -15,8 +14,6 @@ abstract class AbstractAwsS3Info extends ServerInfo implements SpecificConfigura
     public const BUCKET_NAME = 'bucket';
     public const CLIENT_NAME = 'client';
     public const PATH_PREFIX = 'path-prefix';
-
-    protected const SERVER_NAME = 'aws';
 
     protected array $requiredOptions = [
         self::BUCKET_NAME,
@@ -30,6 +27,8 @@ abstract class AbstractAwsS3Info extends ServerInfo implements SpecificConfigura
 
     protected AwsClientInfo $clientInfo;
 
+    protected ?AwsVisibilityConverter $visibilityConverter = null;
+
     /**
      * @param array $info
      *
@@ -38,6 +37,10 @@ abstract class AbstractAwsS3Info extends ServerInfo implements SpecificConfigura
     public function constructSpecific(array $info): void
     {
         $this->clientInfo = new AwsClientInfo($this->getOption(static::CLIENT_NAME));
+
+        if ($this->hasOption(static::VISIBILITY)) {
+            $this->visibilityConverter = new AwsVisibilityConverter($this->getOption(static::VISIBILITY));
+        }
     }
 
     /**
@@ -46,22 +49,22 @@ abstract class AbstractAwsS3Info extends ServerInfo implements SpecificConfigura
     public function validate(): void
     {
         if (!$this->checkRequiredOptions()) {
-            if (!$this->hasOption(static::BUCKET_NAME)) {
+            if (!$this->hasOption(static::BUCKET_NAME) || !is_string($this->getOption(static::BUCKET_NAME))) {
                 throw new ConfigException(
-                    \sprintf('%s server needs used bucket name defined', $this->getServerName())
+                    \sprintf('%s server needs used bucket name defined as string', $this->getServerInfoType())
                 );
             }
 
             if (!$this->hasOption(static::CLIENT_NAME)) {
                 throw new ConfigException(
-                    \sprintf('%s server needs S3 client description', $this->getServerName())
+                    \sprintf('%s server needs S3 client description', $this->getServerInfoType())
                 );
             }
 
             throw new ConfigException(
                 \sprintf(
                     '%s server needs all required options defined: %s',
-                    $this->getServerName(),
+                    $this->getServerInfoType(),
                     implode(',', $this->requiredOptions)
                 )
             );
@@ -72,14 +75,9 @@ abstract class AbstractAwsS3Info extends ServerInfo implements SpecificConfigura
                 $optionVal = $this->getOption($optionLabel);
                 switch ($optionLabel) {
                     case static::VISIBILITY:
-                        $allowedValues = [Visibility::PUBLIC, Visibility::PRIVATE];
-                        if (!in_array($optionVal, $allowedValues, true)) {
+                        if (!is_array($optionVal)) {
                             throw new ConfigException(
-                                \sprintf(
-                                    '%s should be defined with one of values: %s',
-                                    $optionLabel,
-                                    implode(',', $allowedValues)
-                                )
+                                \sprintf('%s should be defined as array', $optionLabel)
                             );
                         }
                         break;
@@ -95,15 +93,16 @@ abstract class AbstractAwsS3Info extends ServerInfo implements SpecificConfigura
         }
     }
 
-    /**
-     * @param string $bucketName
-     * @param string|null $fileName
-     *
-     * @return null
-     */
-    public function buildBucketPath(string $bucketName, ?string $fileName = null): ?string
+    public function getVisibiltyConverter()
     {
-        return null;
+        return $this->visibilityConverter instanceof AwsVisibilityConverter
+            ? $this->visibilityConverter->getConverter()
+            : null;
+    }
+
+    public function getClient()
+    {
+        return $this->clientInfo->getClient();
     }
 
     public function isAdvancedUsage(): bool
@@ -115,10 +114,5 @@ abstract class AbstractAwsS3Info extends ServerInfo implements SpecificConfigura
         }
 
         return false;
-    }
-
-    protected function getServerName(): string
-    {
-        return static::SERVER_NAME;
     }
 }
