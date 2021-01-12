@@ -32,13 +32,24 @@ class LocalInfo extends ServerInfo
     public function validate(): void
     {
         if (!$this->checkRequiredOptions()) {
-            if (!$this->hasOption(static::ROOT_DIR_OPTION)) {
-                throw new ConfigException(\sprintf('%s server needs rootDir defined', $this->getServerInfoType()));
+            if (
+                !$this->hasOption(static::ROOT_DIR_OPTION)
+                || !is_string($this->getOption(static::ROOT_DIR_OPTION))
+            ) {
+                throw new ConfigException(
+                    \sprintf('%s server needs rootDir defined as string', $this->getServerInfoType())
+                );
             }
 
-            if (!$this->hasOption(static::HOST)) {
+            if (
+                !$this->hasOption(static::HOST)
+                || !is_string($this->getOption(static::HOST))
+            ) {
                 throw new ConfigException(
-                    \sprintf('%s server needs host defined for urls providing', $this->getServerInfoType())
+                    \sprintf(
+                        '%s server needs host defined for urls providing as string',
+                        $this->getServerInfoType()
+                    )
                 );
             }
 

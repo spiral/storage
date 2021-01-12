@@ -96,6 +96,4 @@ class AwsVisibilityConverterTest extends AbstractUnitTest
             ]
         );
     }
-
-
 }
