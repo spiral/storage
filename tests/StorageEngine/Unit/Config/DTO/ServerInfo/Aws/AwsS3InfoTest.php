@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo\Aws;
 
+use Aws\S3\S3Client;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
@@ -25,7 +26,7 @@ class AwsS3InfoTest extends AbstractUnitTest
     {
         $options = [
             AwsS3Info::BUCKET_NAME => 'debugBucket',
-            AwsS3Info::CLIENT_NAME => $this->getClientInfoArray(),
+            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
         ];
 
         $serverInfo = new AwsS3Info(
@@ -42,6 +43,8 @@ class AwsS3InfoTest extends AbstractUnitTest
         foreach ($options as $optionKey => $optionVal) {
             $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
         }
+
+        $this->assertNull($serverInfo->getVisibiltyConverter());
     }
 
     /**
@@ -51,9 +54,9 @@ class AwsS3InfoTest extends AbstractUnitTest
     {
         $options = [
             AwsS3Info::BUCKET_NAME => 'debugBucket',
-            AwsS3Info::CLIENT_NAME => $this->getClientInfoArray(),
+            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
             AwsS3Info::PATH_PREFIX => 'somePrefix',
-            AwsS3Info::VISIBILITY => $this->getVisibilityOption(),
+            AwsS3Info::VISIBILITY => $this->getAwsS3VisibilityOption(),
         ];
 
         $advancedAwsS3Info = new AwsS3Info(
@@ -69,6 +72,31 @@ class AwsS3InfoTest extends AbstractUnitTest
         foreach ($options as $optionKey => $optionVal) {
             $this->assertEquals($optionVal, $advancedAwsS3Info->getOption($optionKey));
         }
+
+        $visibilityConvertor = $advancedAwsS3Info->getVisibiltyConverter();
+        $this->assertInstanceOf(PortableVisibilityConverter::class, $visibilityConvertor);
+        $this->assertSame($visibilityConvertor, $advancedAwsS3Info->getVisibiltyConverter());
+    }
+
+    public function testGetClient(): void
+    {
+        $options = [
+            AwsS3Info::BUCKET_NAME => 'debugBucket',
+            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+        ];
+
+        $serverInfo = new AwsS3Info(
+            'someServer',
+            [
+                'class' => AwsS3V3Adapter::class,
+                'driver' => AdapterName::AWS_S3,
+                'options' => $options,
+            ]
+        );
+
+        $client = $serverInfo->getClient();
+        $this->assertInstanceOf(S3Client::class, $client);
+        $this->assertSame($client, $serverInfo->getClient());
     }
 
     /**
@@ -97,7 +125,29 @@ class AwsS3InfoTest extends AbstractUnitTest
     /**
      * @throws StorageException
      */
-    public function testValidateOptionalOptionsVisibilityFailed(): void
+    public function testValidateVisibilityOptionWrongTypeFailed(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('visibility should be defined as array');
+
+        new AwsS3Info(
+            'someServer',
+            [
+                AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
+                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
+                AwsS3Info::OPTIONS_KEY => [
+                    AwsS3Info::BUCKET_NAME => 'someBucket',
+                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::VISIBILITY => 12,
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testValidateVisibilityOptionWrongValueFailed(): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage('visibility should be defined with one of values: public,private');
@@ -109,7 +159,7 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_NAME => 'someBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getClientInfoArray(),
+                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
                     AwsS3Info::VISIBILITY => [
                         AwsS3Info::CLASS_KEY => PortableVisibilityConverter::class,
                         AwsS3Info::OPTIONS_KEY => [
@@ -136,7 +186,7 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_NAME => 'someBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getClientInfoArray(),
+                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
                     AwsS3Info::PATH_PREFIX => [1, 2],
                 ],
             ]
@@ -155,7 +205,7 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_NAME => 'debugBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getClientInfoArray(),
+                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
                 ],
             ]
         );
@@ -169,7 +219,7 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_NAME => 'debugBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getClientInfoArray(),
+                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
                     AwsS3Info::PATH_PREFIX => 'somePrefix',
                 ],
             ]
@@ -193,16 +243,6 @@ class AwsS3InfoTest extends AbstractUnitTest
                 [AwsS3Info::BUCKET_NAME => 'someBucket'],
                 'awsS3 server needs S3 client description',
             ],
-        ];
-    }
-
-    protected function getVisibilityOption(): array
-    {
-        return [
-            AwsS3Info::CLASS_KEY => PortableVisibilityConverter::class,
-            AwsS3Info::OPTIONS_KEY => [
-                AwsS3Info::VISIBILITY => Visibility::PUBLIC,
-            ]
         ];
     }
 }

@@ -23,13 +23,13 @@ class LocalInfoTest extends AbstractUnitTest
         $hostOption = LocalInfo::HOST;
 
         $options = [
-            'option1' => 'optionVal1',
             $rootDirOption => '/some/root/',
             $hostOption => ServerTestInterface::CONFIG_HOST,
         ];
 
+        $serverName = 'someServer';
         $serverInfo = new LocalInfo(
-            'someServer',
+            $serverName,
             [
                 'class' => LocalFilesystemAdapter::class,
                 'driver' => AdapterName::LOCAL,
@@ -38,6 +38,7 @@ class LocalInfoTest extends AbstractUnitTest
         );
 
         $this->assertEquals(LocalFilesystemAdapter::class, $serverInfo->getAdapterClass());
+        $this->assertEquals($serverName, $serverInfo->getName());
 
         foreach ($options as $optionKey => $optionVal) {
             $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
@@ -63,6 +64,73 @@ class LocalInfoTest extends AbstractUnitTest
                 'class' => LocalFilesystemAdapter::class,
                 'driver' => AdapterName::LOCAL,
                 'options' => $options,
+            ]
+        );
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testValidateUnknownDriverFailed(): void
+    {
+        $serverName = 'someServer';
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(\sprintf('Server driver for %s was not identified', $serverName));
+
+        new LocalInfo(
+            $serverName,
+            [
+                'class' => LocalFilesystemAdapter::class,
+                'driver' => 'missedDriver',
+                'options' => [
+                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testValidateNoDriverFailed(): void
+    {
+        $serverName = 'someServer';
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(\sprintf('Server driver for %s was not identified', $serverName));
+
+        new LocalInfo(
+            $serverName,
+            [
+                'class' => LocalFilesystemAdapter::class,
+                'options' => [
+                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testValidateNoClassFailed(): void
+    {
+        $serverName = 'someServer';
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(\sprintf('Server %s needs adapter class defined', $serverName));
+
+        new LocalInfo(
+            $serverName,
+            [
+                'driver' => AdapterName::LOCAL,
+                'options' => [
+                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                ],
             ]
         );
     }

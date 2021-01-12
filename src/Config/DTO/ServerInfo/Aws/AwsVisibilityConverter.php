@@ -17,7 +17,7 @@ class AwsVisibilityConverter implements ClassBasedInterface, OptionsBasedInterfa
     use ClassBasedTrait;
     use OptionsTrait;
 
-    private const VISIBILITY_KEY = 'visibility';
+    public const VISIBILITY_KEY = 'visibility';
 
     private $converter = null;
 
@@ -48,7 +48,9 @@ class AwsVisibilityConverter implements ClassBasedInterface, OptionsBasedInterfa
         $this->options = $info[static::OPTIONS_KEY];
 
         if (!$this->hasOption(static::VISIBILITY_KEY)) {
-            throw new ConfigException(\sprintf('%s option should be defined', static::VISIBILITY_KEY));
+            throw new ConfigException(
+                \sprintf('%s option should be defined for Aws visibility converter', static::VISIBILITY_KEY)
+            );
         }
 
         $allowedVisibilityOptionValues = [Visibility::PUBLIC, Visibility::PRIVATE];

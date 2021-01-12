@@ -72,7 +72,7 @@ class StorageEngine implements SingletonInterface
     private function initResolvers(): void
     {
         foreach ($this->config->getServersKeys() as $serverKey) {
-            $this->prepareResolverByDriver(
+            $this->resolvers[$serverKey] = $this->prepareResolverByDriver(
                 $this->config->buildServerInfo($serverKey)->getDriver()
             );
         }

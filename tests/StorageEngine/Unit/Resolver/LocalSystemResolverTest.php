@@ -14,10 +14,13 @@ use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AbstractResolver;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class LocalSystemResolverTest extends AbstractUnitTest
 {
+    use StorageConfigTrait;
+
     /**
      * @dataProvider getServerFilePathsList
      *
@@ -195,27 +198,5 @@ class LocalSystemResolverTest extends AbstractUnitTest
                 null
             ],
         ];
-    }
-
-    private function buildConfig(
-        $serverName = ServerTestInterface::SERVER_NAME,
-        ?array $serverInfo = null
-    ): StorageConfig {
-        if ($serverInfo === null) {
-            $serverInfo = [
-                'driver' => AdapterName::LOCAL,
-                'class' => LocalFilesystemAdapter::class,
-                'options' => [
-                    LocalInfo::ROOT_DIR_OPTION => ServerTestInterface::ROOT_DIR,
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                ],
-            ];
-        }
-
-        return new StorageConfig(
-            [
-                'servers' => [$serverName => $serverInfo],
-            ]
-        );
     }
 }

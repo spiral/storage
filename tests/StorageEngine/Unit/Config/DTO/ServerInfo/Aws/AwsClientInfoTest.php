@@ -32,6 +32,25 @@ class AwsClientInfoTest extends AbstractUnitTest
         $this->assertEquals($credentials, $info->getOption('credentials'));
     }
 
+    public function testGetClient(): void
+    {
+        $credentials = new Credentials('someKey', 'someSecret');
+        $info = new AwsClientInfo(
+            [
+                AwsClientInfo::CLASS_KEY => S3Client::class,
+                AwsClientInfo::OPTIONS_KEY => [
+                    'version' => 'latest',
+                    'credentials' => $credentials,
+                    'region' => 'west',
+                ]
+            ]
+        );
+
+        $s3Client = $info->getClient();
+        $this->assertInstanceOf(S3Client::class, $s3Client);
+        $this->assertSame($s3Client, $info->getClient());
+    }
+
     /**
      * @throws StorageException
      */

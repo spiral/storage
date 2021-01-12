@@ -7,7 +7,6 @@ namespace Spiral\StorageEngine\Config;
 use Spiral\Core\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
