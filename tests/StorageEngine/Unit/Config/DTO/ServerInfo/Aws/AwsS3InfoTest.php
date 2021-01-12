@@ -32,9 +32,9 @@ class AwsS3InfoTest extends AbstractUnitTest
         $serverInfo = new AwsS3Info(
             'someServer',
             [
-                'class' => AwsS3V3Adapter::class,
-                'driver' => AdapterName::AWS_S3,
-                'options' => $options,
+                AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
+                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
+                AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
 
@@ -62,9 +62,9 @@ class AwsS3InfoTest extends AbstractUnitTest
         $advancedAwsS3Info = new AwsS3Info(
             'someServer',
             [
-                'class' => AwsS3V3Adapter::class,
-                'driver' => AdapterName::AWS_S3,
-                'options' => $options,
+                AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
+                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
+                AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
 
@@ -88,9 +88,9 @@ class AwsS3InfoTest extends AbstractUnitTest
         $serverInfo = new AwsS3Info(
             'someServer',
             [
-                'class' => AwsS3V3Adapter::class,
-                'driver' => AdapterName::AWS_S3,
-                'options' => $options,
+                AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
+                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
+                AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
 

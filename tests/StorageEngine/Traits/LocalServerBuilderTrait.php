@@ -59,9 +59,9 @@ trait LocalServerBuilderTrait
     protected function buildLocalInfoDescription(?bool $useVcsPrefix = false): array
     {
         return [
-            'class' => LocalFilesystemAdapter::class,
-            'driver' => AdapterName::LOCAL,
-            'options' => [
+            LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+            LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+            LocalInfo::OPTIONS_KEY => [
                 LocalInfo::ROOT_DIR_OPTION => ($useVcsPrefix ? ServerTestInterface::VFS_PREFIX : '')
                     . ServerTestInterface::ROOT_DIR_NAME,
                 LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,

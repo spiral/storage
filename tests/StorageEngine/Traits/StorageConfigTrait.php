@@ -18,9 +18,9 @@ trait StorageConfigTrait
     ): StorageConfig {
         if ($serverInfo === null) {
             $serverInfo = [
-                'driver' => AdapterName::LOCAL,
-                'class' => LocalFilesystemAdapter::class,
-                'options' => [
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => ServerTestInterface::ROOT_DIR,
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
@@ -28,9 +28,7 @@ trait StorageConfigTrait
         }
 
         return new StorageConfig(
-            [
-                'servers' => [$serverName => $serverInfo],
-            ]
+            ['servers' => [$serverName => $serverInfo]]
         );
     }
 }

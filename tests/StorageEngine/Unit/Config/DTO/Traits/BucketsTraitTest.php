@@ -36,7 +36,7 @@ class BucketsTraitTest extends AbstractUnitTest
         $bucket = new BucketInfo(
             $bucketName,
             $this->buildLocalInfo(),
-            ['options' => ['directory' => '/debug/bucket1/']]
+            [BucketInfo::OPTIONS_KEY => [BucketInfo::DIRECTORY_KEY => '/debug/bucket1/']]
         );
 
         $this->callNotPublicMethod(
@@ -68,7 +68,7 @@ class BucketsTraitTest extends AbstractUnitTest
                 new BucketInfo(
                     $bucketName,
                     $localInfo,
-                    ['options' => ['directory' => '/debug/bucket1/']]
+                    [BucketInfo::OPTIONS_KEY => [BucketInfo::DIRECTORY_KEY => '/debug/bucket1/']]
                 )
             ]
         );
@@ -80,7 +80,7 @@ class BucketsTraitTest extends AbstractUnitTest
                 new BucketInfo(
                     $bucketName2,
                     $localInfo,
-                    ['options' => ['directory' => '/debug/bucket2/']]
+                    [BucketInfo::OPTIONS_KEY => [BucketInfo::DIRECTORY_KEY => '/debug/bucket2/']]
                 )
             ]
         );

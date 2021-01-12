@@ -63,9 +63,9 @@ class AdapterFactoryTest extends AbstractUnitTest
         $info = new LocalInfo(
             'debugLocalServer',
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => $options,
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => $options,
             ]
         );
 
@@ -127,9 +127,9 @@ class AdapterFactoryTest extends AbstractUnitTest
         $info = new AwsS3Info(
             'debugAwsS3Server',
             [
-                'class' => AwsS3V3Adapter::class,
-                'driver' => AdapterName::AWS_S3,
-                'options' => $options,
+                LocalInfo::CLASS_KEY => AwsS3V3Adapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::AWS_S3,
+                LocalInfo::OPTIONS_KEY => $options,
             ]
         );
 
@@ -160,7 +160,7 @@ class AdapterFactoryTest extends AbstractUnitTest
                 'someName',
                 [
                     ServerInfo::CLASS_KEY => LocalFilesystemAdapter::class,
-                    'driver' => AdapterName::LOCAL,
+                    LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 ],
             ]
         );

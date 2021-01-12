@@ -83,12 +83,12 @@ class LocalSystemResolverTest extends AbstractUnitTest
 
         $resolver = new LocalSystemResolver(
             $this->buildConfig($serverName, [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => $options,
-                'buckets' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => $options,
+                LocalInfo::BUCKETS_KEY => [
                     $bucketName => [
-                        'options' => [$directoryKey => $bucketDirectory]
+                        LocalInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory]
                     ],
                 ],
             ])
@@ -121,12 +121,12 @@ class LocalSystemResolverTest extends AbstractUnitTest
 
         $resolver = new LocalSystemResolver(
             $this->buildConfig($serverName, [
-                'class' => LocalFilesystemAdapter::class,
-                'options' => $options,
-                'driver' => AdapterName::LOCAL,
-                'buckets' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::OPTIONS_KEY => $options,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::BUCKETS_KEY => [
                     $bucketName => [
-                        'options' => [$directoryKey => $bucketDirectory]
+                        LocalInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory]
                     ],
                 ],
             ])

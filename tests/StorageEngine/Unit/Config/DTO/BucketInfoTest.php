@@ -30,7 +30,7 @@ class BucketInfoTest extends AbstractUnitTest
             'dBucket2',
             $localInfo,
             [
-                'options' => [
+                BucketInfo::OPTIONS_KEY => [
                     $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY') => $directory,
                 ],
             ]

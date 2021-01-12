@@ -31,9 +31,9 @@ class LocalInfoTest extends AbstractUnitTest
         $serverInfo = new LocalInfo(
             $serverName,
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => $options,
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => $options,
             ]
         );
 
@@ -61,9 +61,9 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             'someServer',
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => $options,
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => $options,
             ]
         );
     }
@@ -81,9 +81,9 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => 'missedDriver',
-                'options' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => 'missedDriver',
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
@@ -104,8 +104,8 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                'class' => LocalFilesystemAdapter::class,
-                'options' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
@@ -126,8 +126,8 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                'driver' => AdapterName::LOCAL,
-                'options' => [
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
@@ -146,9 +146,9 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             'someServer',
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::VISIBILITY => 12,
@@ -174,9 +174,9 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             'someServer',
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     $label => 'MyFlag',
@@ -193,9 +193,9 @@ class LocalInfoTest extends AbstractUnitTest
         $simpleLocal = new LocalInfo(
             'someServer',
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
@@ -207,9 +207,9 @@ class LocalInfoTest extends AbstractUnitTest
         $baseAdvancedUsage = new LocalInfo(
             'someServer',
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS => LOCK_EX,
@@ -222,9 +222,9 @@ class LocalInfoTest extends AbstractUnitTest
         $baseAdvancedUsage = new LocalInfo(
             'someServer',
             [
-                'class' => LocalFilesystemAdapter::class,
-                'driver' => AdapterName::LOCAL,
-                'options' => [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_OPTION => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS => LOCK_EX,
