@@ -6,21 +6,17 @@ namespace Spiral\StorageEngine\Builder\Adapter;
 
 use League\Flysystem\FilesystemAdapter;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 
+/**
+ * @property ServerInfoInterface|AwsS3Info $serverInfo
+ */
 class AwsS3Builder extends AbstractBuilder
 {
-    /**
-     * @return FilesystemAdapter
-     *
-     * @throws StorageException
-     */
+    protected const SERVER_INFO_CLASS = AwsS3Info::class;
+
     public function buildSimple(): FilesystemAdapter
     {
-        if (!$this->serverInfo instanceof AwsS3Info) {
-            throw new StorageException('Wrong server info provided for AwsS3 builder');
-        }
-
         $adapterClass = $this->serverInfo->getAdapterClass();
 
         return new $adapterClass(
@@ -29,17 +25,8 @@ class AwsS3Builder extends AbstractBuilder
         );
     }
 
-    /**
-     * @return FilesystemAdapter
-     *
-     * @throws StorageException
-     */
     public function buildAdvanced(): FilesystemAdapter
     {
-        if (!$this->serverInfo instanceof AwsS3Info) {
-            throw new StorageException('Wrong server info provided for AwsS3 builder');
-        }
-
         $adapterClass = $this->serverInfo->getAdapterClass();
 
         return new $adapterClass(
