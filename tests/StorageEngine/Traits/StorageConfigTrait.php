@@ -12,12 +12,10 @@ use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
 trait StorageConfigTrait
 {
-    protected function buildConfig(
-        $serverName = ServerTestInterface::SERVER_NAME,
-        ?array $serverInfo = null
-    ): StorageConfig {
-        if ($serverInfo === null) {
-            $serverInfo = [
+    protected function buildStorageConfig(?array $servers = null): StorageConfig
+    {
+        if (empty($servers)) {
+            $servers[ServerTestInterface::SERVER_NAME] = [
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
@@ -28,7 +26,7 @@ trait StorageConfigTrait
         }
 
         return new StorageConfig(
-            ['servers' => [$serverName => $serverInfo]]
+            ['servers' => $servers]
         );
     }
 }

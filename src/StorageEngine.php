@@ -6,27 +6,17 @@ namespace Spiral\StorageEngine;
 
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\MountManager;
-use Spiral\Core\Container\SingletonInterface;
-use Spiral\StorageEngine\Config\StorageConfig;
-use Spiral\StorageEngine\Enum\AdapterName;
-use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\LocalSystemResolver;
-use Spiral\StorageEngine\Resolver\ResolverInterface;
+use Spiral\StorageEngine\Resolver\ResolveManager;
 
-class StorageEngine implements SingletonInterface
+class StorageEngine
 {
-    private StorageConfig $config;
-
     private ?MountManager $mountManager = null;
 
-    /**
-     * @var ResolverInterface[]
-     */
-    private array $resolvers = [];
+    private ResolveManager $resolveManager;
 
-    public function __construct(StorageConfig $config)
+    public function __construct(ResolveManager $resolveManager)
     {
-        $this->config = $config;
+        $this->resolveManager = $resolveManager;
     }
 
     /**
@@ -37,7 +27,7 @@ class StorageEngine implements SingletonInterface
     public function init(array $servers): void
     {
         $this->mountManager = new MountManager($servers);
-        $this->initResolvers();
+        $this->resolveManager->initResolvers();
     }
 
     public function isInitiated(): bool
@@ -45,53 +35,13 @@ class StorageEngine implements SingletonInterface
         return $this->mountManager instanceof MountManager;
     }
 
-    public function getMountManager(): MountManager
+    public function getMountManager(): ?MountManager
     {
         return $this->mountManager;
     }
 
-    /**
-     * @param string $serverKey
-     *
-     * @return ResolverInterface
-     *
-     * @throws StorageException
-     */
-    public function getResolver(string $serverKey): ResolverInterface
+    public function getResolveManager(): ResolveManager
     {
-        if (!array_key_exists($serverKey, $this->resolvers)) {
-            throw new StorageException('No resolver was detected for server ' . $serverKey);
-        }
-
-        return $this->resolvers[$serverKey];
-    }
-
-    /**
-     * @throws Exception\StorageException
-     */
-    private function initResolvers(): void
-    {
-        foreach ($this->config->getServersKeys() as $serverKey) {
-            $this->resolvers[$serverKey] = $this->prepareResolverByDriver(
-                $this->config->buildServerInfo($serverKey)->getDriver()
-            );
-        }
-    }
-
-    /**
-     * @param string $driver
-     *
-     * @return ResolverInterface
-     *
-     * @throws StorageException
-     */
-    private function prepareResolverByDriver(string $driver): ResolverInterface
-    {
-        switch ($driver) {
-            case AdapterName::LOCAL:
-                return new LocalSystemResolver($this->config);
-            default:
-                throw new StorageException('No resolver was detected for driver ' . $driver);
-        }
+        return $this->resolveManager;
     }
 }

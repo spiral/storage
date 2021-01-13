@@ -4,60 +4,40 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
-use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Config\StorageConfig;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\StorageException;
 
-class LocalSystemResolver extends AbstractResolver
+class LocalSystemResolver extends AbstractResolver implements BucketResolverInterface
 {
-    private StorageConfig $storageConfig;
-
-    public function __construct(StorageConfig $storageConfig)
-    {
-        $this->storageConfig = $storageConfig;
-    }
+    protected const SERVER_INFO_CLASS = LocalInfo::class;
 
     /**
-     * @param string[] $files
-     *
-     * @return \Generator
-     *
-     * @throws StorageException
+     * @var ServerInfoInterface|LocalInfo
      */
-    public function buildUrlsList(array $files): \Generator
-    {
-        foreach ($files as $filePath) {
-            $fileInfo = $this->parseFilePath($filePath);
-            if (!empty($fileInfo)) {
-                $serverInfo = $this->storageConfig->buildServerInfo($fileInfo[self::FILE_PATH_SERVER_PART]);
+    protected ServerInfoInterface $serverInfo;
 
-                if ($serverInfo->hasOption(LocalInfo::HOST)) {
-                    yield $serverInfo->getOption(LocalInfo::HOST) . $fileInfo[self::FILE_PATH_PATH_PART];
-                }
-            }
-        }
+    public function buildUrl(string $filePath): ?string
+    {
+        return $this->serverInfo->getOption(LocalInfo::HOST) . $filePath;
     }
 
     /**
-     * @param string $server
      * @param string $bucketName
      *
      * @return string
      *
      * @throws StorageException
      */
-    public function buildBucketPath(string $server, string $bucketName): string
+    public function buildBucketPath(string $bucketName): string
     {
-        $serverInfo = $this->storageConfig->buildServerInfo($server);
-
-        if (!$serverInfo->hasBucket($bucketName)) {
+        if (!$this->serverInfo->hasBucket($bucketName)) {
             throw new StorageException(
-                \sprintf('Bucket `%s` is not defined for server `%s`', $bucketName, $server)
+                \sprintf('Bucket `%s` is not defined for server `%s`', $bucketName, $this->serverInfo->getName())
             );
         }
 
-        return $serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION)
-            . $serverInfo->getBucket($bucketName)->getDirectory();
+        return $this->serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION)
+            . $this->serverInfo->getBucket($bucketName)->getDirectory();
     }
 }

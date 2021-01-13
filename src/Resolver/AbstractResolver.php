@@ -4,18 +4,34 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Exception\StorageException;
+
 abstract class AbstractResolver implements ResolverInterface
 {
-    public const FILE_PATH_SERVER_PART = 'server';
-    public const FILE_PATH_PATH_PART = 'path';
+    protected const SERVER_INFO_CLASS = '';
 
-    protected const FILE_PATH_PATTERN = '/^(?\'' . self::FILE_PATH_SERVER_PART . '\'[\w\-]*):\/\/(?\''
-    . self::FILE_PATH_PATH_PART . '\'[\w\-\/\.]*)$/';
+    protected ServerInfoInterface $serverInfo;
 
-    public function parseFilePath(string $filePath): ?array
+    /**
+     * @param ServerInfoInterface $serverInfo
+     *
+     * @throws StorageException
+     */
+    public function __construct(ServerInfoInterface $serverInfo)
     {
-        preg_match_all(static::FILE_PATH_PATTERN, $filePath, $matches, PREG_SET_ORDER);
+        $requiredClass = static::SERVER_INFO_CLASS;
 
-        return !empty($matches) ? reset($matches) : null;
+        if (empty($requiredClass) || !$serverInfo instanceof $requiredClass) {
+            throw new StorageException(
+                \sprintf(
+                    'Wrong server info (%s) for resolver %s',
+                    get_class($serverInfo),
+                    static::class
+                )
+            );
+        }
+
+        $this->serverInfo = $serverInfo;
     }
 }

@@ -6,62 +6,70 @@ namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
-use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\AbstractResolver;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
-use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
+use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class LocalSystemResolverTest extends AbstractUnitTest
 {
-    use StorageConfigTrait;
+    use LocalServerBuilderTrait;
+    use AwsS3ServerBuilderTrait;
 
     /**
-     * @dataProvider getServerFilePathsList
-     *
-     * @param string $filePath
-     * @param array|null $expectedArray
+     * @throws StorageException
      */
-    public function testParseFilePath(string $filePath, ?array $expectedArray = null): void
+    public function testWrongServerInfo(): void
     {
-        $resolver = new LocalSystemResolver($this->buildConfig());
-
-        $this->assertEquals($expectedArray, $resolver->parseFilePath($filePath));
-    }
-
-    public function testParseFilePathWrongFormat(): void
-    {
-        $resolver = new LocalSystemResolver($this->buildConfig());
-
-        $this->assertNull(
-            $resolver->parseFilePath(
-                \sprintf('%s//%s', ServerTestInterface::SERVER_NAME, 'file.txt')
+        $this->expectException(StorageException::class);
+        $this->expectExceptionMessage(
+            \sprintf(
+                'Wrong server info (%s) for resolver %s',
+                AwsS3Info::class,
+                LocalSystemResolver::class
             )
+        );
+
+        new LocalSystemResolver(
+            $this->buildAwsS3Info()
         );
     }
 
     /**
-     * @dataProvider getFileLists
+     * @dataProvider getFileUrlList
      *
-     * @param array $filesList
-     * @param array $expectedUrlsList
+     * @param string $serverName
+     * @param string $host
+     * @param string $filePath
+     * @param string $rootDir
+     * @param string $expectedUrl
      *
      * @throws StorageException
      */
-    public function testBuildUrlsList(array $filesList, array $expectedUrlsList): void
-    {
-        $resolver = new LocalSystemResolver($this->buildConfig());
+    public function testBuildUrl(
+        string $serverName,
+        string $host,
+        string $rootDir,
+        string $filePath,
+        string $expectedUrl
+    ): void {
+        $resolver = new LocalSystemResolver(
+            new LocalInfo($serverName, [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::OPTIONS_KEY => [
+                    LocalInfo::ROOT_DIR_OPTION => $rootDir,
+                    LocalInfo::HOST => $host,
+                ],
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+            ])
+        );
 
-        $urlsList = $resolver->buildUrlsList($filesList);
-
-        $this->assertInstanceOf(\Generator::class, $urlsList);
-
-        $this->assertEquals($expectedUrlsList, iterator_to_array($urlsList));
+        $this->assertEquals($expectedUrl, $resolver->buildUrl($filePath));
     }
 
     /**
@@ -82,7 +90,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         ];
 
         $resolver = new LocalSystemResolver(
-            $this->buildConfig($serverName, [
+            new LocalInfo($serverName, [
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
@@ -96,7 +104,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
 
         $this->assertEquals(
             $options[LocalInfo::ROOT_DIR_OPTION] . $bucketDirectory,
-            $resolver->buildBucketPath($serverName, $bucketName)
+            $resolver->buildBucketPath($bucketName)
         );
     }
 
@@ -120,7 +128,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         ];
 
         $resolver = new LocalSystemResolver(
-            $this->buildConfig($serverName, [
+            new LocalInfo($serverName, [
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => $options,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
@@ -137,65 +145,28 @@ class LocalSystemResolverTest extends AbstractUnitTest
             \sprintf('Bucket `%s` is not defined for server `%s`', $missedBucket, $serverName)
         );
 
-        $resolver->buildBucketPath($serverName, $missedBucket);
+        $resolver->buildBucketPath($missedBucket);
     }
 
-    public function getFileLists(): array
+    public function getFileUrlList(): array
     {
         $fileTxt = 'file.txt';
         $specificCsvFile = '/some/specific/dir/file1.csv';
 
         return [
             [
-                [
-                    \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $specificCsvFile),
-                ],
-                [
-                    \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
-                ]
+                ServerTestInterface::SERVER_NAME,
+                ServerTestInterface::CONFIG_HOST,
+                ServerTestInterface::ROOT_DIR,
+                $fileTxt,
+                \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $fileTxt),
             ],
             [
-                [
-                    \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                    \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $specificCsvFile),
-                ],
-                [
-                    \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $fileTxt),
-                    \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
-                ]
-            ],
-        ];
-    }
-
-    public function getServerFilePathsList(): array
-    {
-        $fileTxt = 'file.txt';
-        $dirFile = 'some/debug/dir/file1.csv';
-
-        return [
-            [
-                \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                [
-                    0 => \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                    1 => ServerTestInterface::SERVER_NAME,
-                    2 => $fileTxt,
-                    AbstractResolver::FILE_PATH_SERVER_PART => ServerTestInterface::SERVER_NAME,
-                    AbstractResolver::FILE_PATH_PATH_PART => $fileTxt,
-                ]
-            ],
-            [
-                \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $dirFile),
-                [
-                    0 => \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $dirFile),
-                    1 => ServerTestInterface::SERVER_NAME,
-                    2 => $dirFile,
-                    AbstractResolver::FILE_PATH_SERVER_PART => ServerTestInterface::SERVER_NAME,
-                    AbstractResolver::FILE_PATH_PATH_PART => $dirFile,
-                ]
-            ],
-            [
-                \sprintf('%s:\\some/wrong/format/%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                null
+                ServerTestInterface::SERVER_NAME,
+                ServerTestInterface::CONFIG_HOST,
+                ServerTestInterface::ROOT_DIR,
+                $specificCsvFile,
+                \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
             ],
         ];
     }
