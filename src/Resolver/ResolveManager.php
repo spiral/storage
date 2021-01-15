@@ -95,6 +95,8 @@ class ResolveManager
         switch ($serverInfo->getDriver()) {
             case AdapterName::LOCAL:
                 return new LocalSystemResolver($serverInfo);
+            case AdapterName::AWS_S3:
+                return new AwsS3Resolver($serverInfo);
             default:
                 throw new StorageException('No resolver was detected for driver ' . $serverInfo->getDriver());
         }

@@ -16,7 +16,7 @@ class AwsClientInfo implements ClassBasedInterface, OptionsBasedInterface
     use ClassBasedTrait;
     use OptionsTrait;
 
-    private $client = null;
+    private $client;
 
     /**
      * @param array $clientInfo

@@ -6,6 +6,7 @@ namespace Spiral\StorageEngine\Config;
 
 use Spiral\Core\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Enum\AdapterName;
@@ -69,6 +70,9 @@ class StorageConfig extends InjectableConfig
         switch ($this->extractServerDriver($serverInfo)) {
             case AdapterName::LOCAL:
                 $serverInfoDTO = new LocalInfo($serverLabel, $serverInfo);
+                break;
+            case AdapterName::AWS_S3:
+                $serverInfoDTO = new AwsS3Info($serverLabel, $serverInfo);
                 break;
             default:
                 throw new ConfigException('Driver can\'t be identified for server ' . $serverLabel);

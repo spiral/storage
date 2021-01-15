@@ -6,9 +6,10 @@ namespace Spiral\StorageEngine;
 
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\MountManager;
+use Spiral\Core\Container\SingletonInterface;
 use Spiral\StorageEngine\Resolver\ResolveManager;
 
-class StorageEngine
+class StorageEngine implements SingletonInterface
 {
     private ?MountManager $mountManager = null;
 
