@@ -43,6 +43,24 @@ class ResolveManagerTest extends AbstractUnitTest
         $this->assertSame($resolver, $resolveManager->getResolver('local'));
     }
 
+    /**
+     * @dataProvider getFilePathListForBuild
+     *
+     * @param string $server
+     * @param string $filePath
+     * @param string $expectedFilePath
+     */
+    public function testBuildServerFilePath(string $server, string $filePath, string $expectedFilePath): void
+    {
+        $resolveManager = $this->buildResolveManager(
+            ['local' => $this->buildLocalInfoDescription()]
+        );
+
+        $this->assertEquals(
+            $expectedFilePath, $resolveManager->buildServerFilePath($server, $filePath)
+        );
+    }
+
     public function testGetResolverFailed(): void
     {
         $resolveManager = $this->buildResolveManager(
@@ -172,6 +190,27 @@ class ResolveManagerTest extends AbstractUnitTest
             [
                 \sprintf('%s:\\some/wrong/format/%s', ServerTestInterface::SERVER_NAME, $fileTxt),
                 new ServerFilePathStructure('')
+            ],
+        ];
+    }
+
+    public function getFilePathListForBuild(): array
+    {
+        return [
+            [
+                'local',
+                'file1.txt',
+                'local://file1.txt',
+            ],
+            [
+                'aws',
+                'dir/file1.txt',
+                'aws://dir/file1.txt',
+            ],
+            [
+                'ftp',
+                'dir/specific/file1.txt',
+                'ftp://dir/specific/file1.txt',
             ],
         ];
     }

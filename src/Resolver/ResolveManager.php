@@ -25,11 +25,7 @@ class ResolveManager implements ResolveManagerInterface
     }
 
     /**
-     * @param string $serverKey
-     *
-     * @return ResolverInterface
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function getResolver(string $serverKey): ResolverInterface
     {
@@ -41,7 +37,7 @@ class ResolveManager implements ResolveManagerInterface
     }
 
     /**
-     * @throws StorageException
+     * @inheritDoc
      */
     public function initResolvers(): void
     {
@@ -53,11 +49,7 @@ class ResolveManager implements ResolveManagerInterface
     }
 
     /**
-     * @param string[] $files
-     *
-     * @return \Generator
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function buildUrlsList(array $files): \Generator
     {
@@ -74,6 +66,11 @@ class ResolveManager implements ResolveManagerInterface
     public function parseFilePath(string $filePath): ServerFilePathStructure
     {
         return new ServerFilePathStructure($filePath);
+    }
+
+    public function buildServerFilePath(string $serverName, string $filePath): string
+    {
+        return \sprintf('%s%s%s', $serverName, static::SERVER_PATH_SEPARATOR, $filePath);
     }
 
     /**
