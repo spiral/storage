@@ -5,36 +5,39 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Resolver;
 
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Config\StorageConfig;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\StorageException;
 
-class LocalSystemResolver extends AbstractResolver
+class LocalSystemResolver extends AbstractResolver implements BucketResolverInterface
 {
-    private StorageConfig $storageConfig;
+    protected const SERVER_INFO_CLASS = LocalInfo::class;
 
-    public function __construct(StorageConfig $storageConfig)
+    /**
+     * @var ServerInfoInterface|LocalInfo
+     */
+    protected ServerInfoInterface $serverInfo;
+
+    public function buildUrl(string $filePath): ?string
     {
-        $this->storageConfig = $storageConfig;
+        return $this->serverInfo->getOption(LocalInfo::HOST) . $this->normalizePathForServer($filePath);
     }
 
     /**
-     * @param string[] $files
+     * @param string $bucketName
      *
-     * @return \Generator
+     * @return string
      *
      * @throws StorageException
      */
-    public function buildUrlsList(array $files): \Generator
+    public function buildBucketPath(string $bucketName): string
     {
-        foreach ($files as $filePath) {
-            $fileInfo = $this->parseFilePath($filePath);
-            if (!empty($fileInfo)) {
-                $serverInfo = $this->storageConfig->buildServerInfo($fileInfo[self::FILE_PATH_SERVER_PART]);
-
-                if ($serverInfo->hasOption(LocalInfo::HOST)) {
-                    yield $serverInfo->getOption(LocalInfo::HOST) .  $fileInfo[self::FILE_PATH_PATH_PART];
-                }
-            }
+        if (!$this->serverInfo->hasBucket($bucketName)) {
+            throw new StorageException(
+                \sprintf('Bucket `%s` is not defined for server `%s`', $bucketName, $this->serverInfo->getName())
+            );
         }
+
+        return $this->serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION)
+            . $this->serverInfo->getBucket($bucketName)->getDirectory();
     }
 }

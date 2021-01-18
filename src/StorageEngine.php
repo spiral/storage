@@ -7,21 +7,42 @@ namespace Spiral\StorageEngine;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\MountManager;
 use Spiral\Core\Container\SingletonInterface;
+use Spiral\StorageEngine\Resolver\ResolveManager;
 
 class StorageEngine implements SingletonInterface
 {
-    private ?MountManager $manager = null;
+    private ?MountManager $mountManager = null;
+
+    private ResolveManager $resolveManager;
+
+    public function __construct(ResolveManager $resolveManager)
+    {
+        $this->resolveManager = $resolveManager;
+    }
 
     /**
      * @param array<string, FilesystemOperator> $servers
+     *
+     * @throws Exception\StorageException
      */
     public function init(array $servers): void
     {
-        $this->manager = new MountManager($servers);
+        $this->mountManager = new MountManager($servers);
+        $this->resolveManager->initResolvers();
     }
 
     public function isInitiated(): bool
     {
-        return $this->manager instanceof MountManager;
+        return $this->mountManager instanceof MountManager;
+    }
+
+    public function getMountManager(): ?MountManager
+    {
+        return $this->mountManager;
+    }
+
+    public function getResolveManager(): ResolveManager
+    {
+        return $this->resolveManager;
     }
 }

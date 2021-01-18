@@ -6,10 +6,5 @@ namespace Spiral\StorageEngine\Resolver;
 
 interface ResolverInterface
 {
-    /**
-     * @param string[] $files
-     *
-     * @return \Generator
-     */
-    public function buildUrlsList(array $files): \Generator;
+    public function buildUrl(string $filePath): ?string;
 }

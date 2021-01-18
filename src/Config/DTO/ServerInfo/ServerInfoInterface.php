@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
+use Spiral\StorageEngine\Config\DTO\BucketInfo;
+
 interface ServerInfoInterface
 {
+    public const BUCKETS_KEY = 'buckets';
+    public const DRIVER_KEY = 'driver';
+
     /**
      * Check if option was defined for server
      *
@@ -24,6 +29,10 @@ interface ServerInfoInterface
      */
     public function getOption(string $key);
 
+    public function hasBucket(string $name): bool;
+
+    public function getBucket(string $name): ?BucketInfo;
+
     /**
      * Get adapter class
      *
@@ -31,20 +40,14 @@ interface ServerInfoInterface
      */
     public function getAdapterClass(): string;
 
+    public function getName(): string;
+
+    public function getDriver(): string;
+
     /**
      * Check if adapter for server should be configured with additional params
      *
      * @return bool
      */
     public function isAdvancedUsage(): bool;
-
-    /**
-     * Build path to bucket dir or path to defined file in bucket dir
-     *
-     * @param string $bucketName
-     * @param string|null $fileName
-     *
-     * @return string
-     */
-    public function buildBucketPath(string $bucketName, ?string $fileName): string;
 }

@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO;
 
+use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 
-class BucketInfo
+class BucketInfo implements OptionsBasedInterface
 {
     use OptionsTrait;
 
-    private const OPTIONS_KEY = 'options';
-
-    private const DIRECTORY_KEY = 'directory';
+    public const DIRECTORY_KEY = 'directory';
 
     public string $name;
 

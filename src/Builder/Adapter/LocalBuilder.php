@@ -7,9 +7,15 @@ namespace Spiral\StorageEngine\Builder\Adapter;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 
+/**
+ * @property ServerInfoInterface|LocalInfo $serverInfo
+ */
 class LocalBuilder extends AbstractBuilder
 {
+    protected const SERVER_INFO_CLASS = LocalInfo::class;
+
     public function buildSimple(): FilesystemAdapter
     {
         $adapterClass = $this->serverInfo->getAdapterClass();

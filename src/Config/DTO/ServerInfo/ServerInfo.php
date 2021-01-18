@@ -8,21 +8,23 @@ use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Config\DTO\Traits\BucketsTrait;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
+use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Traits\ClassBasedTrait;
 
-abstract class ServerInfo implements ServerInfoInterface
+abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, OptionsBasedInterface
 {
     use BucketsTrait;
     use ClassBasedTrait;
     use OptionsTrait;
 
-    protected const OPTIONS_KEY = 'options';
-    protected const BUCKETS_KEY = 'buckets';
+    public const VISIBILITY = 'visibility';
 
-    protected const CLASS_KEY = 'class';
+    protected const SERVER_INFO_TYPE = '';
 
-    public string $name;
+    protected string $name;
+
+    protected string $driver;
 
     protected array $requiredOptions = [];
 
@@ -36,15 +38,25 @@ abstract class ServerInfo implements ServerInfoInterface
      */
     public function __construct(string $name, array $info)
     {
+        $this->validateInfoSufficient($name, $info);
+
         $this->name = $name;
 
-        $this->constructClass($info);
+        $this->driver = $info[static::DRIVER_KEY];
 
-        $this->constructOptions($info);
+        $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
+
+        if (array_key_exists(static::OPTIONS_KEY, $info)) {
+            $this->options = $info[static::OPTIONS_KEY];
+        }
 
         $this->constructBuckets($info);
 
         $this->validate();
+
+        if ($this instanceof SpecificConfigurableServerInfo) {
+            $this->constructSpecific($info);
+        }
     }
 
     public function getAdapterClass(): string
@@ -52,26 +64,31 @@ abstract class ServerInfo implements ServerInfoInterface
         return $this->getClass();
     }
 
-    /**
-     * @param array $info
-     *
-     * @throws StorageException
-     */
-    protected function constructClass(array $info): void
+    public function getName(): string
     {
-        if (!array_key_exists(static::CLASS_KEY, $info)) {
+        return $this->name;
+    }
+
+    public function getDriver(): string
+    {
+        return $this->driver;
+    }
+
+    protected function validateInfoSufficient(string $serverName, array $info): void
+    {
+        if (
+            !array_key_exists(static::DRIVER_KEY, $info)
+            || !in_array($info[static::DRIVER_KEY], AdapterName::ALL, true)
+        ) {
             throw new ConfigException(
-                \sprintf('Server %s needs adapter class defined', $this->name)
+                \sprintf('Server driver for %s was not identified', $serverName)
             );
         }
 
-        $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
-    }
-
-    protected function constructOptions(array $info): void
-    {
-        if (array_key_exists(static::OPTIONS_KEY, $info)) {
-            $this->options = $info[static::OPTIONS_KEY];
+        if (!array_key_exists(static::CLASS_KEY, $info)) {
+            throw new ConfigException(
+                \sprintf('Server %s needs adapter class defined', $serverName)
+            );
         }
     }
 
@@ -93,6 +110,11 @@ abstract class ServerInfo implements ServerInfoInterface
         }
 
         return true;
+    }
+
+    protected function getServerInfoType(): string
+    {
+        return static::SERVER_INFO_TYPE;
     }
 
     /**

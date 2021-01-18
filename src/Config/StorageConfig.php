@@ -6,6 +6,7 @@ namespace Spiral\StorageEngine\Config;
 
 use Spiral\Core\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Enum\AdapterName;
@@ -16,7 +17,6 @@ class StorageConfig extends InjectableConfig
     public const CONFIG = 'storage';
 
     private const SERVERS_KEY = 'servers';
-    private const DRIVER_KEY = 'driver';
 
     protected $config = [
         self::SERVERS_KEY   => [],
@@ -67,28 +67,26 @@ class StorageConfig extends InjectableConfig
 
         $serverInfo = $this->config[static::SERVERS_KEY][$serverLabel];
 
-        if (
-            !array_key_exists(static::DRIVER_KEY, $serverInfo)
-            || !in_array($serverInfo[static::DRIVER_KEY], AdapterName::ALL, true)
-        ) {
-            throw new ConfigException(
-                \sprintf(
-                    'Server driver for %s was not identified',
-                    $serverLabel
-                )
-            );
-        }
-
-        switch ($serverInfo[static::DRIVER_KEY]) {
+        switch ($this->extractServerDriver($serverInfo)) {
             case AdapterName::LOCAL:
                 $serverInfoDTO = new LocalInfo($serverLabel, $serverInfo);
                 break;
+            case AdapterName::AWS_S3:
+                $serverInfoDTO = new AwsS3Info($serverLabel, $serverInfo);
+                break;
             default:
-                throw new ConfigException('Driver info can\'t be built for driver ' . $serverLabel);
+                throw new ConfigException('Driver can\'t be identified for server ' . $serverLabel);
         }
 
         $this->serversInfo[$serverLabel] = $serverInfoDTO;
 
         return $serverInfoDTO;
+    }
+
+    private function extractServerDriver(array $serverInfo): ?string
+    {
+        return array_key_exists(ServerInfoInterface::DRIVER_KEY, $serverInfo)
+            ? $serverInfo[ServerInfoInterface::DRIVER_KEY]
+            : null;
     }
 }

@@ -9,10 +9,11 @@ use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
-trait ServerBuilderTrait
+trait LocalServerBuilderTrait
 {
     /**
      * @param bool|null $useVcsPrefix
@@ -37,7 +38,7 @@ trait ServerBuilderTrait
      */
     protected function buildLocalAdapter(?bool $useVcsPrefix = false): FilesystemAdapter
     {
-        return AdapterFactory::build($this->buildLocalInfo(ServerTestInterface::LOCAL_SERVER_NAME, $useVcsPrefix));
+        return AdapterFactory::build($this->buildLocalInfo(ServerTestInterface::SERVER_NAME, $useVcsPrefix));
     }
 
     /**
@@ -49,19 +50,22 @@ trait ServerBuilderTrait
      * @throws StorageException
      */
     protected function buildLocalInfo(
-        ?string $name = ServerTestInterface::LOCAL_SERVER_NAME,
+        ?string $name = ServerTestInterface::SERVER_NAME,
         ?bool $useVcsPrefix = false
     ): LocalInfo {
-        return new LocalInfo(
-            $name,
-            [
-                'class' => LocalFilesystemAdapter::class,
-                'options' => [
-                    LocalInfo::ROOT_DIR_OPTION => ($useVcsPrefix ? ServerTestInterface::VFS_PREFIX : '')
-                        . ServerTestInterface::ROOT_DIR_NAME,
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                ],
-            ]
-        );
+        return new LocalInfo($name, $this->buildLocalInfoDescription($useVcsPrefix));
+    }
+
+    protected function buildLocalInfoDescription(?bool $useVcsPrefix = false): array
+    {
+        return [
+            LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+            LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+            LocalInfo::OPTIONS_KEY => [
+                LocalInfo::ROOT_DIR_OPTION => ($useVcsPrefix ? ServerTestInterface::VFS_PREFIX : '')
+                    . ServerTestInterface::ROOT_DIR_NAME,
+                LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+            ],
+        ];
     }
 }
