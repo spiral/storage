@@ -10,7 +10,7 @@ use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
-class ResolveManager
+class ResolveManager implements ResolveManagerInterface
 {
     private StorageConfig $storageConfig;
 

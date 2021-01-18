@@ -12,7 +12,6 @@ use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\ReflectionHelperTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 use Spiral\StorageEngine\Resolver\ResolveManager;
@@ -20,7 +19,6 @@ use Spiral\StorageEngine\Resolver\ResolveManager;
 class ResolveManagerTest extends AbstractUnitTest
 {
     use LocalServerBuilderTrait;
-    use ReflectionHelperTrait;
     use StorageConfigTrait;
 
     private const LOCAL_SERVER_1 = 'local';

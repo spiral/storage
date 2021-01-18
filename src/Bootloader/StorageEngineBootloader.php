@@ -9,10 +9,16 @@ use Spiral\Boot\Bootloader\Bootloader;
 use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Resolver\ResolveManager;
+use Spiral\StorageEngine\Resolver\ResolveManagerInterface;
 use Spiral\StorageEngine\StorageEngine;
 
 class StorageEngineBootloader extends Bootloader
 {
+    protected const BINDINGS = [
+        ResolveManagerInterface::class => ResolveManager::class,
+    ];
+
     private StorageConfig $config;
 
     public function __construct(StorageConfig $config)

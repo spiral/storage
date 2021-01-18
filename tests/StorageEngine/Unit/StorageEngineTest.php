@@ -11,12 +11,10 @@ use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Resolver\ResolveManager;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\ReflectionHelperTrait;
 
 class StorageEngineTest extends AbstractUnitTest
 {
     use LocalServerBuilderTrait;
-    use ReflectionHelperTrait;
 
     public function testIsInitiated(): void
     {
