@@ -8,6 +8,7 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
@@ -77,26 +78,13 @@ class ResolveManagerTest extends AbstractUnitTest
      * @dataProvider getServerFilePathsList
      *
      * @param string $filePath
-     * @param array|null $expectedArray
-     *
-     * @throws StorageException
+     * @param ServerFilePathStructure $filePathStructure
      */
-    public function testParseFilePath(string $filePath, ?array $expectedArray = null): void
+    public function testParseFilePath(string $filePath, ServerFilePathStructure $filePathStructure): void
     {
         $resolveManager = $this->buildResolveManager();
 
-        $this->assertEquals($expectedArray, $resolveManager->parseFilePath($filePath));
-    }
-
-    public function testParseFilePathWrongFormat(): void
-    {
-        $resolveManager = $this->buildResolveManager();
-
-        $this->assertNull(
-            $resolveManager->parseFilePath(
-                \sprintf('%s//%s', ServerTestInterface::SERVER_NAME, 'file.txt')
-            )
-        );
+        $this->assertEquals($filePathStructure, $resolveManager->parseFilePath($filePath));
     }
 
     /**
@@ -166,30 +154,26 @@ class ResolveManagerTest extends AbstractUnitTest
         $fileTxt = 'file.txt';
         $dirFile = 'some/debug/dir/file1.csv';
 
+        $filePathStruct1 = new ServerFilePathStructure('');
+        $filePathStruct1->serverName = ServerTestInterface::SERVER_NAME;
+        $filePathStruct1->filePath = $fileTxt;
+
+        $filePathStruct2 = new ServerFilePathStructure('');
+        $filePathStruct2->serverName = ServerTestInterface::SERVER_NAME;
+        $filePathStruct2->filePath = $dirFile;
+
         return [
             [
                 \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                [
-                    0 => \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                    1 => ServerTestInterface::SERVER_NAME,
-                    2 => $fileTxt,
-                    ResolveManager::FILE_PATH_SERVER_PART => ServerTestInterface::SERVER_NAME,
-                    ResolveManager::FILE_PATH_PATH_PART => $fileTxt,
-                ]
+                $filePathStruct1
             ],
             [
                 \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $dirFile),
-                [
-                    0 => \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $dirFile),
-                    1 => ServerTestInterface::SERVER_NAME,
-                    2 => $dirFile,
-                    ResolveManager::FILE_PATH_SERVER_PART => ServerTestInterface::SERVER_NAME,
-                    ResolveManager::FILE_PATH_PATH_PART => $dirFile,
-                ]
+                $filePathStruct2
             ],
             [
                 \sprintf('%s:\\some/wrong/format/%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                null
+                new ServerFilePathStructure('')
             ],
         ];
     }

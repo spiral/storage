@@ -8,15 +8,10 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
 class ResolveManager
 {
-    public const FILE_PATH_SERVER_PART = 'server';
-    public const FILE_PATH_PATH_PART = 'path';
-
-    public const FILE_PATH_PATTERN = '/^(?\'' . self::FILE_PATH_SERVER_PART . '\'[\w\-]*):\/\/(?\''
-    . self::FILE_PATH_PATH_PART . '\'[\w\-\/\.]*)$/';
-
     private StorageConfig $storageConfig;
 
     /**
@@ -68,19 +63,17 @@ class ResolveManager
     {
         foreach ($files as $filePath) {
             $fileInfo = $this->parseFilePath($filePath);
-            if (!empty($fileInfo)) {
-                $resolver = $this->getResolver($fileInfo[self::FILE_PATH_SERVER_PART]);
+            if ($fileInfo->isIdentified()) {
+                $resolver = $this->getResolver($fileInfo->serverName);
 
-                yield $resolver->buildUrl($fileInfo[self::FILE_PATH_PATH_PART]);
+                yield $resolver->buildUrl($fileInfo->filePath);
             }
         }
     }
 
-    public function parseFilePath(string $filePath): ?array
+    public function parseFilePath(string $filePath): ServerFilePathStructure
     {
-        preg_match_all(static::FILE_PATH_PATTERN, $filePath, $matches, PREG_SET_ORDER);
-
-        return !empty($matches) ? reset($matches) : null;
+        return new ServerFilePathStructure($filePath);
     }
 
     /**

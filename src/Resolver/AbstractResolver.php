@@ -6,6 +6,7 @@ namespace Spiral\StorageEngine\Resolver;
 
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
 abstract class AbstractResolver implements ResolverInterface
 {
@@ -33,5 +34,14 @@ abstract class AbstractResolver implements ResolverInterface
         }
 
         $this->serverInfo = $serverInfo;
+    }
+
+    public function normalizePathForServer(string $filePath): string
+    {
+        if (ServerFilePathStructure::isServerFilePath($filePath)) {
+            return (new ServerFilePathStructure($filePath))->filePath;
+        }
+
+        return $filePath;
     }
 }

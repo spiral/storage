@@ -19,7 +19,7 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
 
     public function buildUrl(string $filePath): ?string
     {
-        return $this->serverInfo->getOption(LocalInfo::HOST) . $filePath;
+        return $this->serverInfo->getOption(LocalInfo::HOST) . $this->normalizePathForServer($filePath);
     }
 
     /**
