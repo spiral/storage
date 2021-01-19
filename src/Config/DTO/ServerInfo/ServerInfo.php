@@ -47,7 +47,13 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
 
         if (array_key_exists(static::OPTIONS_KEY, $info)) {
-            $this->options = $info[static::OPTIONS_KEY];
+            foreach ($info[static::OPTIONS_KEY] as $optionKey => $option) {
+                if (!$this->isAvailableOption($optionKey)) {
+                    continue;
+                }
+
+                $this->options[$optionKey] = $option;
+            }
         }
 
         $this->constructBuckets($info);
@@ -115,6 +121,19 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
     protected function getServerInfoType(): string
     {
         return static::SERVER_INFO_TYPE;
+    }
+
+    protected function isAvailableOption(string $option): bool
+    {
+        if (in_array($option, $this->requiredOptions, true)) {
+            return true;
+        }
+
+        if (in_array($option, $this->optionalOptions, true)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

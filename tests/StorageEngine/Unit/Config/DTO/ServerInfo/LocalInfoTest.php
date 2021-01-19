@@ -22,9 +22,12 @@ class LocalInfoTest extends AbstractUnitTest
         $rootDirOption = LocalInfo::ROOT_DIR_OPTION;
         $hostOption = LocalInfo::HOST;
 
+        $missedOption = 'missedOption';
+
         $options = [
             $rootDirOption => '/some/root/',
             $hostOption => ServerTestInterface::CONFIG_HOST,
+            $missedOption => 'someMissedVal',
         ];
 
         $serverName = 'someServer';
@@ -41,6 +44,11 @@ class LocalInfoTest extends AbstractUnitTest
         $this->assertEquals($serverName, $serverInfo->getName());
 
         foreach ($options as $optionKey => $optionVal) {
+            if ($optionKey === $missedOption) {
+                $this->assertNull($serverInfo->getOption($optionKey));
+                continue;
+            }
+
             $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
         }
     }
