@@ -10,7 +10,7 @@ use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
-class ResolveManager
+class ResolveManager implements ResolveManagerInterface
 {
     private StorageConfig $storageConfig;
 
@@ -25,11 +25,7 @@ class ResolveManager
     }
 
     /**
-     * @param string $serverKey
-     *
-     * @return ResolverInterface
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function getResolver(string $serverKey): ResolverInterface
     {
@@ -41,7 +37,7 @@ class ResolveManager
     }
 
     /**
-     * @throws StorageException
+     * @inheritDoc
      */
     public function initResolvers(): void
     {
@@ -53,11 +49,7 @@ class ResolveManager
     }
 
     /**
-     * @param string[] $files
-     *
-     * @return \Generator
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function buildUrlsList(array $files): \Generator
     {
@@ -74,6 +66,11 @@ class ResolveManager
     public function parseFilePath(string $filePath): ServerFilePathStructure
     {
         return new ServerFilePathStructure($filePath);
+    }
+
+    public function buildServerFilePath(string $serverName, string $filePath): string
+    {
+        return \sprintf('%s%s%s', $serverName, static::SERVER_PATH_SEPARATOR, $filePath);
     }
 
     /**

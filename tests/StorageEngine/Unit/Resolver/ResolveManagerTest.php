@@ -12,7 +12,6 @@ use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\ReflectionHelperTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 use Spiral\StorageEngine\Resolver\ResolveManager;
@@ -20,7 +19,6 @@ use Spiral\StorageEngine\Resolver\ResolveManager;
 class ResolveManagerTest extends AbstractUnitTest
 {
     use LocalServerBuilderTrait;
-    use ReflectionHelperTrait;
     use StorageConfigTrait;
 
     private const LOCAL_SERVER_1 = 'local';
@@ -43,6 +41,24 @@ class ResolveManagerTest extends AbstractUnitTest
         $resolver = $resolveManager->getResolver('local');
         $this->assertInstanceOf(LocalSystemResolver::class, $resolver);
         $this->assertSame($resolver, $resolveManager->getResolver('local'));
+    }
+
+    /**
+     * @dataProvider getFilePathListForBuild
+     *
+     * @param string $server
+     * @param string $filePath
+     * @param string $expectedFilePath
+     */
+    public function testBuildServerFilePath(string $server, string $filePath, string $expectedFilePath): void
+    {
+        $resolveManager = $this->buildResolveManager(
+            ['local' => $this->buildLocalInfoDescription()]
+        );
+
+        $this->assertEquals(
+            $expectedFilePath, $resolveManager->buildServerFilePath($server, $filePath)
+        );
     }
 
     public function testGetResolverFailed(): void
@@ -174,6 +190,27 @@ class ResolveManagerTest extends AbstractUnitTest
             [
                 \sprintf('%s:\\some/wrong/format/%s', ServerTestInterface::SERVER_NAME, $fileTxt),
                 new ServerFilePathStructure('')
+            ],
+        ];
+    }
+
+    public function getFilePathListForBuild(): array
+    {
+        return [
+            [
+                'local',
+                'file1.txt',
+                'local://file1.txt',
+            ],
+            [
+                'aws',
+                'dir/file1.txt',
+                'aws://dir/file1.txt',
+            ],
+            [
+                'ftp',
+                'dir/specific/file1.txt',
+                'ftp://dir/specific/file1.txt',
             ],
         ];
     }
