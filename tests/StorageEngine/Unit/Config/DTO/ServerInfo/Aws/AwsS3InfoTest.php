@@ -293,7 +293,7 @@ class AwsS3InfoTest extends AbstractUnitTest
                 'awsS3 server needs used bucket name defined',
             ],
             [
-                ['option1' => 'optionVal'],
+                [AwsS3Info::CLIENT_NAME => 'client'],
                 'awsS3 server needs used bucket name defined',
             ],
             [
