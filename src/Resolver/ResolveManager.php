@@ -71,7 +71,7 @@ class ResolveManager implements ResolveManagerInterface
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
-        } catch (\Throwable $e) {
+        } catch (ResolveException $e) {
             return null;
         }
 
