@@ -1,0 +1,72 @@
+Storage Engine. 
+========
+
+AwsS3 file server
+-------
+For work with local file server you should use on of specific adapters:
+- `\League\Flysystem\AwsS3V3\AwsS3V3Adapter`
+  * `composer require league/flysystem-aws-s3-v3` for adapter installation
+- `\League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter`
+  * `composer require league/flysystem-async-aws-s3` for adapter installation
+
+## Required options
+- `bucket` - used bucket name
+- `client` - S3Client with options
+
+## Additional options
+- `path-prefix` - optional path prefix
+- `visibility` - `public` or `private`
+
+## Example of config file for basic usage
+```php
+<?php
+return [
+    'servers' => [
+        'aws' => [
+            'class' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
+            'driver' => \Spiral\StorageEngine\Enum\AdapterName::AWS_S3,
+            'options' => [
+                'bucket' => env('AWS_BUCKET'),
+                'client' => [
+                    'class' => \Aws\S3\S3Client::class,
+                    'options' => [
+                        'version' => 'latest',
+                        'region' => env('AWS_REGION'),
+                        'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
+                        'use_path_style_endpoint' => true,
+                        'endpoint' => env('AWS_PUBLIC_URL')
+                    ],
+                ],
+            ]
+        ],
+    ],
+];
+```
+
+## Example of config file for advanced usage
+```php
+<?php
+return [
+    'servers' => [
+        'aws' => [
+            'class' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
+            'driver' => \Spiral\StorageEngine\Enum\AdapterName::AWS_S3,
+            'options' => [
+                'bucket' => env('AWS_BUCKET'),
+                'client' => [
+                    'class' => \Aws\S3\S3Client::class,
+                    'options' => [
+                        'version' => 'latest',
+                        'region' => env('AWS_REGION'),
+                        'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
+                        'use_path_style_endpoint' => true,
+                        'endpoint' => env('AWS_PUBLIC_URL')
+                    ],
+                ],
+                'path-prefix' => '/some/prefixDir/',
+                'visibility' => 'public',
+            ]
+        ],
+    ],
+];
+```
