@@ -27,9 +27,13 @@ class ResolveManager implements ResolveManagerInterface
     /**
      * @inheritDoc
      */
-    public function getResolver(string $serverKey): ResolverInterface
+    public function getResolver(string $serverKey, bool $canBeNullable = false): ?ResolverInterface
     {
         if (!array_key_exists($serverKey, $this->resolvers)) {
+            if ($canBeNullable) {
+                return null;
+            }
+
             throw new StorageException('No resolver was detected for server ' . $serverKey);
         }
 
@@ -54,13 +58,21 @@ class ResolveManager implements ResolveManagerInterface
     public function buildUrlsList(array $files): \Generator
     {
         foreach ($files as $filePath) {
-            $fileInfo = $this->parseFilePath($filePath);
-            if ($fileInfo->isIdentified()) {
-                $resolver = $this->getResolver($fileInfo->serverName);
-
-                yield $resolver->buildUrl($fileInfo->filePath);
-            }
+            yield $this->buildUrl($filePath);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function buildUrl(string $filePath): ?string
+    {
+        $fileInfo = $this->parseFilePath($filePath);
+        if ($fileInfo->isIdentified() && ($resolver = $this->getResolver($fileInfo->serverName, true))) {
+            return $resolver->buildUrl($fileInfo->filePath);
+        }
+
+        return null;
     }
 
     public function parseFilePath(string $filePath): ServerFilePathStructure

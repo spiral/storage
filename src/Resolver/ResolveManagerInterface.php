@@ -18,12 +18,13 @@ interface ResolveManagerInterface
 
     /**
      * @param string $serverKey
+     * @param bool $canBeNullable
      *
-     * @return ResolverInterface
+     * @return ResolverInterface|null
      *
      * @throws StorageException
      */
-    public function getResolver(string $serverKey): ResolverInterface;
+    public function getResolver(string $serverKey, bool $canBeNullable = false): ?ResolverInterface;
 
     /**
      * @throws StorageException
@@ -38,6 +39,15 @@ interface ResolveManagerInterface
      * @throws StorageException
      */
     public function buildUrlsList(array $files): \Generator;
+
+    /**
+     * @param string $filePath
+     *
+     * @return string|null
+     *
+     * @throws StorageException
+     */
+    public function buildUrl(string $filePath): ?string;
 
     public function parseFilePath(string $filePath): ServerFilePathStructure;
 
