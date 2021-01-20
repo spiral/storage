@@ -97,6 +97,24 @@ class ResolveManagerTest extends AbstractUnitTest
     }
 
     /**
+     * @throws StorageException
+     * @throws \ReflectionException
+     */
+    public function testPrepareResolverByUnknownDriver(): void
+    {
+        $resolveManager = $this->buildResolveManager();
+        $serverInfo = $this->buildLocalInfo();
+
+        $unknownDriver = 'unknownDriver';
+
+        $this->setProtectedProperty($serverInfo, 'driver', $unknownDriver);
+
+        $this->expectExceptionMessage('No resolver was detected for driver ' . $unknownDriver);
+
+        $resolver = $this->callNotPublicMethod($resolveManager, 'prepareResolverByServerInfo', [$serverInfo]);
+    }
+
+    /**
      * @dataProvider getServerFilePathsList
      *
      * @param string $filePath
@@ -154,6 +172,20 @@ class ResolveManagerTest extends AbstractUnitTest
         $resolveManager->initResolvers();
 
         $this->assertNull($resolveManager->buildUrl('unknownServer://someFile.txt'));
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testBuildUrlWrongFormatServer(): void
+    {
+        $resolveManager = $this->buildResolveManager(
+            [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+        );
+
+        $resolveManager->initResolvers();
+
+        $this->assertNull($resolveManager->buildUrl('unknownServer:\\/someFile.txt'));
     }
 
     public function getFileLists(): array

@@ -148,6 +148,30 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $resolver->buildBucketPath($missedBucket);
     }
 
+    public function testNormalizePathForServer(): void
+    {
+        $serverName = ServerTestInterface::SERVER_NAME;
+        $fileName = 'file.txt';
+
+        $resolver = new LocalSystemResolver(
+            new LocalInfo($serverName, [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::OPTIONS_KEY => [
+                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                ],
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+            ])
+        );
+
+        $this->assertEquals(
+            $fileName,
+            $resolver->normalizePathForServer(
+                \sprintf('%s://%s', $serverName, $fileName)
+            )
+        );
+    }
+
     public function getFileUrlList(): array
     {
         $fileTxt = 'file.txt';
