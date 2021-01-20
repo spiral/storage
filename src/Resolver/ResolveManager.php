@@ -7,6 +7,7 @@ namespace Spiral\StorageEngine\Resolver;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
+use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
@@ -27,14 +28,10 @@ class ResolveManager implements ResolveManagerInterface
     /**
      * @inheritDoc
      */
-    public function getResolver(string $serverKey, bool $canBeNullable = false): ?ResolverInterface
+    public function getResolver(string $serverKey): ResolverInterface
     {
         if (!array_key_exists($serverKey, $this->resolvers)) {
-            if ($canBeNullable) {
-                return null;
-            }
-
-            throw new StorageException('No resolver was detected for server ' . $serverKey);
+            throw new ResolveException('No resolver was detected for server ' . $serverKey);
         }
 
         return $this->resolvers[$serverKey];
@@ -67,9 +64,15 @@ class ResolveManager implements ResolveManagerInterface
      */
     public function buildUrl(string $filePath): ?string
     {
-        $fileInfo = $this->parseFilePath($filePath);
-        if ($fileInfo->isIdentified() && ($resolver = $this->getResolver($fileInfo->serverName, true))) {
-            return $resolver->buildUrl($fileInfo->filePath);
+        try {
+            $fileInfo = $this->parseFilePath($filePath);
+
+            if ($fileInfo->isIdentified()) {
+                return $this->getResolver($fileInfo->serverName)
+                    ->buildUrl($fileInfo->filePath);
+            }
+        } catch (\Throwable $e) {
+            return null;
         }
 
         return null;
@@ -90,6 +93,7 @@ class ResolveManager implements ResolveManagerInterface
      *
      * @return ResolverInterface
      *
+     * @throws ResolveException
      * @throws StorageException
      */
     protected function prepareResolverByServerInfo(ServerInfoInterface $serverInfo): ResolverInterface
@@ -100,7 +104,7 @@ class ResolveManager implements ResolveManagerInterface
             case AdapterName::AWS_S3:
                 return new AwsS3Resolver($serverInfo);
             default:
-                throw new StorageException('No resolver was detected for driver ' . $serverInfo->getDriver());
+                throw new ResolveException('No resolver was detected for driver ' . $serverInfo->getDriver());
         }
     }
 }

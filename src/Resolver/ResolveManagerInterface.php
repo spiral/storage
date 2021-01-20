@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
+use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
@@ -18,15 +19,15 @@ interface ResolveManagerInterface
 
     /**
      * @param string $serverKey
-     * @param bool $canBeNullable
      *
-     * @return ResolverInterface|null
+     * @return ResolverInterface
      *
-     * @throws StorageException
+     * @throws ResolveException
      */
-    public function getResolver(string $serverKey, bool $canBeNullable = false): ?ResolverInterface;
+    public function getResolver(string $serverKey): ResolverInterface;
 
     /**
+     * @throws ResolveException
      * @throws StorageException
      */
     public function initResolvers(): void;
@@ -36,7 +37,7 @@ interface ResolveManagerInterface
      *
      * @return \Generator
      *
-     * @throws StorageException
+     * @throws ResolveException
      */
     public function buildUrlsList(array $files): \Generator;
 
@@ -45,7 +46,7 @@ interface ResolveManagerInterface
      *
      * @return string|null
      *
-     * @throws StorageException
+     * @throws ResolveException
      */
     public function buildUrl(string $filePath): ?string;
 
