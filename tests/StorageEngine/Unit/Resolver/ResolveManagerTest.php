@@ -6,11 +6,14 @@ namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Resolver\AwsS3Resolver;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
@@ -19,6 +22,7 @@ use Spiral\StorageEngine\Resolver\ResolveManager;
 class ResolveManagerTest extends AbstractUnitTest
 {
     use LocalServerBuilderTrait;
+    use AwsS3ServerBuilderTrait;
     use StorageConfigTrait;
 
     private const LOCAL_SERVER_1 = 'local';
@@ -76,18 +80,20 @@ class ResolveManagerTest extends AbstractUnitTest
     }
 
     /**
+     * @dataProvider getServerInfoListForResolversPrepare
+     *
+     * @param ServerInfoInterface $serverInfo
+     * @param string $expectedClass
+     *
      * @throws \ReflectionException
-     * @throws StorageException
      */
-    public function testPrepareResolverByDriver(): void
+    public function testPrepareResolverByDriver(ServerInfoInterface $serverInfo, string $expectedClass): void
     {
         $resolveManager = $this->buildResolveManager();
 
-        $serverInfo = $this->buildLocalInfo();
-
         $resolver = $this->callNotPublicMethod($resolveManager, 'prepareResolverByServerInfo', [$serverInfo]);
 
-        $this->assertInstanceOf(LocalSystemResolver::class, $resolver);
+        $this->assertInstanceOf($expectedClass, $resolver);
     }
 
     /**
@@ -134,6 +140,20 @@ class ResolveManagerTest extends AbstractUnitTest
         $this->assertInstanceOf(\Generator::class, $urlsList);
 
         $this->assertEquals($expectedUrlsList, iterator_to_array($urlsList));
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testBuildUrlUnknownServer(): void
+    {
+        $resolveManager = $this->buildResolveManager(
+            [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+        );
+
+        $resolveManager->initResolvers();
+
+        $this->assertNull($resolveManager->buildUrl('unknownServer://someFile.txt'));
     }
 
     public function getFileLists(): array
@@ -212,6 +232,14 @@ class ResolveManagerTest extends AbstractUnitTest
                 'dir/specific/file1.txt',
                 'ftp://dir/specific/file1.txt',
             ],
+        ];
+    }
+
+    public function getServerInfoListForResolversPrepare(): array
+    {
+        return [
+            [$this->buildLocalInfo(), LocalSystemResolver::class],
+            [$this->buildAwsS3Info(), AwsS3Resolver::class]
         ];
     }
 
