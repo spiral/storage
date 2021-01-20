@@ -12,12 +12,12 @@ use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
 class ResolveManager implements ResolveManagerInterface
 {
-    private StorageConfig $storageConfig;
+    protected StorageConfig $storageConfig;
 
     /**
      * @var ResolverInterface[]
      */
-    private array $resolvers = [];
+    protected array $resolvers = [];
 
     public function __construct(StorageConfig $storageConfig)
     {
@@ -80,7 +80,7 @@ class ResolveManager implements ResolveManagerInterface
      *
      * @throws StorageException
      */
-    private function prepareResolverByServerInfo(ServerInfoInterface $serverInfo): ResolverInterface
+    protected function prepareResolverByServerInfo(ServerInfoInterface $serverInfo): ResolverInterface
     {
         switch ($serverInfo->getDriver()) {
             case AdapterName::LOCAL:
