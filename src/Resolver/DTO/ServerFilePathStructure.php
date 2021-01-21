@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver\DTO;
 
-use Spiral\StorageEngine\Resolver\ResolveManagerInterface;
+use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class ServerFilePathStructure
 {
@@ -12,23 +12,17 @@ class ServerFilePathStructure
 
     public ?string $filePath = null;
 
-    public static function isServerFilePath(string $filePath): bool
-    {
-        return strpos($filePath, ResolveManagerInterface::SERVER_PATH_SEPARATOR) !== false;
-    }
-
     public function __construct(string $filePath)
     {
-        preg_match_all(ResolveManagerInterface::FILE_PATH_PATTERN, $filePath, $matches, PREG_SET_ORDER);
+        preg_match(FilePathValidator::SERVER_FILE_PATH_PATTERN, $filePath, $match);
 
-        if (count($matches) > 0) {
-            $match = $matches[0];
-            if (array_key_exists(ResolveManagerInterface::FILE_PATH_SERVER_PART, $match)) {
-                $this->serverName = $match[ResolveManagerInterface::FILE_PATH_SERVER_PART];
+        if (!empty($match)) {
+            if (array_key_exists(FilePathValidator::FILE_PATH_SERVER_PART, $match)) {
+                $this->serverName = $match[FilePathValidator::FILE_PATH_SERVER_PART];
             }
 
-            if (array_key_exists(ResolveManagerInterface::FILE_PATH_PATH_PART, $match)) {
-                $this->filePath = $match[ResolveManagerInterface::FILE_PATH_PATH_PART];
+            if (array_key_exists(FilePathValidator::FILE_PATH_PART, $match)) {
+                $this->filePath = $match[FilePathValidator::FILE_PATH_PART];
             }
         }
     }

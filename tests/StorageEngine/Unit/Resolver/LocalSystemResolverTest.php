@@ -149,30 +149,18 @@ class LocalSystemResolverTest extends AbstractUnitTest
     }
 
     /**
+     * @dataProvider getFilePathListForNormalize
+     *
+     * @param string $filePath
+     * @param string $expectedFilePath
+     *
      * @throws StorageException
      */
-    public function testNormalizePathForServer(): void
+    public function testNormalizePathForServer(string $filePath, string $expectedFilePath): void
     {
-        $serverName = ServerTestInterface::SERVER_NAME;
-        $fileName = 'file.txt';
+        $resolver = new LocalSystemResolver($this->buildLocalInfo());
 
-        $resolver = new LocalSystemResolver(
-            new LocalInfo($serverName, [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                ],
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
-            ])
-        );
-
-        $this->assertEquals(
-            $fileName,
-            $resolver->normalizePathForServer(
-                \sprintf('%s://%s', $serverName, $fileName)
-            )
-        );
+        $this->assertEquals($expectedFilePath, $resolver->normalizePathForServer($filePath));
     }
 
     public function getFileUrlList(): array
@@ -196,5 +184,43 @@ class LocalSystemResolverTest extends AbstractUnitTest
                 \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
             ],
         ];
+    }
+
+    public function getFilePathListForNormalize(): array
+    {
+        $serverName = ServerTestInterface::SERVER_NAME;
+
+        $result = [
+            [
+                \sprintf('%s://some/dir/%s', $serverName, 'file.txt'),
+                'some/dir/file.txt',
+            ],
+            [
+                \sprintf('%s//%s', $serverName, 'file.txt'),
+                \sprintf('%s//%s', $serverName, 'file.txt'),
+            ],
+        ];
+
+        $filesList = [
+            'file.txt',
+            'file2-.txt',
+            'file_4+.gif',
+            '412391*.jpg',
+            'file+*(1)128121644.png',
+            'file spaces-and-some-chars 2.jpg',
+            'File(part 1).png',
+            'File-part+2_.png',
+        ];
+
+        foreach ($filesList as $fileName) {
+            $result[] = [
+                \sprintf('%s://%s', $serverName, $fileName),
+                $fileName,
+            ];
+
+            $result[] = [$fileName, $fileName];
+        }
+
+        return $result;
     }
 }

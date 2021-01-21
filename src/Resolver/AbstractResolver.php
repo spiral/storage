@@ -6,7 +6,9 @@ namespace Spiral\StorageEngine\Resolver;
 
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Exception\ValidationException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
+use Spiral\StorageEngine\Validation\FilePathValidator;
 
 abstract class AbstractResolver implements ResolverInterface
 {
@@ -38,8 +40,11 @@ abstract class AbstractResolver implements ResolverInterface
 
     public function normalizePathForServer(string $filePath): string
     {
-        if (ServerFilePathStructure::isServerFilePath($filePath)) {
-            return (new ServerFilePathStructure($filePath))->filePath;
+        try {
+            if (FilePathValidator::validateServerFilePath($filePath)) {
+                return (new ServerFilePathStructure($filePath))->filePath;
+            }
+        } catch (ValidationException $e) {
         }
 
         return $filePath;

@@ -22,7 +22,7 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
         self::CLIENT_NAME,
     ];
 
-    protected const ADDITIONAL_OPTIONS= [
+    protected const ADDITIONAL_OPTIONS = [
         self::PATH_PREFIX,
         self::VISIBILITY,
     ];
