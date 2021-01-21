@@ -18,6 +18,10 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
     use ClassBasedTrait;
     use OptionsTrait;
 
+    protected const REQUIRED_OPTIONS = [];
+
+    protected const ADDITIONAL_OPTIONS = [];
+
     public const VISIBILITY = 'visibility';
 
     protected const SERVER_INFO_TYPE = '';
@@ -25,10 +29,6 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
     protected string $name;
 
     protected string $driver;
-
-    protected array $requiredOptions = [];
-
-    protected array $optionalOptions = [];
 
     /**
      * @param string $name
@@ -46,14 +46,8 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
         $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
 
-        if (array_key_exists(static::OPTIONS_KEY, $info)) {
-            foreach ($info[static::OPTIONS_KEY] as $optionKey => $option) {
-                if (!$this->isAvailableOption($optionKey)) {
-                    continue;
-                }
-
-                $this->options[$optionKey] = $option;
-            }
+        if (array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
+            $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
         }
 
         $this->constructBuckets($info);
@@ -62,6 +56,17 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
         if ($this instanceof SpecificConfigurableServerInfo) {
             $this->constructSpecific($info);
+        }
+    }
+
+    protected function prepareOptions(array $options): void
+    {
+        foreach ($options as $optionKey => $option) {
+            if (!$this->isAvailableOption($optionKey)) {
+                continue;
+            }
+
+            $this->options[$optionKey] = $option;
         }
     }
 
@@ -109,7 +114,7 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     protected function checkRequiredOptions(): bool
     {
-        foreach ($this->requiredOptions as $requiredOption) {
+        foreach (static::REQUIRED_OPTIONS as $requiredOption) {
             if (!$this->hasOption($requiredOption)) {
                 return false;
             }
@@ -125,11 +130,11 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     protected function isAvailableOption(string $option): bool
     {
-        if (in_array($option, $this->requiredOptions, true)) {
+        if (in_array($option, static::REQUIRED_OPTIONS, true)) {
             return true;
         }
 
-        if (in_array($option, $this->optionalOptions, true)) {
+        if (in_array($option, static::ADDITIONAL_OPTIONS, true)) {
             return true;
         }
 

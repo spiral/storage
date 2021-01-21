@@ -148,6 +148,9 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $resolver->buildBucketPath($missedBucket);
     }
 
+    /**
+     * @throws StorageException
+     */
     public function testNormalizePathForServer(): void
     {
         $serverName = ServerTestInterface::SERVER_NAME;
