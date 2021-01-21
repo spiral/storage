@@ -17,12 +17,12 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 
     protected const SERVER_INFO_TYPE = 'awsS3';
 
-    protected array $requiredOptions = [
+    protected const REQUIRED_OPTIONS = [
         self::BUCKET_NAME,
         self::CLIENT_NAME,
     ];
 
-    protected array $optionalOptions = [
+    protected const ADDITIONAL_OPTIONS= [
         self::PATH_PREFIX,
         self::VISIBILITY,
     ];
@@ -67,12 +67,12 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
                 \sprintf(
                     '%s server needs all required options defined: %s',
                     $this->getServerInfoType(),
-                    implode(',', $this->requiredOptions)
+                    implode(',', static::REQUIRED_OPTIONS)
                 )
             );
         }
 
-        foreach ($this->optionalOptions as $optionLabel) {
+        foreach (static::ADDITIONAL_OPTIONS as $optionLabel) {
             if ($this->hasOption($optionLabel)) {
                 $optionVal = $this->getOption($optionLabel);
                 switch ($optionLabel) {
@@ -95,15 +95,6 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
         }
     }
 
-    /**
-     * Buckets are not allowed for aws
-     *
-     * @param array $info
-     */
-    protected function constructBuckets(array $info): void
-    {
-    }
-
     public function getVisibiltyConverter()
     {
         return $this->visibilityConverter instanceof AwsVisibilityConverter
@@ -118,7 +109,7 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 
     public function isAdvancedUsage(): bool
     {
-        foreach ($this->optionalOptions as $optionalOption) {
+        foreach (static::ADDITIONAL_OPTIONS as $optionalOption) {
             if ($this->hasOption($optionalOption)) {
                 return true;
             }

@@ -94,7 +94,7 @@ class AdapterFactoryTest extends AbstractUnitTest
      */
     public function testBuildSimpleAwsS3Server(): void
     {
-        $serverDescription = $this->getAwsS3ServerDescription();
+        $serverDescription = $this->buildAwsS3ServerDescription();
         $serverInfo = new AwsS3Info('awsS3', $serverDescription);
 
         $adapter = AdapterFactory::build($serverInfo);

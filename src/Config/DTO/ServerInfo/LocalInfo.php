@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Config\DTO\Traits\BucketsTrait;
 
-class LocalInfo extends ServerInfo
+class LocalInfo extends ServerInfo implements BucketsBasedInterface
 {
+    use BucketsTrait;
+
     public const ROOT_DIR_OPTION = 'rootDir';
     public const WRITE_FLAGS = 'write-flags';
     public const LINK_HANDLING = 'link-handling';
@@ -15,16 +18,25 @@ class LocalInfo extends ServerInfo
 
     protected const SERVER_INFO_TYPE = 'local';
 
-    protected array $requiredOptions = [
+    protected const REQUIRED_OPTIONS = [
         self::ROOT_DIR_OPTION,
         self::HOST,
     ];
 
-    protected array $optionalOptions = [
+    protected const ADDITIONAL_OPTIONS = [
         self::VISIBILITY,
         self::WRITE_FLAGS,
         self::LINK_HANDLING,
     ];
+
+    public function __construct(string $name, array $info)
+    {
+        parent::__construct($name, $info);
+
+        if (array_key_exists(BucketsBasedInterface::BUCKETS_KEY, $info)) {
+            $this->constructBuckets($info[static::BUCKETS_KEY], $this);
+        }
+    }
 
     /**
      * @inheritDoc
@@ -57,12 +69,12 @@ class LocalInfo extends ServerInfo
                 \sprintf(
                     '%s server needs all required options defined: %s',
                     $this->getServerInfoType(),
-                    implode(',', $this->requiredOptions)
+                    implode(',', static::REQUIRED_OPTIONS)
                 )
             );
         }
 
-        foreach ($this->optionalOptions as $optionLabel) {
+        foreach (static::ADDITIONAL_OPTIONS as $optionLabel) {
             if ($this->hasOption($optionLabel)) {
                 $option = $this->getOption($optionLabel);
                 switch ($optionLabel) {
@@ -84,7 +96,7 @@ class LocalInfo extends ServerInfo
 
     public function isAdvancedUsage(): bool
     {
-        foreach ($this->optionalOptions as $optionalOption) {
+        foreach (static::ADDITIONAL_OPTIONS as $optionalOption) {
             if ($this->hasOption($optionalOption)) {
                 return true;
             }

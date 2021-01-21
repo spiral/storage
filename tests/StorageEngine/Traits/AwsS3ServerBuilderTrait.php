@@ -25,10 +25,10 @@ trait AwsS3ServerBuilderTrait
      */
     protected function buildAwsS3Info(?string $name = ServerTestInterface::SERVER_NAME): AwsS3Info
     {
-        return new AwsS3Info($name, $this->getAwsS3ServerDescription());
+        return new AwsS3Info($name, $this->buildAwsS3ServerDescription());
     }
 
-    protected function getAwsS3ServerDescription(): array
+    protected function buildAwsS3ServerDescription(): array
     {
         return [
             AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,

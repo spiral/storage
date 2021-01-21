@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\BucketInfo;
-use Spiral\StorageEngine\Config\DTO\Traits\BucketsTrait;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -14,21 +12,18 @@ use Spiral\StorageEngine\Traits\ClassBasedTrait;
 
 abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, OptionsBasedInterface
 {
-    use BucketsTrait;
     use ClassBasedTrait;
     use OptionsTrait;
 
-    public const VISIBILITY = 'visibility';
+    protected const REQUIRED_OPTIONS = [];
+
+    protected const ADDITIONAL_OPTIONS = [];
 
     protected const SERVER_INFO_TYPE = '';
 
     protected string $name;
 
     protected string $driver;
-
-    protected array $requiredOptions = [];
-
-    protected array $optionalOptions = [];
 
     /**
      * @param string $name
@@ -46,22 +41,25 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
         $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
 
-        if (array_key_exists(static::OPTIONS_KEY, $info)) {
-            foreach ($info[static::OPTIONS_KEY] as $optionKey => $option) {
-                if (!$this->isAvailableOption($optionKey)) {
-                    continue;
-                }
-
-                $this->options[$optionKey] = $option;
-            }
+        if (array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
+            $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
         }
-
-        $this->constructBuckets($info);
 
         $this->validate();
 
         if ($this instanceof SpecificConfigurableServerInfo) {
             $this->constructSpecific($info);
+        }
+    }
+
+    protected function prepareOptions(array $options): void
+    {
+        foreach ($options as $optionKey => $option) {
+            if (!$this->isAvailableOption($optionKey)) {
+                continue;
+            }
+
+            $this->options[$optionKey] = $option;
         }
     }
 
@@ -98,18 +96,9 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         }
     }
 
-    protected function constructBuckets(array $info): void
-    {
-        if (array_key_exists(static::BUCKETS_KEY, $info)) {
-            foreach ($info[static::BUCKETS_KEY] as $bucketName => $bucketInfo) {
-                $this->addBucket(new BucketInfo($bucketName, $this, $bucketInfo));
-            }
-        }
-    }
-
     protected function checkRequiredOptions(): bool
     {
-        foreach ($this->requiredOptions as $requiredOption) {
+        foreach (static::REQUIRED_OPTIONS as $requiredOption) {
             if (!$this->hasOption($requiredOption)) {
                 return false;
             }
@@ -125,11 +114,11 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     protected function isAvailableOption(string $option): bool
     {
-        if (in_array($option, $this->requiredOptions, true)) {
+        if (in_array($option, static::REQUIRED_OPTIONS, true)) {
             return true;
         }
 
-        if (in_array($option, $this->optionalOptions, true)) {
+        if (in_array($option, static::ADDITIONAL_OPTIONS, true)) {
             return true;
         }
 
