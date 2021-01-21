@@ -42,7 +42,9 @@ abstract class AbstractResolver implements ResolverInterface
     {
         try {
             if (FilePathValidator::validateServerFilePath($filePath)) {
-                return (new ServerFilePathStructure($filePath))->filePath;
+                $filePathStructure = new ServerFilePathStructure($filePath);
+
+                return $filePathStructure->isIdentified() ? $filePathStructure->filePath : $filePath;
             }
         } catch (ValidationException $e) {
         }
