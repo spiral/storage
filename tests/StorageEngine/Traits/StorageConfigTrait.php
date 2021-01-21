@@ -19,7 +19,7 @@ trait StorageConfigTrait
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => ServerTestInterface::ROOT_DIR,
+                    LocalInfo::ROOT_DIR => ServerTestInterface::ROOT_DIR,
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
             ];

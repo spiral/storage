@@ -20,7 +20,7 @@ class AwsS3Resolver extends AbstractResolver
     {
         return $this->serverInfo->getClient()
                 ->getObjectUrl(
-                    $this->serverInfo->getOption(AwsS3Info::BUCKET_NAME),
+                    $this->serverInfo->getOption(AwsS3Info::BUCKET),
                     $this->normalizePathForServer($filePath)
                 );
     }

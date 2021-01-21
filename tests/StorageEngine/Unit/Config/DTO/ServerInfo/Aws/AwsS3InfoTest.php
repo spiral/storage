@@ -12,6 +12,7 @@ use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
@@ -25,8 +26,8 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testValidateSimple(): void
     {
         $options = [
-            AwsS3Info::BUCKET_NAME => 'debugBucket',
-            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET => 'debugBucket',
+            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
         ];
 
         $serverInfo = new AwsS3Info(
@@ -53,8 +54,8 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testValidateSimpleAsync(): void
     {
         $options = [
-            AwsS3Info::BUCKET_NAME => 'debugBucket',
-            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET => 'debugBucket',
+            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
         ];
 
         $serverInfo = new AwsS3Info(
@@ -79,8 +80,8 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testAdvancedUsage(): void
     {
         $options = [
-            AwsS3Info::BUCKET_NAME => 'debugBucket',
-            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET => 'debugBucket',
+            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
             AwsS3Info::PATH_PREFIX => 'somePrefix',
             AwsS3Info::VISIBILITY => $this->getAwsS3VisibilityOption(),
         ];
@@ -110,8 +111,8 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testAdvancedUsageAsync(): void
     {
         $options = [
-            AwsS3Info::BUCKET_NAME => 'debugBucket',
-            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET => 'debugBucket',
+            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
             AwsS3Info::PATH_PREFIX => 'somePrefix',
             AwsS3Info::VISIBILITY => $this->getAwsS3VisibilityOption(),
         ];
@@ -138,8 +139,8 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testGetClient(): void
     {
         $options = [
-            AwsS3Info::BUCKET_NAME => 'debugBucket',
-            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET => 'debugBucket',
+            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
         ];
 
         $serverInfo = new AwsS3Info(
@@ -159,18 +160,19 @@ class AwsS3InfoTest extends AbstractUnitTest
     /**
      * @dataProvider getMissedRequiredOptions
      *
+     * @param string $serverName
      * @param array $options
      * @param string $exceptionMsg
      *
      * @throws StorageException
      */
-    public function testValidateRequiredOptionsFailed(array $options, string $exceptionMsg): void
+    public function testValidateRequiredOptionsFailed(string $serverName, array $options, string $exceptionMsg): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage($exceptionMsg);
 
         new AwsS3Info(
-            'someServer',
+            $serverName,
             [
                 AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
@@ -185,7 +187,9 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testValidateVisibilityOptionWrongTypeFailed(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('visibility should be defined as array');
+        $this->expectExceptionMessage(
+            'Option visibility defined in wrong format for server someServer, array expected'
+        );
 
         new AwsS3Info(
             'someServer',
@@ -193,8 +197,8 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET_NAME => 'someBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::BUCKET => 'someBucket',
+                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
                     AwsS3Info::VISIBILITY => 12,
                 ],
             ]
@@ -215,8 +219,8 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET_NAME => 'someBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::BUCKET => 'someBucket',
+                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
                     AwsS3Info::VISIBILITY => [
                         AwsS3Info::CLASS_KEY => PortableVisibilityConverter::class,
                         AwsS3Info::OPTIONS_KEY => [
@@ -234,7 +238,9 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testValidateOptionalOptionsPathPrefixFailed(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('path-prefix should be defined as scalar value');
+        $this->expectExceptionMessage(
+            'Option path-prefix defined in wrong format for server someServer, string expected'
+        );
 
         new AwsS3Info(
             'someServer',
@@ -242,8 +248,8 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET_NAME => 'someBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::BUCKET => 'someBucket',
+                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
                     AwsS3Info::PATH_PREFIX => [1, 2],
                 ],
             ]
@@ -261,8 +267,8 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET_NAME => 'debugBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::BUCKET => 'debugBucket',
+                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
                 ],
             ]
         );
@@ -275,8 +281,8 @@ class AwsS3InfoTest extends AbstractUnitTest
                 AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET_NAME => 'debugBucket',
-                    AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::BUCKET => 'debugBucket',
+                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
                     AwsS3Info::PATH_PREFIX => 'somePrefix',
                 ],
             ]
@@ -287,18 +293,23 @@ class AwsS3InfoTest extends AbstractUnitTest
 
     public function getMissedRequiredOptions(): array
     {
+        $serverName = ServerTestInterface::SERVER_NAME;
+
         return [
             [
+                $serverName,
                 [],
-                'awsS3 server needs used bucket name defined',
+                'Option bucket not detected for server ' . $serverName,
             ],
             [
-                [AwsS3Info::CLIENT_NAME => 'client'],
-                'awsS3 server needs used bucket name defined',
+                $serverName,
+                [AwsS3Info::CLIENT => 'client'],
+                'Option bucket not detected for server ' . $serverName,
             ],
             [
-                [AwsS3Info::BUCKET_NAME => 'someBucket'],
-                'awsS3 server needs S3 client description',
+                'someServer',
+                [AwsS3Info::BUCKET => 'someBucket'],
+                'Option client not detected for server someServer',
             ],
         ];
     }
