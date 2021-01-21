@@ -95,15 +95,6 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
         }
     }
 
-    /**
-     * Buckets are not allowed for aws
-     *
-     * @param array $info
-     */
-    protected function constructBuckets(array $info): void
-    {
-    }
-
     public function getVisibiltyConverter()
     {
         return $this->visibilityConverter instanceof AwsVisibilityConverter

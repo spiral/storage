@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Config\DTO\Traits\BucketsTrait;
 
-class LocalInfo extends ServerInfo
+class LocalInfo extends ServerInfo implements BucketsBasedInterface
 {
+    use BucketsTrait;
+
     public const ROOT_DIR_OPTION = 'rootDir';
     public const WRITE_FLAGS = 'write-flags';
     public const LINK_HANDLING = 'link-handling';
@@ -25,6 +28,15 @@ class LocalInfo extends ServerInfo
         self::WRITE_FLAGS,
         self::LINK_HANDLING,
     ];
+
+    public function __construct(string $name, array $info)
+    {
+        parent::__construct($name, $info);
+
+        if (array_key_exists(BucketsBasedInterface::BUCKETS_KEY, $info)) {
+            $this->constructBuckets($info[static::BUCKETS_KEY], $this);
+        }
+    }
 
     /**
      * @inheritDoc

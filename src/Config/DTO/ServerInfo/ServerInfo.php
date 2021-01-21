@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\BucketInfo;
-use Spiral\StorageEngine\Config\DTO\Traits\BucketsTrait;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -14,15 +12,12 @@ use Spiral\StorageEngine\Traits\ClassBasedTrait;
 
 abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, OptionsBasedInterface
 {
-    use BucketsTrait;
     use ClassBasedTrait;
     use OptionsTrait;
 
     protected const REQUIRED_OPTIONS = [];
 
     protected const ADDITIONAL_OPTIONS = [];
-
-    public const VISIBILITY = 'visibility';
 
     protected const SERVER_INFO_TYPE = '';
 
@@ -49,8 +44,6 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         if (array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
             $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
         }
-
-        $this->constructBuckets($info);
 
         $this->validate();
 
@@ -100,15 +93,6 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
             throw new ConfigException(
                 \sprintf('Server %s needs adapter class defined', $serverName)
             );
-        }
-    }
-
-    protected function constructBuckets(array $info): void
-    {
-        if (array_key_exists(static::BUCKETS_KEY, $info)) {
-            foreach ($info[static::BUCKETS_KEY] as $bucketName => $bucketInfo) {
-                $this->addBucket(new BucketInfo($bucketName, $this, $bucketInfo));
-            }
         }
     }
 
