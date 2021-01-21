@@ -60,9 +60,7 @@ class ResolveManagerTest extends AbstractUnitTest
             ['local' => $this->buildLocalInfoDescription()]
         );
 
-        $this->assertEquals(
-            $expectedFilePath, $resolveManager->buildServerFilePath($server, $filePath)
-        );
+        $this->assertEquals($expectedFilePath, $resolveManager->buildServerFilePath($server, $filePath));
     }
 
     public function testGetResolverFailed(): void
