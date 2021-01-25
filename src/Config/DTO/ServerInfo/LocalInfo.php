@@ -36,15 +36,4 @@ class LocalInfo extends ServerInfo implements BucketsBasedInterface
             $this->constructBuckets($info[static::BUCKETS_KEY], $this);
         }
     }
-
-    public function isAdvancedUsage(): bool
-    {
-        foreach (static::ADDITIONAL_OPTIONS as $optionalOption => $type) {
-            if ($this->hasOption($optionalOption)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

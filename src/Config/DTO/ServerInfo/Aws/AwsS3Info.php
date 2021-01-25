@@ -55,15 +55,4 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
     {
         return $this->clientInfo->getClient();
     }
-
-    public function isAdvancedUsage(): bool
-    {
-        foreach (static::ADDITIONAL_OPTIONS as $optionalOption => $type) {
-            if ($this->hasOption($optionalOption)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
