@@ -19,7 +19,7 @@ class LocalInfoTest extends AbstractUnitTest
      */
     public function testValidateSimple(): void
     {
-        $rootDirOption = LocalInfo::ROOT_DIR_OPTION;
+        $rootDirOption = LocalInfo::ROOT_DIR;
         $hostOption = LocalInfo::HOST;
 
         $missedOption = 'missedOption';
@@ -56,18 +56,19 @@ class LocalInfoTest extends AbstractUnitTest
     /**
      * @dataProvider getMissedRequiredOptions
      *
+     * @param string $serverName
      * @param array $options
      * @param string $exceptionMsg
      *
      * @throws StorageException
      */
-    public function testValidateRequiredOptionsFailed(array $options, string $exceptionMsg): void
+    public function testValidateRequiredOptionsFailed(string $serverName, array $options, string $exceptionMsg): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage($exceptionMsg);
 
         new LocalInfo(
-            'someServer',
+            $serverName,
             [
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
@@ -79,77 +80,12 @@ class LocalInfoTest extends AbstractUnitTest
     /**
      * @throws StorageException
      */
-    public function testValidateUnknownDriverFailed(): void
-    {
-        $serverName = 'someServer';
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server driver for %s was not identified', $serverName));
-
-        new LocalInfo(
-            $serverName,
-            [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => 'missedDriver',
-                LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                ],
-            ]
-        );
-    }
-
-    /**
-     * @throws StorageException
-     */
-    public function testValidateNoDriverFailed(): void
-    {
-        $serverName = 'someServer';
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server driver for %s was not identified', $serverName));
-
-        new LocalInfo(
-            $serverName,
-            [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                ],
-            ]
-        );
-    }
-
-    /**
-     * @throws StorageException
-     */
-    public function testValidateNoClassFailed(): void
-    {
-        $serverName = 'someServer';
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server %s needs adapter class defined', $serverName));
-
-        new LocalInfo(
-            $serverName,
-            [
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
-                LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                ],
-            ]
-        );
-    }
-
-    /**
-     * @throws StorageException
-     */
     public function testValidateOptionalOptionsVisibilityFailed(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Visibility specification should be defined as array');
+        $this->expectExceptionMessage(
+            'Option visibility defined in wrong format for server someServer, array expected'
+        );
 
         new LocalInfo(
             'someServer',
@@ -157,7 +93,7 @@ class LocalInfoTest extends AbstractUnitTest
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
+                    LocalInfo::ROOT_DIR => '/some/dir/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::VISIBILITY => 12,
                 ],
@@ -176,7 +112,7 @@ class LocalInfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            \sprintf('%s should be defined as integer', $label)
+            \sprintf('Option %s defined in wrong format for server someServer, int expected', $label)
         );
 
         new LocalInfo(
@@ -185,7 +121,7 @@ class LocalInfoTest extends AbstractUnitTest
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/dir/',
+                    LocalInfo::ROOT_DIR => '/some/dir/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     $label => 'MyFlag',
                 ],
@@ -204,7 +140,7 @@ class LocalInfoTest extends AbstractUnitTest
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::ROOT_DIR => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
             ]
@@ -218,7 +154,7 @@ class LocalInfoTest extends AbstractUnitTest
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::ROOT_DIR => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS => LOCK_EX,
                 ],
@@ -227,13 +163,13 @@ class LocalInfoTest extends AbstractUnitTest
 
         $this->assertTrue($baseAdvancedUsage->isAdvancedUsage());
 
-        $baseAdvancedUsage = new LocalInfo(
+        $advancedUsage = new LocalInfo(
             'someServer',
             [
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+                    LocalInfo::ROOT_DIR => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS => LOCK_EX,
                     LocalInfo::LINK_HANDLING => LocalFilesystemAdapter::DISALLOW_LINKS,
@@ -251,27 +187,50 @@ class LocalInfoTest extends AbstractUnitTest
             ]
         );
 
-        $this->assertTrue($baseAdvancedUsage->isAdvancedUsage());
+        $this->assertTrue($advancedUsage->isAdvancedUsage());
+    }
+
+    public function testIntParamsUsage(): void
+    {
+        $baseAdvancedUsage = new LocalInfo(
+            'someServer',
+            [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                LocalInfo::OPTIONS_KEY => [
+                    LocalInfo::ROOT_DIR => '/some/root/',
+                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::WRITE_FLAGS => '15',
+                ],
+            ]
+        );
+
+        $this->assertIsInt($baseAdvancedUsage->getOption(LocalInfo::WRITE_FLAGS));
     }
 
     public function getMissedRequiredOptions(): array
     {
+        $serverName = ServerTestInterface::SERVER_NAME;
+
         return [
             [
+                $serverName,
                 [],
-                'local server needs rootDir defined',
+                'Option rootDir not detected for server ' . $serverName,
             ],
             [
+                $serverName,
                 [
-                    LocalInfo::ROOT_DIR_OPTION => '/root/',
+                    LocalInfo::ROOT_DIR => '/root/',
                 ],
-                'local server needs host defined for urls providing',
+                'Option host not detected for server ' . $serverName,
             ],
             [
+                'someServer',
                 [
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                 ],
-                'local server needs rootDir defined'
+                'Option rootDir not detected for server someServer'
             ]
         ];
     }

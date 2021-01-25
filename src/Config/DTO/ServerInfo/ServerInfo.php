@@ -41,11 +41,7 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
         $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
 
-        if (array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
-            $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
-        }
-
-        $this->validate();
+        $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
 
         if ($this instanceof SpecificConfigurableServerInfo) {
             $this->constructSpecific($info);
@@ -54,12 +50,20 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     protected function prepareOptions(array $options): void
     {
+        $this->validateRequiredOptions(
+            array_keys(static::REQUIRED_OPTIONS),
+            $options,
+            ' for server ' . $this->getName()
+        );
+
         foreach ($options as $optionKey => $option) {
-            if (!$this->isAvailableOption($optionKey)) {
+            if (($type = $this->getOptionType($optionKey)) === null) {
                 continue;
             }
 
-            $this->options[$optionKey] = $option;
+            $this->validateOptionByType($optionKey, $type, $option);
+
+            $this->options[$optionKey] = $this->processOptionByType($option, $type);
         }
     }
 
@@ -78,6 +82,17 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         return $this->driver;
     }
 
+    public function isAdvancedUsage(): bool
+    {
+        foreach (static::ADDITIONAL_OPTIONS as $optionalOption => $type) {
+            if ($this->hasOption($optionalOption)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected function validateInfoSufficient(string $serverName, array $info): void
     {
         if (
@@ -94,39 +109,43 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
                 \sprintf('Server %s needs adapter class defined', $serverName)
             );
         }
-    }
 
-    protected function checkRequiredOptions(): bool
-    {
-        foreach (static::REQUIRED_OPTIONS as $requiredOption) {
-            if (!$this->hasOption($requiredOption)) {
-                return false;
-            }
+        if (!array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
+            throw new ConfigException(
+                \sprintf('Server %s needs options defined', $serverName)
+            );
         }
-
-        return true;
-    }
-
-    protected function getServerInfoType(): string
-    {
-        return static::SERVER_INFO_TYPE;
-    }
-
-    protected function isAvailableOption(string $option): bool
-    {
-        if (in_array($option, static::REQUIRED_OPTIONS, true)) {
-            return true;
-        }
-
-        if (in_array($option, static::ADDITIONAL_OPTIONS, true)) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
-     * @throws StorageException
+     * @param string $optionLabel
+     * @param string $optionType
+     * @param mixed $optionVal
      */
-    abstract protected function validate(): void;
+    protected function validateOptionByType(string $optionLabel, string $optionType, $optionVal): void
+    {
+        if (!$this->isOptionHasRequiredType($optionLabel, $optionVal, $optionType)) {
+            throw new ConfigException(
+                \sprintf(
+                    'Option %s defined in wrong format for server %s, %s expected',
+                    $optionLabel,
+                    $this->getName(),
+                    $optionType
+                )
+            );
+        }
+    }
+
+    protected function getOptionType(string $option): ?string
+    {
+        if (array_key_exists($option, static::REQUIRED_OPTIONS)) {
+            return static::REQUIRED_OPTIONS[$option];
+        }
+
+        if (array_key_exists($option, static::ADDITIONAL_OPTIONS)) {
+            return static::ADDITIONAL_OPTIONS[$option];
+        }
+
+        return null;
+    }
 }

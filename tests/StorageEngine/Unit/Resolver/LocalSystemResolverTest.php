@@ -62,7 +62,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
             new LocalInfo($serverName, [
                 LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_OPTION => $rootDir,
+                    LocalInfo::ROOT_DIR => $rootDir,
                     LocalInfo::HOST => $host,
                 ],
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
@@ -85,7 +85,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $bucketDirectory = 'debug/dir1/';
 
         $options = [
-            LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+            LocalInfo::ROOT_DIR => '/some/root/',
             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
         ];
 
@@ -103,7 +103,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         );
 
         $this->assertEquals(
-            $options[LocalInfo::ROOT_DIR_OPTION] . $bucketDirectory,
+            $options[LocalInfo::ROOT_DIR] . $bucketDirectory,
             $resolver->buildBucketPath($bucketName)
         );
     }
@@ -123,7 +123,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $missedBucket = 'missedBucket';
 
         $options = [
-            LocalInfo::ROOT_DIR_OPTION => '/some/root/',
+            LocalInfo::ROOT_DIR => '/some/root/',
             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
         ];
 

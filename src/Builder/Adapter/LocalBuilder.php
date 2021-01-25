@@ -21,7 +21,7 @@ class LocalBuilder extends AbstractBuilder
         $adapterClass = $this->serverInfo->getAdapterClass();
 
         return new $adapterClass(
-            $this->serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION)
+            $this->serverInfo->getOption(LocalInfo::ROOT_DIR)
         );
     }
 
@@ -30,7 +30,7 @@ class LocalBuilder extends AbstractBuilder
         $adapterClass = $this->serverInfo->getAdapterClass();
 
         return new $adapterClass(
-            $this->serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION),
+            $this->serverInfo->getOption(LocalInfo::ROOT_DIR),
             $this->serverInfo->hasOption(LocalInfo::VISIBILITY)
                 ? PortableVisibilityConverter::fromArray($this->serverInfo->getOption(LocalInfo::VISIBILITY))
                 : null,

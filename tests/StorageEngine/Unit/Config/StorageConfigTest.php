@@ -67,7 +67,7 @@ class StorageConfigTest extends AbstractUnitTest
                         ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
                         ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
                         OptionsBasedInterface::OPTIONS_KEY => [
-                            LocalInfo::ROOT_DIR_OPTION => $rootDir,
+                            LocalInfo::ROOT_DIR => $rootDir,
                             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                         ],
                     ],

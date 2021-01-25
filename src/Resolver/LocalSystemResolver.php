@@ -37,7 +37,7 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
             );
         }
 
-        return $this->serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION)
+        return $this->serverInfo->getOption(LocalInfo::ROOT_DIR)
             . $this->serverInfo->getBucket($bucketName)->getDirectory();
     }
 }

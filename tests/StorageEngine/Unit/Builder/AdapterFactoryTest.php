@@ -44,7 +44,7 @@ class AdapterFactoryTest extends AbstractUnitTest
     public function testBuildAdvancedLocalServer(): void
     {
         $options = [
-            LocalInfo::ROOT_DIR_OPTION => ServerTestInterface::ROOT_DIR,
+            LocalInfo::ROOT_DIR => ServerTestInterface::ROOT_DIR,
             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
             LocalInfo::WRITE_FLAGS => LOCK_NB,
             LocalInfo::LINK_HANDLING => LocalFilesystemAdapter::SKIP_LINKS,
@@ -102,7 +102,7 @@ class AdapterFactoryTest extends AbstractUnitTest
         $this->assertInstanceOf(AwsS3V3Adapter::class, $adapter);
 
         $this->assertEquals(
-            $serverDescription[AwsS3Info::OPTIONS_KEY][AwsS3Info::BUCKET_NAME],
+            $serverDescription[AwsS3Info::OPTIONS_KEY][AwsS3Info::BUCKET],
             $this->getProtectedProperty($adapter, 'bucket')
         );
         $this->assertSame(
@@ -118,8 +118,8 @@ class AdapterFactoryTest extends AbstractUnitTest
     public function testBuildAdvancedAwsS3Server(): void
     {
         $options = [
-            AwsS3Info::BUCKET_NAME => 'testBucket',
-            AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET => 'testBucket',
+            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
             AwsS3Info::PATH_PREFIX => '/some/prefix/',
             AwsS3Info::VISIBILITY => $this->getAwsS3VisibilityOption(),
         ];
@@ -161,6 +161,7 @@ class AdapterFactoryTest extends AbstractUnitTest
                 [
                     ServerInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                     LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+                    ServerInfo::OPTIONS_KEY => [],
                 ],
             ]
         );
