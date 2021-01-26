@@ -7,13 +7,13 @@ except local you will need to provide required FlySystem adapter (take a look at
 
 Base class `\Spiral\StorageEngine\StorageEngine` provides 2 manager classes:
 1. MountManager
-    * work with all defined file servers for work with files
+    * works with all file servers that handle files
     * works with file paths in specific format `{serverName}://{filePath}`
 2. ResolveManager
     * build server path in format required by MountManager
     * parse file path from MountManager format to identify used server
     * build url for file download
-    * can be replaced with your specific class by implementing `\Spiral\StorageEngine\Resolver\ResolveManagerInterface` by binding
+    * can be replaced with your specific class by implementing `\Spiral\StorageEngine\Resolver\ResolveManagerInterface` and binding it
 
 # Supported file servers
 Current release provides ability to work with:
@@ -21,9 +21,9 @@ Current release provides ability to work with:
 - [Aws S3 (+async)](doc/awsS3.md)
 
 # Configuration
-To provide file servers description you should provide spiral configuration file `storage.php` in configuration directory.
+You can configure file servers usage in Spiral with configuration file `storage.php` located in configuration directory.
 
-More details about spiral configuration you can receive from [here](https://spiral.dev/docs/start-configuration).
+You can receive more details about spiral configuration from [here](https://spiral.dev/docs/start-configuration).
 
 More details about specific file servers configuration you can find [here](#supported-file-servers)
 

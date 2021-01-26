@@ -16,6 +16,7 @@ For work with local file server you should use on of specific adapters:
 ## Additional options
 - `path-prefix` - optional path prefix
 - `visibility` - `public` or `private`
+- `url-expires` - string or DateTimeInterface object with expires term for urls built by resolver
 
 ## Example of config file for basic usage
 ```php
@@ -60,7 +61,8 @@ return [
                         'region' => env('AWS_REGION'),
                         'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
                         'use_path_style_endpoint' => true,
-                        'endpoint' => env('AWS_PUBLIC_URL')
+                        'endpoint' => env('AWS_PUBLIC_URL'),
+                        'url-expires' => '+48hours',
                     ],
                 ],
                 'path-prefix' => '/some/prefixDir/',
