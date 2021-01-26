@@ -70,6 +70,11 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
         return $this->clientInfo->getClient();
     }
 
+    /**
+     * @param string|\DateTimeInterface $expires
+     *
+     * @return $this
+     */
     public function setUrlExpires($expires): self
     {
         if (empty($expires) || (!is_string($expires) && !$expires instanceof \DateTimeInterface)) {
@@ -84,6 +89,9 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
         return $this;
     }
 
+    /**
+     * @return \DateTimeInterface|string
+     */
     public function getUrlExpires()
     {
         return $this->urlExpires;
