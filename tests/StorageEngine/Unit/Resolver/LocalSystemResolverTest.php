@@ -9,6 +9,7 @@ use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Enum\AdapterName;
+use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
@@ -70,6 +71,27 @@ class LocalSystemResolverTest extends AbstractUnitTest
         );
 
         $this->assertEquals($expectedUrl, $resolver->buildUrl($filePath));
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testBuildUrlNoHost(): void
+    {
+        $resolver = new LocalSystemResolver(
+            new LocalInfo('someServer', [
+                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::OPTIONS_KEY => [
+                    LocalInfo::ROOT_DIR => 'rootDir',
+                ],
+                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
+            ])
+        );
+
+        $this->expectException(ResolveException::class);
+        $this->expectExceptionMessage('Url can\'t be built for server someServer - host was not defined');
+
+        $resolver->buildUrl('file1.txt');
     }
 
     /**

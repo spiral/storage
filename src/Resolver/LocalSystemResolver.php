@@ -6,6 +6,7 @@ namespace Spiral\StorageEngine\Resolver;
 
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 
 class LocalSystemResolver extends AbstractResolver implements BucketResolverInterface
@@ -17,8 +18,21 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
      */
     protected ServerInfoInterface $serverInfo;
 
+    /**
+     * @param string $filePath
+     *
+     * @return string|null
+     *
+     * @throws ResolveException
+     */
     public function buildUrl(string $filePath): ?string
     {
+        if (!$this->serverInfo->hasOption(LocalInfo::HOST)) {
+            throw new ResolveException(
+                \sprintf('Url can\'t be built for server %s - host was not defined', $this->serverInfo->getName())
+            );
+        }
+
         return $this->serverInfo->getOption(LocalInfo::HOST) . $this->normalizePathForServer($filePath);
     }
 

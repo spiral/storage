@@ -219,13 +219,6 @@ class LocalInfoTest extends AbstractUnitTest
                 'Option rootDir not detected for server ' . $serverName,
             ],
             [
-                $serverName,
-                [
-                    LocalInfo::ROOT_DIR => '/root/',
-                ],
-                'Option host not detected for server ' . $serverName,
-            ],
-            [
                 'someServer',
                 [
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
