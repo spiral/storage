@@ -62,7 +62,7 @@ class FilePathValidatorTest extends AbstractUnitTest
             ['/tmp/file.txt', true],
             ['/tmp/file 1+2*3.txt', true],
             ['/tmp/file_-(1+2*3).txt', true],
-            ['file:txt', false],
+            ['file,2:=.txt', false],
         ];
     }
 

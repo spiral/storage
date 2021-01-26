@@ -6,6 +6,7 @@ namespace Spiral\StorageEngine\Tests\Unit\Bootloader;
 
 use Spiral\StorageEngine\Bootloader\StorageEngineBootloader;
 use Spiral\StorageEngine\Config\StorageConfig;
+use Spiral\StorageEngine\Resolver\FilePathResolver;
 use Spiral\StorageEngine\Resolver\ResolveManager;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
@@ -29,7 +30,7 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
         );
 
         $engine = new StorageEngine(
-            new ResolveManager($config)
+            new ResolveManager($config, new FilePathResolver())
         );
 
         $this->assertFalse($engine->isInitiated());

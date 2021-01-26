@@ -10,7 +10,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
-use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
+use Spiral\StorageEngine\Resolver\FilePathResolver;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
@@ -45,22 +45,6 @@ class ResolveManagerTest extends AbstractUnitTest
         $resolver = $resolveManager->getResolver('local');
         $this->assertInstanceOf(LocalSystemResolver::class, $resolver);
         $this->assertSame($resolver, $resolveManager->getResolver('local'));
-    }
-
-    /**
-     * @dataProvider getFilePathListForBuild
-     *
-     * @param string $server
-     * @param string $filePath
-     * @param string $expectedFilePath
-     */
-    public function testBuildServerFilePath(string $server, string $filePath, string $expectedFilePath): void
-    {
-        $resolveManager = $this->buildResolveManager(
-            ['local' => $this->buildLocalInfoDescription()]
-        );
-
-        $this->assertEquals($expectedFilePath, $resolveManager->buildServerFilePath($server, $filePath));
     }
 
     public function testGetResolverFailed(): void
@@ -109,20 +93,7 @@ class ResolveManagerTest extends AbstractUnitTest
 
         $this->expectExceptionMessage('No resolver was detected for driver ' . $unknownDriver);
 
-        $resolver = $this->callNotPublicMethod($resolveManager, 'prepareResolverByServerInfo', [$serverInfo]);
-    }
-
-    /**
-     * @dataProvider getServerFilePathsList
-     *
-     * @param string $filePath
-     * @param ServerFilePathStructure $filePathStructure
-     */
-    public function testParseFilePath(string $filePath, ServerFilePathStructure $filePathStructure): void
-    {
-        $resolveManager = $this->buildResolveManager();
-
-        $this->assertEquals($filePathStructure, $resolveManager->parseFilePath($filePath));
+        $this->callNotPublicMethod($resolveManager, 'prepareResolverByServerInfo', [$serverInfo]);
     }
 
     /**
@@ -215,56 +186,6 @@ class ResolveManagerTest extends AbstractUnitTest
         ];
     }
 
-    public function getServerFilePathsList(): array
-    {
-        $fileTxt = 'file.txt';
-        $dirFile = 'some/debug/dir/file1.csv';
-
-        $filePathStruct1 = new ServerFilePathStructure('');
-        $filePathStruct1->serverName = ServerTestInterface::SERVER_NAME;
-        $filePathStruct1->filePath = $fileTxt;
-
-        $filePathStruct2 = new ServerFilePathStructure('');
-        $filePathStruct2->serverName = ServerTestInterface::SERVER_NAME;
-        $filePathStruct2->filePath = $dirFile;
-
-        return [
-            [
-                \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                $filePathStruct1
-            ],
-            [
-                \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $dirFile),
-                $filePathStruct2
-            ],
-            [
-                \sprintf('%s:\\some/wrong/format/%s', ServerTestInterface::SERVER_NAME, $fileTxt),
-                new ServerFilePathStructure('')
-            ],
-        ];
-    }
-
-    public function getFilePathListForBuild(): array
-    {
-        return [
-            [
-                'local',
-                'file1.txt',
-                'local://file1.txt',
-            ],
-            [
-                'aws',
-                'dir/file1.txt',
-                'aws://dir/file1.txt',
-            ],
-            [
-                'ftp',
-                'dir/specific/file1.txt',
-                'ftp://dir/specific/file1.txt',
-            ],
-        ];
-    }
-
     public function getServerInfoListForResolversPrepare(): array
     {
         return [
@@ -275,8 +196,6 @@ class ResolveManagerTest extends AbstractUnitTest
 
     private function buildResolveManager(?array $servers = null): ResolveManager
     {
-        return new ResolveManager(
-            $this->buildStorageConfig($servers)
-        );
+        return new ResolveManager($this->buildStorageConfig($servers), new FilePathResolver());
     }
 }

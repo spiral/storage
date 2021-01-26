@@ -20,9 +20,12 @@ class ResolveManager implements ResolveManagerInterface
      */
     protected array $resolvers = [];
 
-    public function __construct(StorageConfig $storageConfig)
+    private FilePathResolverInterface $filePathResolver;
+
+    public function __construct(StorageConfig $storageConfig, FilePathResolverInterface $filePathResolver)
     {
         $this->storageConfig = $storageConfig;
+        $this->filePathResolver = $filePathResolver;
     }
 
     /**
@@ -65,9 +68,9 @@ class ResolveManager implements ResolveManagerInterface
     public function buildUrl(string $filePath): ?string
     {
         try {
-            $fileInfo = $this->parseFilePath($filePath);
+            $fileInfo = $this->filePathResolver->parseServerFilePathToStructure($filePath);
 
-            if ($fileInfo->isIdentified()) {
+            if ($fileInfo instanceof ServerFilePathStructure && $fileInfo->isIdentified()) {
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
@@ -76,16 +79,6 @@ class ResolveManager implements ResolveManagerInterface
         }
 
         return null;
-    }
-
-    public function parseFilePath(string $filePath): ServerFilePathStructure
-    {
-        return new ServerFilePathStructure($filePath);
-    }
-
-    public function buildServerFilePath(string $serverName, string $filePath): string
-    {
-        return \sprintf('%s%s%s', $serverName, static::SERVER_PATH_SEPARATOR, $filePath);
     }
 
     /**
