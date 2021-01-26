@@ -11,8 +11,6 @@ class AwsS3Resolver extends AbstractResolver
 {
     protected const SERVER_INFO_CLASS = AwsS3Info::class;
 
-    private const DEFAULT_EXPIRES = '+24hours';
-
     /**
      * @var ServerInfoInterface|AwsS3Info
      */
@@ -22,14 +20,17 @@ class AwsS3Resolver extends AbstractResolver
     {
         $s3Client = $this->serverInfo->getClient();
 
-        $command = $s3Client->getCommand(
-            'GetObject',
-            [
-                'Bucket' => $this->serverInfo->getOption(AwsS3Info::BUCKET),
-                'Key' => $this->normalizePathForServer($filePath),
-            ]
-        );
-
-        return  (string)$s3Client->createPresignedRequest($command, static::DEFAULT_EXPIRES)->getUri();
+        return  (string)$s3Client
+            ->createPresignedRequest(
+                $s3Client->getCommand(
+                    'GetObject',
+                    [
+                        'Bucket' => $this->serverInfo->getOption(AwsS3Info::BUCKET),
+                        'Key' => $this->normalizePathForServer($filePath),
+                    ]
+                ),
+                $this->serverInfo->getUrlExpires()
+            )
+            ->getUri();
     }
 }

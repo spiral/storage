@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
 
+use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\SpecificConfigurableServerInfo;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -13,6 +14,7 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
     public const BUCKET = 'bucket';
     public const CLIENT = 'client';
     public const PATH_PREFIX = 'path-prefix';
+    public const URL_EXPIRES = 'url-expires';
 
     protected const SERVER_INFO_TYPE = 'awsS3';
 
@@ -31,6 +33,11 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
     protected ?AwsVisibilityConverter $visibilityConverter = null;
 
     /**
+     * @var string|\DateTimeInterface
+     */
+    protected $urlExpires = '+24hours';
+
+    /**
      * @param array $info
      *
      * @throws StorageException
@@ -41,6 +48,10 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 
         if ($this->hasOption(static::VISIBILITY)) {
             $this->visibilityConverter = new AwsVisibilityConverter($this->getOption(static::VISIBILITY));
+        }
+
+        if (array_key_exists(static::URL_EXPIRES, $info)) {
+            $this->setUrlExpires($info[static::URL_EXPIRES]);
         }
     }
 
@@ -54,5 +65,22 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
     public function getClient()
     {
         return $this->clientInfo->getClient();
+    }
+
+    public function setUrlExpires($expires): self
+    {
+        if (!is_string($expires) && !$expires instanceof \DateTimeInterface) {
+            throw new ConfigException(
+                'Url expires should be string or DateTimeInterface implemented object for server '
+                . $this->getName()
+            );
+        }
+
+        return $this;
+    }
+
+    public function getUrlExpires()
+    {
+        return $this->urlExpires;
     }
 }
