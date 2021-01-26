@@ -46,6 +46,7 @@ class AwsS3InfoTest extends AbstractUnitTest
         }
 
         $this->assertNull($serverInfo->getVisibiltyConverter());
+        $this->assertEquals('+24hours', $serverInfo->getUrlExpires());
     }
 
     /**
@@ -84,9 +85,10 @@ class AwsS3InfoTest extends AbstractUnitTest
             AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
             AwsS3Info::PATH_PREFIX => 'somePrefix',
             AwsS3Info::VISIBILITY => $this->getAwsS3VisibilityOption(),
+            AwsS3Info::URL_EXPIRES => new \DateTime('+5 days'),
         ];
 
-        $advancedAwsS3Info = new AwsS3Info(
+        $serverInfo = new AwsS3Info(
             'someServer',
             [
                 AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
@@ -95,14 +97,20 @@ class AwsS3InfoTest extends AbstractUnitTest
             ]
         );
 
-        $this->assertTrue($advancedAwsS3Info->isAdvancedUsage());
+        $this->assertTrue($serverInfo->isAdvancedUsage());
         foreach ($options as $optionKey => $optionVal) {
-            $this->assertEquals($optionVal, $advancedAwsS3Info->getOption($optionKey));
+            if ($optionKey === AwsS3Info::URL_EXPIRES) {
+                continue;
+            }
+
+            $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
         }
 
-        $visibilityConvertor = $advancedAwsS3Info->getVisibiltyConverter();
+        $visibilityConvertor = $serverInfo->getVisibiltyConverter();
         $this->assertInstanceOf(PortableVisibilityConverter::class, $visibilityConvertor);
-        $this->assertSame($visibilityConvertor, $advancedAwsS3Info->getVisibiltyConverter());
+        $this->assertSame($visibilityConvertor, $serverInfo->getVisibiltyConverter());
+
+        $this->assertEquals($options[AwsS3Info::URL_EXPIRES], $serverInfo->getUrlExpires());
     }
 
     /**
@@ -155,6 +163,36 @@ class AwsS3InfoTest extends AbstractUnitTest
         $client = $serverInfo->getClient();
         $this->assertInstanceOf(S3Client::class, $client);
         $this->assertSame($client, $serverInfo->getClient());
+    }
+
+    /**
+     * @dataProvider getWrongUrlExpiresList
+     *
+     * @param string $serverName
+     * @param $expires
+     * @param string $errorMsg
+     *
+     * @throws StorageException
+     */
+    public function testWrongUrlExpires(string $serverName, $expires, string $errorMsg): void
+    {
+        $options = [
+            AwsS3Info::BUCKET => 'debugBucket',
+            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
+            AwsS3Info::URL_EXPIRES => $expires,
+        ];
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage($errorMsg);
+
+        new AwsS3Info(
+            $serverName,
+            [
+                AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
+                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
+                AwsS3Info::OPTIONS_KEY => $options,
+            ]
+        );
     }
 
     /**
@@ -289,6 +327,30 @@ class AwsS3InfoTest extends AbstractUnitTest
         );
 
         $this->assertTrue($advancedAwsS3Info->isAdvancedUsage());
+    }
+
+    public function getWrongUrlExpiresList(): array
+    {
+        $serverName = ServerTestInterface::SERVER_NAME;
+        $errorMsgPrefix = 'Url expires should be string or DateTimeInterface implemented object for server ';
+
+        return [
+            [
+                $serverName,
+                [new \DateTime('+1 hour')],
+                $errorMsgPrefix . ServerTestInterface::SERVER_NAME,
+            ],
+            [
+                $serverName,
+                null,
+                $errorMsgPrefix . ServerTestInterface::SERVER_NAME,
+            ],
+            [
+                'someServer',
+                true,
+                $errorMsgPrefix . 'someServer',
+            ],
+        ];
     }
 
     public function getMissedRequiredOptions(): array
