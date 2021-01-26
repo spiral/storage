@@ -50,8 +50,11 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
             $this->visibilityConverter = new AwsVisibilityConverter($this->getOption(static::VISIBILITY));
         }
 
-        if (array_key_exists(static::URL_EXPIRES, $info)) {
-            $this->setUrlExpires($info[static::URL_EXPIRES]);
+        if (
+            array_key_exists(static::OPTIONS_KEY, $info)
+            && array_key_exists(static::URL_EXPIRES, $info[static::OPTIONS_KEY])
+        ) {
+            $this->setUrlExpires($info[static::OPTIONS_KEY][static::URL_EXPIRES]);
         }
     }
 
@@ -69,12 +72,14 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 
     public function setUrlExpires($expires): self
     {
-        if (!is_string($expires) && !$expires instanceof \DateTimeInterface) {
+        if (empty($expires) || (!is_string($expires) && !$expires instanceof \DateTimeInterface)) {
             throw new ConfigException(
                 'Url expires should be string or DateTimeInterface implemented object for server '
                 . $this->getName()
             );
         }
+
+        $this->urlExpires = $expires;
 
         return $this;
     }
