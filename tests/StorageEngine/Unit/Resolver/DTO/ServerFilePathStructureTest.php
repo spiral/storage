@@ -11,16 +11,6 @@ class ServerFilePathStructureTest extends AbstractUnitTest
 {
     /**
      * @dataProvider getServerFilePathsListForCheck
-     * @param string $filePath
-     * @param bool $expectedResult
-     */
-    public function testIsServerFilePath(string $filePath, bool $expectedResult): void
-    {
-        $this->assertEquals(ServerFilePathStructure::isServerFilePath($filePath), $expectedResult);
-    }
-
-    /**
-     * @dataProvider getServerFilePathsListForCheck
      *
      * @param string $filePath
      * @param bool $expectedResult

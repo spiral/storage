@@ -60,9 +60,7 @@ class ResolveManagerTest extends AbstractUnitTest
             ['local' => $this->buildLocalInfoDescription()]
         );
 
-        $this->assertEquals(
-            $expectedFilePath, $resolveManager->buildServerFilePath($server, $filePath)
-        );
+        $this->assertEquals($expectedFilePath, $resolveManager->buildServerFilePath($server, $filePath));
     }
 
     public function testGetResolverFailed(): void
@@ -144,7 +142,7 @@ class ResolveManagerTest extends AbstractUnitTest
                     LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
                     LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                     LocalInfo::OPTIONS_KEY => [
-                        LocalInfo::ROOT_DIR_OPTION => static::LOCAL_SERVER_ROOT_2,
+                        LocalInfo::ROOT_DIR => static::LOCAL_SERVER_ROOT_2,
                         LocalInfo::HOST => static::LOCAL_SERVER_HOST_2,
                     ],
                 ],

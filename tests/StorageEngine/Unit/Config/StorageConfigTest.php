@@ -6,6 +6,7 @@ namespace Spiral\StorageEngine\Tests\Unit\Config;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ClassBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
@@ -14,39 +15,40 @@ use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class StorageConfigTest extends AbstractUnitTest
 {
+    use LocalServerBuilderTrait;
+    use AwsS3ServerBuilderTrait;
+
     /**
-     * @throws \ReflectionException
+     * @dataProvider getServersListForBuild
+     *
+     * @param string $serverName
+     * @param array $serverDescription
+     * @param string $class
+     *
      * @throws StorageException
      */
-    public function testBuildServerInfoForLocal(): void
+    public function testBuildServerInfo(string $serverName, array $serverDescription, string $class): void
     {
-        $localServer = 'local';
-        $rootDir = '/debug/root';
-
         $config = new StorageConfig(
             [
-                'servers' => [
-                    $localServer => [
-                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
-                        ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
-                        OptionsBasedInterface::OPTIONS_KEY => [
-                            LocalInfo::ROOT_DIR_OPTION => $rootDir,
-                            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                        ],
-                    ],
-                ],
+                'servers' => [$serverName => $serverDescription],
             ]
         );
 
-        $serverInfo = $config->buildServerInfo($localServer);
+        /** @var ServerInfoInterface|OptionsBasedInterface $serverInfo */
+        $serverInfo = $config->buildServerInfo($serverName);
 
-        $this->assertInstanceOf(LocalInfo::class, $serverInfo);
-        $this->assertEquals($rootDir, $serverInfo->getOption(LocalInfo::ROOT_DIR_OPTION));
-        $this->assertFalse($serverInfo->isAdvancedUsage());
+        $this->assertInstanceOf($class, $serverInfo);
+
+        foreach ($serverDescription[OptionsBasedInterface::OPTIONS_KEY] as $optionKey => $optionVal) {
+            $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
+        }
     }
 
     /**
@@ -65,7 +67,7 @@ class StorageConfigTest extends AbstractUnitTest
                         ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
                         ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
                         OptionsBasedInterface::OPTIONS_KEY => [
-                            LocalInfo::ROOT_DIR_OPTION => $rootDir,
+                            LocalInfo::ROOT_DIR => $rootDir,
                             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
                         ],
                     ],
@@ -188,5 +190,13 @@ class StorageConfigTest extends AbstractUnitTest
 
         $this->assertTrue($config->hasServer($localServer));
         $this->assertFalse($config->hasServer('missing'));
+    }
+
+    public function getServersListForBuild(): array
+    {
+        return [
+            ['local', $this->buildLocalInfoDescription(), LocalInfo::class],
+            ['awsS3', $this->buildAwsS3ServerDescription(), AwsS3Info::class],
+        ];
     }
 }

@@ -12,11 +12,6 @@ interface ResolveManagerInterface
 {
     public const SERVER_PATH_SEPARATOR = '://';
 
-    public const FILE_PATH_PATH_PART = 'path';
-    public const FILE_PATH_SERVER_PART = 'server';
-    public const FILE_PATH_PATTERN = '/^(?\'' . self::FILE_PATH_SERVER_PART . '\'[\w\-]*):\/\/(?\''
-    . self::FILE_PATH_PATH_PART . '\'[\w\-\/\.]*)$/';
-
     /**
      * @param string $serverKey
      *

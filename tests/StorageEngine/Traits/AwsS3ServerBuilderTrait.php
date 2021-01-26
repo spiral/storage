@@ -25,17 +25,17 @@ trait AwsS3ServerBuilderTrait
      */
     protected function buildAwsS3Info(?string $name = ServerTestInterface::SERVER_NAME): AwsS3Info
     {
-        return new AwsS3Info($name, $this->getAwsS3ServerDescription());
+        return new AwsS3Info($name, $this->buildAwsS3ServerDescription());
     }
 
-    protected function getAwsS3ServerDescription(): array
+    protected function buildAwsS3ServerDescription(): array
     {
         return [
             AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
             AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
             AwsS3Info::OPTIONS_KEY => [
-                AwsS3Info::BUCKET_NAME => 'debugBucket',
-                AwsS3Info::CLIENT_NAME => $this->getAwsS3ClientDescription(),
+                AwsS3Info::BUCKET => 'debugBucket',
+                AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
             ],
         ];
     }

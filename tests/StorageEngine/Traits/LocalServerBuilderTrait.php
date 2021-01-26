@@ -62,7 +62,7 @@ trait LocalServerBuilderTrait
             LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
             LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
             LocalInfo::OPTIONS_KEY => [
-                LocalInfo::ROOT_DIR_OPTION => ($useVcsPrefix ? ServerTestInterface::VFS_PREFIX : '')
+                LocalInfo::ROOT_DIR => ($useVcsPrefix ? ServerTestInterface::VFS_PREFIX : '')
                     . ServerTestInterface::ROOT_DIR_NAME,
                 LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
             ],

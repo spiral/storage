@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\BucketInfo;
-use Spiral\StorageEngine\Config\DTO\Traits\BucketsTrait;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -14,21 +12,18 @@ use Spiral\StorageEngine\Traits\ClassBasedTrait;
 
 abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, OptionsBasedInterface
 {
-    use BucketsTrait;
     use ClassBasedTrait;
     use OptionsTrait;
 
-    public const VISIBILITY = 'visibility';
+    protected const REQUIRED_OPTIONS = [];
+
+    protected const ADDITIONAL_OPTIONS = [];
 
     protected const SERVER_INFO_TYPE = '';
 
     protected string $name;
 
     protected string $driver;
-
-    protected array $requiredOptions = [];
-
-    protected array $optionalOptions = [];
 
     /**
      * @param string $name
@@ -46,22 +41,29 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
         $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
 
-        if (array_key_exists(static::OPTIONS_KEY, $info)) {
-            foreach ($info[static::OPTIONS_KEY] as $optionKey => $option) {
-                if (!$this->isAvailableOption($optionKey)) {
-                    continue;
-                }
-
-                $this->options[$optionKey] = $option;
-            }
-        }
-
-        $this->constructBuckets($info);
-
-        $this->validate();
+        $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
 
         if ($this instanceof SpecificConfigurableServerInfo) {
             $this->constructSpecific($info);
+        }
+    }
+
+    protected function prepareOptions(array $options): void
+    {
+        $this->validateRequiredOptions(
+            array_keys(static::REQUIRED_OPTIONS),
+            $options,
+            ' for server ' . $this->getName()
+        );
+
+        foreach ($options as $optionKey => $option) {
+            if (($type = $this->getOptionType($optionKey)) === null) {
+                continue;
+            }
+
+            $this->validateOptionByType($optionKey, $type, $option);
+
+            $this->options[$optionKey] = $this->processOptionByType($option, $type);
         }
     }
 
@@ -80,6 +82,17 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         return $this->driver;
     }
 
+    public function isAdvancedUsage(): bool
+    {
+        foreach (static::ADDITIONAL_OPTIONS as $optionalOption => $type) {
+            if ($this->hasOption($optionalOption)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected function validateInfoSufficient(string $serverName, array $info): void
     {
         if (
@@ -96,48 +109,43 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
                 \sprintf('Server %s needs adapter class defined', $serverName)
             );
         }
-    }
 
-    protected function constructBuckets(array $info): void
-    {
-        if (array_key_exists(static::BUCKETS_KEY, $info)) {
-            foreach ($info[static::BUCKETS_KEY] as $bucketName => $bucketInfo) {
-                $this->addBucket(new BucketInfo($bucketName, $this, $bucketInfo));
-            }
+        if (!array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
+            throw new ConfigException(
+                \sprintf('Server %s needs options defined', $serverName)
+            );
         }
-    }
-
-    protected function checkRequiredOptions(): bool
-    {
-        foreach ($this->requiredOptions as $requiredOption) {
-            if (!$this->hasOption($requiredOption)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    protected function getServerInfoType(): string
-    {
-        return static::SERVER_INFO_TYPE;
-    }
-
-    protected function isAvailableOption(string $option): bool
-    {
-        if (in_array($option, $this->requiredOptions, true)) {
-            return true;
-        }
-
-        if (in_array($option, $this->optionalOptions, true)) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
-     * @throws StorageException
+     * @param string $optionLabel
+     * @param string $optionType
+     * @param mixed $optionVal
      */
-    abstract protected function validate(): void;
+    protected function validateOptionByType(string $optionLabel, string $optionType, $optionVal): void
+    {
+        if (!$this->isOptionHasRequiredType($optionLabel, $optionVal, $optionType)) {
+            throw new ConfigException(
+                \sprintf(
+                    'Option %s defined in wrong format for server %s, %s expected',
+                    $optionLabel,
+                    $this->getName(),
+                    $optionType
+                )
+            );
+        }
+    }
+
+    protected function getOptionType(string $option): ?string
+    {
+        if (array_key_exists($option, static::REQUIRED_OPTIONS)) {
+            return static::REQUIRED_OPTIONS[$option];
+        }
+
+        if (array_key_exists($option, static::ADDITIONAL_OPTIONS)) {
+            return static::ADDITIONAL_OPTIONS[$option];
+        }
+
+        return null;
+    }
 }
