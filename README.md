@@ -2,8 +2,8 @@
 Storage engine provides required functionality to manage your files for different file servers 
 based on provided configuration.  
 
-Storage engine based on [FlySystem](https://github.com/thephpleague/flysystem) and for correct work with file servers 
-except local you will need to provide required FlySystem adapter (take a look at concrete filesystem doc).
+Storage engine is based on [FlySystem](https://github.com/thephpleague/flysystem) and for correct work with file servers 
+(except local one) you will need to provide required FlySystem adapter (take a look at concrete filesystem doc).
 
 Base class `\Spiral\StorageEngine\StorageEngine` provides 2 manager classes:
 1. MountManager
@@ -28,19 +28,19 @@ You can receive more details about spiral configuration from [here](https://spir
 More details about specific file servers configuration you can find [here](#supported-file-servers)
 
 # Basic usage
-When you will finish your configuration file you should add `Spiral\StorageEngine\Bootloader\StorageEngineBootloader` in your app.
+When you finish your configuration file you should add `Spiral\StorageEngine\Bootloader\StorageEngineBootloader` in your app.
 
-When you need to make some operation you should use your StorageEngine object when you need it to:
-1. For different operations with files:
+When you need to make some file operation you should use your StorageEngine object for it:
+1. To perform different operations on your files:
 ``` php
 /** @var \Spiral\StorageEngine\StorageEngine $storageEngine **/
 $storageEngine->getMountManager()->write('local://someDir/myFile.txt', 'It is my text');
 ```
-2. For building filepath to store it in db:
+2. TO build filepath, for example to store it in db later:
 ``` php
 $storageEngine->getResolveManager()->buildServerFilePath('local','someDir/myFile.txt');
 ```
-3. For building url to your file:
+3. To build url to your file:
 ``` php
 $storageEngine->getResolveManager()->buildUrl('local://someDir/myFile.txt');
 ```

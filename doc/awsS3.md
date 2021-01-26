@@ -3,7 +3,7 @@ Storage Engine.
 
 AwsS3 file server
 -------
-For work with local file server you should use on of specific adapters:
+To work with local file server you should use one of specific adapters:
 - `\League\Flysystem\AwsS3V3\AwsS3V3Adapter`
   * `composer require league/flysystem-aws-s3-v3` for adapter installation
 - `\League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter`
@@ -18,7 +18,7 @@ For work with local file server you should use on of specific adapters:
 - `visibility` - `public` or `private`
 - `url-expires` - string or DateTimeInterface object with expires term for urls built by resolver
 
-## Example of config file for basic usage
+## Example config file for basic usage
 ```php
 <?php
 return [
@@ -44,7 +44,7 @@ return [
 ];
 ```
 
-## Example of config file for advanced usage
+## Example config file for advanced usage
 ```php
 <?php
 return [
