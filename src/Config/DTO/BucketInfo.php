@@ -8,7 +8,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 
-class BucketInfo implements OptionsBasedInterface
+class BucketInfo implements OptionsBasedInterface, BucketInfoInterface
 {
     use OptionsTrait;
 
