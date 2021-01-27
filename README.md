@@ -5,13 +5,13 @@ based on provided configuration.
 Storage engine is based on [FlySystem](https://github.com/thephpleague/flysystem) and for correct work with file servers 
 (except local one) you will need to provide required FlySystem adapter (take a look at concrete filesystem doc).
 
-Base class `\Spiral\StorageEngine\StorageEngine` provides 2 manager classes:
-1. MountManager
+StorageEngine based on 2 classes:
+1. StorageEngine
     * works with all file servers that handle files
     * works with file paths in specific format `{serverName}://{filePath}`
 2. ResolveManager
-    * build server path in format required by MountManager
-    * parse file path from MountManager format to identify used server
+    * build server path for filepaths storage
+    * parse file path from db format to identify used server
     * build url for file download
     * can be replaced with your specific class by implementing `\Spiral\StorageEngine\Resolver\ResolveManagerInterface` and binding it
 
@@ -28,6 +28,7 @@ You can receive more details about spiral configuration from [here](https://spir
 More details about specific file servers configuration you can find [here](#supported-file-servers)
 
 # Basic usage
+## If you are use Spiral Framework
 When you finish your configuration file you should add `Spiral\StorageEngine\Bootloader\StorageEngineBootloader` in your app.
 
 When you need to make some file operation you should use your StorageEngine object for it:
@@ -36,13 +37,13 @@ When you need to make some file operation you should use your StorageEngine obje
 /** @var \Spiral\StorageEngine\StorageEngine $storageEngine **/
 $storageEngine->getMountManager()->write('local://someDir/myFile.txt', 'It is my text');
 ```
-2. TO build filepath, for example to store it in db later:
+2. To build filepath, for example to store it in db later you can use ResolveManagerInterface object:
 ``` php
-$storageEngine->getResolveManager()->buildServerFilePath('local','someDir/myFile.txt');
+$resolveManager->buildServerFilePath('local','someDir/myFile.txt'); // => local://someDir/myFile.txt
 ```
-3. To build url to your file:
+3. To build url to your file you can use ResolveManagerInterface object:
 ``` php
-$storageEngine->getResolveManager()->buildUrl('local://someDir/myFile.txt');
+$resolveManager->buildUrl('local://someDir/myFile.txt');
 ```
 # License:
 MIT License (MIT). Please see [`LICENSE`](./LICENSE) for more information. Maintained by [Spiral Scout](https://spiralscout.com).
