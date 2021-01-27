@@ -32,10 +32,10 @@ More details about specific file servers configuration you can find [here](#supp
 When you finish your configuration file you should add `Spiral\StorageEngine\Bootloader\StorageEngineBootloader` in your app.
 
 When you need to make some file operation you should use your StorageEngine object for it:
-1. To perform different operations on your files:
+1. To perform different operations on your files you can use FilesystemOperator implemented object:
 ``` php
 /** @var \Spiral\StorageEngine\StorageEngine $storageEngine **/
-$storageEngine->getMountManager()->write('local://someDir/myFile.txt', 'It is my text');
+$fileSystemOperator->write('local://someDir/myFile.txt', 'It is my text');
 ```
 2. To build filepath, for example to store it in db later you can use ResolveManagerInterface object:
 ``` php

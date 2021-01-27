@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Bootloader;
 
 use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemOperator;
 use Spiral\Boot\Bootloader\Bootloader;
 use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\StorageConfig;
@@ -20,6 +21,7 @@ class StorageEngineBootloader extends Bootloader
     protected const BINDINGS = [
         ResolveManagerInterface::class => ResolveManager::class,
         FilePathResolverInterface::class => FilePathResolver::class,
+        FilesystemOperator::class => [self::class, 'getMountManager'],
     ];
 
     private StorageConfig $config;
@@ -45,5 +47,10 @@ class StorageEngineBootloader extends Bootloader
         }
 
         $storageEngine->init($servers);
+    }
+
+    public function getMountManager(StorageEngine $storageEngine): FilesystemOperator
+    {
+        return $storageEngine->getMountManager();
     }
 }
