@@ -24,7 +24,7 @@ Any of the additional options can be used to configure specific params
 return [
     'servers' => [
         'aws' => [
-            'class' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
+            'adapter' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
             'driver' => \Spiral\StorageEngine\Enum\AdapterName::LOCAL,
             'options' => [
                 'rootDir' => '/tmp/',
@@ -41,7 +41,7 @@ return [
 return [
     'servers' => [
         'aws' => [
-            'class' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
+            'adapter' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
             'driver' => \Spiral\StorageEngine\Enum\AdapterName::LOCAL,
             'options' => [
                 'rootDir' => '/tmp/',

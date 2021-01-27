@@ -39,7 +39,7 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
         $this->driver = $info[static::DRIVER_KEY];
 
-        $this->setClass($info[static::CLASS_KEY], \sprintf('Server %s class', $this->name));
+        $this->setClass($info[static::ADAPTER], \sprintf('Server %s class', $this->name));
 
         $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
 
@@ -104,7 +104,7 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
             );
         }
 
-        if (!array_key_exists(static::CLASS_KEY, $info)) {
+        if (!array_key_exists(static::ADAPTER, $info)) {
             throw new ConfigException(
                 \sprintf('Server %s needs adapter class defined', $serverName)
             );

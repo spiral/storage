@@ -6,6 +6,8 @@ namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 interface ServerInfoInterface
 {
+    public const ADAPTER = 'adapter';
+
     public const DRIVER_KEY = 'driver';
 
     public const VISIBILITY = 'visibility';

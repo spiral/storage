@@ -34,7 +34,7 @@ class LocalInfoTest extends AbstractUnitTest
         $serverInfo = new LocalInfo(
             $serverName,
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
@@ -70,7 +70,7 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
@@ -90,7 +90,7 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             'someServer',
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR => '/some/dir/',
@@ -118,7 +118,7 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             'someServer',
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR => '/some/dir/',
@@ -137,7 +137,7 @@ class LocalInfoTest extends AbstractUnitTest
         $simpleLocal = new LocalInfo(
             'someServer',
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR => '/some/root/',
@@ -151,7 +151,7 @@ class LocalInfoTest extends AbstractUnitTest
         $baseAdvancedUsage = new LocalInfo(
             'someServer',
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR => '/some/root/',
@@ -166,7 +166,7 @@ class LocalInfoTest extends AbstractUnitTest
         $advancedUsage = new LocalInfo(
             'someServer',
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR => '/some/root/',
@@ -195,7 +195,7 @@ class LocalInfoTest extends AbstractUnitTest
         $baseAdvancedUsage = new LocalInfo(
             'someServer',
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR => '/some/root/',

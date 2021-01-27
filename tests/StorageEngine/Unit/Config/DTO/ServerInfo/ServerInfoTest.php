@@ -27,7 +27,7 @@ class ServerInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => 'missedDriver',
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR => '/some/root/',
@@ -50,7 +50,7 @@ class ServerInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR => '/some/root/',
                     LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
@@ -72,7 +72,7 @@ class ServerInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::CLASS_KEY => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
             ]
         );

@@ -24,7 +24,7 @@ To work with local file server you should use one of specific adapters:
 return [
     'servers' => [
         'aws' => [
-            'class' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
+            'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'driver' => \Spiral\StorageEngine\Enum\AdapterName::AWS_S3,
             'options' => [
                 'bucket' => env('AWS_BUCKET'),
@@ -50,7 +50,7 @@ return [
 return [
     'servers' => [
         'aws' => [
-            'class' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
+            'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'driver' => \Spiral\StorageEngine\Enum\AdapterName::AWS_S3,
             'options' => [
                 'bucket' => env('AWS_BUCKET'),
