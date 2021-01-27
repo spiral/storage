@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Traits;
+namespace Spiral\StorageEngine\Config\DTO\Traits;
 
 use Spiral\StorageEngine\Exception\StorageException;
 

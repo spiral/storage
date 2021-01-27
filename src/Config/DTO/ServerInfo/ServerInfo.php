@@ -8,7 +8,7 @@ use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Traits\ClassBasedTrait;
+use Spiral\StorageEngine\Config\DTO\Traits\ClassBasedTrait;
 
 abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, OptionsBasedInterface
 {

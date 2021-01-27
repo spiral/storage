@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Tests\Unit\Traits;
+namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\Traits;
 
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
-use Spiral\StorageEngine\Traits\ClassBasedTrait;
+use Spiral\StorageEngine\Config\DTO\Traits\ClassBasedTrait;
 
 class ClassBasedTraitTest extends AbstractUnitTest
 {
