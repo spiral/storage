@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
+use Spiral\Core\Container\SingletonInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Enum\AdapterName;
@@ -11,7 +12,7 @@ use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
-class ResolveManager implements ResolveManagerInterface
+class ResolveManager implements SingletonInterface, ResolveManagerInterface
 {
     protected StorageConfig $storageConfig;
 
@@ -34,22 +35,12 @@ class ResolveManager implements ResolveManagerInterface
     public function getResolver(string $serverKey): ResolverInterface
     {
         if (!array_key_exists($serverKey, $this->resolvers)) {
-            throw new ResolveException('No resolver was detected for server ' . $serverKey);
-        }
-
-        return $this->resolvers[$serverKey];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function initResolvers(): void
-    {
-        foreach ($this->storageConfig->getServersKeys() as $serverKey) {
             $this->resolvers[$serverKey] = $this->prepareResolverByServerInfo(
                 $this->storageConfig->buildServerInfo($serverKey)
             );
         }
+
+        return $this->resolvers[$serverKey];
     }
 
     /**

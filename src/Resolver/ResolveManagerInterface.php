@@ -15,14 +15,9 @@ interface ResolveManagerInterface
      * @return ResolverInterface
      *
      * @throws ResolveException
-     */
-    public function getResolver(string $serverKey): ResolverInterface;
-
-    /**
-     * @throws ResolveException
      * @throws StorageException
      */
-    public function initResolvers(): void;
+    public function getResolver(string $serverKey): ResolverInterface;
 
     /**
      * @param string[] $files

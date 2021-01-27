@@ -39,10 +39,10 @@ trait OptionsTrait
             case OptionsBasedInterface::STRING_TYPE:
                 return is_string($optionVal);
             case OptionsBasedInterface::BOOL_TYPE:
-                return is_bool($optionVal);
+                return is_bool($optionVal) || in_array($optionVal, [0, 1]);
             case OptionsBasedInterface::ARRAY_TYPE:
                 return is_array($optionVal);
-            case static::MIXED_TYPE:
+            case OptionsBasedInterface::MIXED_TYPE:
                 return true;
             default:
                 throw new ConfigException(

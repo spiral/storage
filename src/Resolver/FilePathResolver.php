@@ -23,7 +23,7 @@ class FilePathResolver implements FilePathResolverInterface
      */
     public function buildServerFilePath(string $serverKey, string $filePath): string
     {
-        try{
+        try {
             if (FilePathValidator::validateServerFilePath($filePath)) {
                 throw new ResolveException(
                     \sprintf('Filepath %s already contains server key', $filePath)

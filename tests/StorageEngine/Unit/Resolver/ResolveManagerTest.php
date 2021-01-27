@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Enum\AdapterName;
+use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
 use Spiral\StorageEngine\Resolver\FilePathResolver;
@@ -40,8 +42,6 @@ class ResolveManagerTest extends AbstractUnitTest
             ['local' => $this->buildLocalInfoDescription()]
         );
 
-        $resolveManager->initResolvers();
-
         $resolver = $resolveManager->getResolver('local');
         $this->assertInstanceOf(LocalSystemResolver::class, $resolver);
         $this->assertSame($resolver, $resolveManager->getResolver('local'));
@@ -55,8 +55,8 @@ class ResolveManagerTest extends AbstractUnitTest
 
         $missedServer = 'missedServer';
 
-        $this->expectException(StorageException::class);
-        $this->expectExceptionMessage(\sprintf('No resolver was detected for server %s', $missedServer));
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(\sprintf('Server %s was not found', $missedServer));
 
         $resolveManager->getResolver($missedServer);
     }
@@ -91,6 +91,7 @@ class ResolveManagerTest extends AbstractUnitTest
 
         $this->setProtectedProperty($serverInfo, 'driver', $unknownDriver);
 
+        $this->expectException(ResolveException::class);
         $this->expectExceptionMessage('No resolver was detected for driver ' . $unknownDriver);
 
         $this->callNotPublicMethod($resolveManager, 'prepareResolverByServerInfo', [$serverInfo]);
@@ -120,8 +121,6 @@ class ResolveManagerTest extends AbstractUnitTest
             ]
         );
 
-        $resolveManager->initResolvers();
-
         $urlsList = $resolveManager->buildUrlsList($filesList);
 
         $this->assertInstanceOf(\Generator::class, $urlsList);
@@ -134,13 +133,16 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testBuildUrlUnknownServer(): void
     {
+        $unknownServer = 'unknownServer';
+
         $resolveManager = $this->buildResolveManager(
             [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
         );
 
-        $resolveManager->initResolvers();
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(\sprintf('Server %s was not found', $unknownServer));
 
-        $this->assertNull($resolveManager->buildUrl('unknownServer://someFile.txt'));
+        $resolveManager->buildUrl('unknownServer://someFile.txt');
     }
 
     /**
@@ -151,8 +153,6 @@ class ResolveManagerTest extends AbstractUnitTest
         $resolveManager = $this->buildResolveManager(
             [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
         );
-
-        $resolveManager->initResolvers();
 
         $this->assertNull($resolveManager->buildUrl('unknownServer:\\/someFile.txt'));
     }
