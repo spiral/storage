@@ -47,6 +47,7 @@ abstract class AbstractResolver implements ResolverInterface
                 return $filePathStructure->isIdentified() ? $filePathStructure->filePath : $filePath;
             }
         } catch (ValidationException $e) {
+            // if filePath is not server file path we supposes it is short form of filepath - without server name
         }
 
         return $filePath;

@@ -56,7 +56,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     /**
      * @inheritDoc
      */
-    public function buildUrl(string $filePath): ?string
+    public function buildUrl(string $filePath, bool $useException = false): ?string
     {
         try {
             $fileInfo = $this->filePathResolver->parseServerFilePathToStructure($filePath);
@@ -66,6 +66,10 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
                     ->buildUrl($fileInfo->filePath);
             }
         } catch (ResolveException $e) {
+            if ($useException) {
+                throw $e;
+            }
+
             return null;
         }
 
