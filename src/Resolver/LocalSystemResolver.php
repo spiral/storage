@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
+use Spiral\StorageEngine\Config\DTO\ServerInfo\BucketsBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
@@ -33,7 +34,11 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
             );
         }
 
-        return $this->serverInfo->getOption(LocalInfo::HOST) . $this->normalizePathForServer($filePath);
+        return \sprintf(
+            '%s%s',
+            $this->serverInfo->getOption(LocalInfo::HOST),
+            $this->normalizePathForServer($filePath)
+        );
     }
 
     /**
@@ -45,13 +50,16 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
      */
     public function buildBucketPath(string $bucketName): string
     {
-        if (!$this->serverInfo->hasBucket($bucketName)) {
+        if (!($bucket = $this->serverInfo->getBucket($bucketName)) instanceof BucketsBasedInterface) {
             throw new StorageException(
                 \sprintf('Bucket `%s` is not defined for server `%s`', $bucketName, $this->serverInfo->getName())
             );
         }
 
-        return $this->serverInfo->getOption(LocalInfo::ROOT_DIR)
-            . $this->serverInfo->getBucket($bucketName)->getDirectory();
+        return \sprintf(
+            '%s%s',
+            $this->serverInfo->getOption(LocalInfo::ROOT_DIR),
+            $bucket->getDirectory()
+        );
     }
 }
