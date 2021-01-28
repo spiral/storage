@@ -24,11 +24,11 @@ class FilePathResolver implements FilePathResolverInterface
     public function buildServerFilePath(string $serverKey, string $filePath): string
     {
         try {
-            if (FilePathValidator::validateServerFilePath($filePath)) {
-                throw new ResolveException(
-                    \sprintf('Filepath %s already contains server key', $filePath)
-                );
-            }
+            FilePathValidator::validateServerFilePath($filePath);
+
+            throw new ResolveException(
+                \sprintf('Filepath %s already contains server key', $filePath)
+            );
         } catch (ValidationException $e) {
         }
 
@@ -43,9 +43,9 @@ class FilePathResolver implements FilePathResolverInterface
     public function parseServerFilePathToStructure(string $filePath): ?ServerFilePathStructure
     {
         try {
-            if (FilePathValidator::validateServerFilePath($filePath)) {
-                return new ServerFilePathStructure($filePath);
-            }
+            FilePathValidator::validateServerFilePath($filePath);
+
+            return new ServerFilePathStructure($filePath);
         } catch (ValidationException $e) {
         }
 

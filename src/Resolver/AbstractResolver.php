@@ -41,11 +41,11 @@ abstract class AbstractResolver implements ResolverInterface
     public function normalizePathForServer(string $filePath): string
     {
         try {
-            if (FilePathValidator::validateServerFilePath($filePath)) {
-                $filePathStructure = new ServerFilePathStructure($filePath);
+            FilePathValidator::validateServerFilePath($filePath);
 
-                return $filePathStructure->isIdentified() ? $filePathStructure->filePath : $filePath;
-            }
+            $filePathStructure = new ServerFilePathStructure($filePath);
+
+            return $filePathStructure->isIdentified() ? $filePathStructure->filePath : $filePath;
         } catch (ValidationException $e) {
             // if filePath is not server file path we supposes it is short form of filepath - without server name
         }

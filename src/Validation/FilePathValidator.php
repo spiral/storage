@@ -20,31 +20,23 @@ class FilePathValidator
      * @param string $filePath
      *
      * @throws ValidationException
-     *
-     * @return bool
      */
-    public static function validateFilePath(string $filePath): bool
+    public static function validateFilePath(string $filePath): void
     {
         if (!preg_match(\sprintf('/^%s$/', self::FILE_PATH_PATTERN), $filePath)) {
             throw new ValidationException('File name is not suitable by format');
         }
-
-        return true;
     }
 
     /**
      * @param string $filePath
      *
      * @throws ValidationException
-     *
-     * @return bool
      */
-    public static function validateServerFilePath(string $filePath): bool
+    public static function validateServerFilePath(string $filePath): void
     {
         if (!preg_match(static::SERVER_FILE_PATH_PATTERN, $filePath)) {
             throw new ValidationException('Server file path is not suitable by format');
         }
-
-        return true;
     }
 }

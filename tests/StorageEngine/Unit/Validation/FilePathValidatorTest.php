@@ -25,10 +25,10 @@ class FilePathValidatorTest extends AbstractUnitTest
             $this->expectExceptionMessage('File name is not suitable by format');
         }
 
-        $result = FilePathValidator::validateFilePath($filePath);
+        FilePathValidator::validateFilePath($filePath);
 
         if ($expectedResult === true) {
-            $this->assertTrue($result);
+            $this->expectNotToPerformAssertions();
         }
     }
 
@@ -47,10 +47,10 @@ class FilePathValidatorTest extends AbstractUnitTest
             $this->expectExceptionMessage('Server file path is not suitable by format');
         }
 
-        $result = FilePathValidator::validateServerFilePath($filePath);
+        FilePathValidator::validateServerFilePath($filePath);
 
         if ($expectedResult === true) {
-            $this->assertTrue($result);
+            $this->expectNotToPerformAssertions();
         }
     }
 
