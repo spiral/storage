@@ -11,6 +11,7 @@ use Spiral\StorageEngine\Resolver\ResolveManager;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
+use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class StorageEngineBootloaderTest extends AbstractUnitTest
 {
@@ -29,8 +30,10 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
             ]
         );
 
+        $filePathValidator = new FilePathValidator();
+
         $engine = new StorageEngine(
-            new ResolveManager($config, new FilePathResolver())
+            new ResolveManager($config, new FilePathResolver($filePathValidator), $filePathValidator)
         );
 
         $this->assertFalse($engine->isInitiated());

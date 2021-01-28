@@ -20,6 +20,7 @@ use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 use Spiral\StorageEngine\Resolver\ResolveManager;
+use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class ResolveManagerTest extends AbstractUnitTest
 {
@@ -196,6 +197,12 @@ class ResolveManagerTest extends AbstractUnitTest
 
     private function buildResolveManager(?array $servers = null): ResolveManager
     {
-        return new ResolveManager($this->buildStorageConfig($servers), new FilePathResolver());
+        $filePathValidator = new FilePathValidator();
+
+        return new ResolveManager(
+            $this->buildStorageConfig($servers),
+            new FilePathResolver($filePathValidator),
+            $filePathValidator
+        );
     }
 }

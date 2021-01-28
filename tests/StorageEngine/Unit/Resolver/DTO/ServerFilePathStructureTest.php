@@ -6,6 +6,7 @@ namespace Spiral\StorageEngine\Tests\Unit\Resolver\DTO;
 
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
+use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class ServerFilePathStructureTest extends AbstractUnitTest
 {
@@ -17,7 +18,9 @@ class ServerFilePathStructureTest extends AbstractUnitTest
      */
     public function testIsIdentified(string $filePath, bool $expectedResult): void
     {
-        $structure = new ServerFilePathStructure($filePath);
+        $filePathValidator = new FilePathValidator();
+
+        $structure = new ServerFilePathStructure($filePath, $filePathValidator->getServerFilePathPattern());
 
         $this->assertEquals($structure->isIdentified(), $expectedResult);
     }

@@ -9,6 +9,7 @@ use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Resolver\FilePathResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
+use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class FilePathResolverTest extends AbstractUnitTest
 {
@@ -20,7 +21,7 @@ class FilePathResolverTest extends AbstractUnitTest
      */
     public function testParseFilePath(string $filePath, ?ServerFilePathStructure $filePathStructure = null): void
     {
-        $resolver = new FilePathResolver();
+        $resolver = new FilePathResolver(new FilePathValidator());
 
         $this->assertEquals($filePathStructure, $resolver->parseServerFilePathToStructure($filePath));
     }
@@ -36,7 +37,7 @@ class FilePathResolverTest extends AbstractUnitTest
      */
     public function testBuildServerFilePath(string $server, string $filePath, string $expectedFilePath): void
     {
-        $resolver = new FilePathResolver();
+        $resolver = new FilePathResolver(new FilePathValidator());
 
         $this->assertEquals($expectedFilePath, $resolver->buildServerFilePath($server, $filePath));
     }
@@ -47,7 +48,7 @@ class FilePathResolverTest extends AbstractUnitTest
     public function testBuildServerFilePathForServerFilePath(): void
     {
         $filePath = 'aws://someDir/file1.txt';
-        $resolver = new FilePathResolver();
+        $resolver = new FilePathResolver(new FilePathValidator());
 
         $this->expectException(ResolveException::class);
         $this->expectExceptionMessage(\sprintf('Filepath %s already contains server key', $filePath));
@@ -57,14 +58,16 @@ class FilePathResolverTest extends AbstractUnitTest
 
     public function getServerFilePathsList(): array
     {
+        $filePathValidator = new FilePathValidator();
+
         $fileTxt = 'file.txt';
         $dirFile = 'some/debug/dir/file1.csv';
 
-        $filePathStruct1 = new ServerFilePathStructure('');
+        $filePathStruct1 = new ServerFilePathStructure('', $filePathValidator->getServerFilePathPattern());
         $filePathStruct1->serverName = ServerTestInterface::SERVER_NAME;
         $filePathStruct1->filePath = $fileTxt;
 
-        $filePathStruct2 = new ServerFilePathStructure('');
+        $filePathStruct2 = new ServerFilePathStructure('', $filePathValidator->getServerFilePathPattern());
         $filePathStruct2->serverName = ServerTestInterface::SERVER_NAME;
         $filePathStruct2->filePath = $dirFile;
 

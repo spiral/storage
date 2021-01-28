@@ -15,6 +15,8 @@ use Spiral\StorageEngine\Resolver\FilePathResolverInterface;
 use Spiral\StorageEngine\Resolver\ResolveManager;
 use Spiral\StorageEngine\Resolver\ResolveManagerInterface;
 use Spiral\StorageEngine\StorageEngine;
+use Spiral\StorageEngine\Validation\FilePathValidator;
+use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class StorageEngineBootloader extends Bootloader
 {
@@ -22,6 +24,7 @@ class StorageEngineBootloader extends Bootloader
         ResolveManagerInterface::class => ResolveManager::class,
         FilePathResolverInterface::class => FilePathResolver::class,
         FilesystemOperator::class => [self::class, 'getMountManager'],
+        FilePathValidatorInterface::class => FilePathValidator::class,
     ];
 
     private StorageConfig $config;

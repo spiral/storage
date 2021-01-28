@@ -11,6 +11,7 @@ use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
+use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
 {
@@ -23,10 +24,16 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
 
     private FilePathResolverInterface $filePathResolver;
 
-    public function __construct(StorageConfig $storageConfig, FilePathResolverInterface $filePathResolver)
-    {
+    private FilePathValidatorInterface $filePathValidator;
+
+    public function __construct(
+        StorageConfig $storageConfig,
+        FilePathResolverInterface $filePathResolver,
+        FilePathValidatorInterface $filePathValidator
+    ) {
         $this->storageConfig = $storageConfig;
         $this->filePathResolver = $filePathResolver;
+        $this->filePathValidator = $filePathValidator;
     }
 
     /**
@@ -88,9 +95,9 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     {
         switch ($serverInfo->getDriver()) {
             case AdapterName::LOCAL:
-                return new LocalSystemResolver($serverInfo);
+                return new LocalSystemResolver($serverInfo, $this->filePathValidator);
             case AdapterName::AWS_S3:
-                return new AwsS3Resolver($serverInfo);
+                return new AwsS3Resolver($serverInfo, $this->filePathValidator);
             default:
                 throw new ResolveException('No resolver was detected for driver ' . $serverInfo->getDriver());
         }
