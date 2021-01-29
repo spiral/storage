@@ -30,11 +30,11 @@ interface ResolveManagerInterface
 
     /**
      * @param string $filePath
-     * @param bool $useException
+     * @param bool $useException - if url can't be built - throw exception. In other case - return null
      *
      * @return string|null
      *
      * @throws ResolveException
      */
-    public function buildUrl(string $filePath, bool $useException): ?string;
+    public function buildUrl(string $filePath, bool $useException = false): ?string;
 }

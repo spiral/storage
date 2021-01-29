@@ -26,18 +26,11 @@ class FilePathResolver implements FilePathResolverInterface
      *
      * @return string
      *
-     * @throws ResolveException
+     * @throws ValidationException
      */
     public function buildServerFilePath(string $serverKey, string $filePath): string
     {
-        try {
-            $this->filePathValidator->validateServerFilePath($filePath);
-
-            throw new ResolveException(
-                \sprintf('Filepath %s already contains server key', $filePath)
-            );
-        } catch (ValidationException $e) {
-        }
+        $this->filePathValidator->validateFilePath($filePath);
 
         return \sprintf(
             '%s%s%s',
@@ -57,6 +50,7 @@ class FilePathResolver implements FilePathResolverInterface
                 $this->filePathValidator->getServerFilePathPattern()
             );
         } catch (ValidationException $e) {
+            // if provided filepath is not server filePath - structure can't be built
         }
 
         return null;
