@@ -19,13 +19,13 @@ class LocalInfo extends ServerInfo implements BucketsBasedInterface
 
     protected const REQUIRED_OPTIONS = [
         self::ROOT_DIR => self::STRING_TYPE,
-        self::HOST => self::STRING_TYPE,
     ];
 
     protected const ADDITIONAL_OPTIONS = [
         self::VISIBILITY => self::ARRAY_TYPE,
         self::WRITE_FLAGS => self::INT_TYPE,
         self::LINK_HANDLING => self::INT_TYPE,
+        self::HOST => self::STRING_TYPE,
     ];
 
     public function __construct(string $name, array $info)
@@ -35,5 +35,20 @@ class LocalInfo extends ServerInfo implements BucketsBasedInterface
         if (array_key_exists(BucketsBasedInterface::BUCKETS_KEY, $info)) {
             $this->constructBuckets($info[static::BUCKETS_KEY], $this);
         }
+    }
+
+    public function isAdvancedUsage(): bool
+    {
+        foreach (static::ADDITIONAL_OPTIONS as $optionalOption => $type) {
+            if ($optionalOption === static::HOST) {
+                continue;
+            }
+
+            if ($this->hasOption($optionalOption)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

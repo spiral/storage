@@ -10,7 +10,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ClassBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Traits\ClassBasedTrait;
+use Spiral\StorageEngine\Config\DTO\Traits\ClassBasedTrait;
 
 class AwsVisibilityConverter implements ClassBasedInterface, OptionsBasedInterface
 {

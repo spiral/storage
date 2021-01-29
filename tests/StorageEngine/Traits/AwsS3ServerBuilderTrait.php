@@ -31,7 +31,7 @@ trait AwsS3ServerBuilderTrait
     protected function buildAwsS3ServerDescription(): array
     {
         return [
-            AwsS3Info::CLASS_KEY => AwsS3V3Adapter::class,
+            AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
             AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
             AwsS3Info::OPTIONS_KEY => [
                 AwsS3Info::BUCKET => 'debugBucket',

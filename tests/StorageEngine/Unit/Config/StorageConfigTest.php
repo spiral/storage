@@ -65,7 +65,7 @@ class StorageConfigTest extends AbstractUnitTest
                 'servers' => [
                     $localServer => [
                         ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
-                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::ADAPTER => LocalFilesystemAdapter::class,
                         OptionsBasedInterface::OPTIONS_KEY => [
                             LocalInfo::ROOT_DIR => $rootDir,
                             LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
@@ -93,7 +93,7 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     $localServer => [
-                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::ADAPTER => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]
@@ -120,7 +120,7 @@ class StorageConfigTest extends AbstractUnitTest
                 'servers' => [
                     $localServer => [
                         ServerInfoInterface::DRIVER_KEY => 'missingAdapter',
-                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::ADAPTER => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]
@@ -147,7 +147,7 @@ class StorageConfigTest extends AbstractUnitTest
                 'servers' => [
                     'local' => [
                         ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
-                        ClassBasedInterface::CLASS_KEY => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::ADAPTER => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]

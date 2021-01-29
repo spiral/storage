@@ -9,6 +9,7 @@ use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
+use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class AwsS3ResolverTest extends AbstractUnitTest
 {
@@ -28,8 +29,6 @@ class AwsS3ResolverTest extends AbstractUnitTest
             )
         );
 
-        new AwsS3Resolver(
-            $this->buildLocalInfo()
-        );
+        new AwsS3Resolver($this->buildLocalInfo(), new FilePathValidator());
     }
 }

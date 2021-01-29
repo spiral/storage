@@ -20,15 +20,17 @@ class FilePathValidatorTest extends AbstractUnitTest
      */
     public function testValidateFilePath(string $filePath, bool $expectedResult): void
     {
+        $filePathValidator = new FilePathValidator();
+
         if (!$expectedResult) {
             $this->expectException(ValidationException::class);
             $this->expectExceptionMessage('File name is not suitable by format');
         }
 
-        $result = FilePathValidator::validateFilePath($filePath);
+        $filePathValidator->validateFilePath($filePath);
 
         if ($expectedResult === true) {
-            $this->assertTrue($result);
+            $this->expectNotToPerformAssertions();
         }
     }
 
@@ -42,15 +44,17 @@ class FilePathValidatorTest extends AbstractUnitTest
      */
     public function testValidateServerFilePath(string $filePath, bool $expectedResult): void
     {
+        $filePathValidator = new FilePathValidator();
+
         if (!$expectedResult) {
             $this->expectException(ValidationException::class);
             $this->expectExceptionMessage('Server file path is not suitable by format');
         }
 
-        $result = FilePathValidator::validateServerFilePath($filePath);
+        $filePathValidator->validateServerFilePath($filePath);
 
         if ($expectedResult === true) {
-            $this->assertTrue($result);
+            $this->expectNotToPerformAssertions();
         }
     }
 
@@ -62,7 +66,7 @@ class FilePathValidatorTest extends AbstractUnitTest
             ['/tmp/file.txt', true],
             ['/tmp/file 1+2*3.txt', true],
             ['/tmp/file_-(1+2*3).txt', true],
-            ['file:txt', false],
+            ['file,2:=.txt', false],
         ];
     }
 

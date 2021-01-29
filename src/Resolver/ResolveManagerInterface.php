@@ -6,26 +6,18 @@ namespace Spiral\StorageEngine\Resolver;
 
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 
 interface ResolveManagerInterface
 {
-    public const SERVER_PATH_SEPARATOR = '://';
-
     /**
      * @param string $serverKey
      *
      * @return ResolverInterface
      *
      * @throws ResolveException
-     */
-    public function getResolver(string $serverKey): ResolverInterface;
-
-    /**
-     * @throws ResolveException
      * @throws StorageException
      */
-    public function initResolvers(): void;
+    public function getResolver(string $serverKey): ResolverInterface;
 
     /**
      * @param string[] $files
@@ -38,14 +30,11 @@ interface ResolveManagerInterface
 
     /**
      * @param string $filePath
+     * @param bool $useException - if url can't be built - throw exception. In other case - return null
      *
      * @return string|null
      *
      * @throws ResolveException
      */
-    public function buildUrl(string $filePath): ?string;
-
-    public function parseFilePath(string $filePath): ServerFilePathStructure;
-
-    public function buildServerFilePath(string $serverName, string $filePath): string;
+    public function buildUrl(string $filePath, bool $useException = false): ?string;
 }
