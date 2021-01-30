@@ -8,7 +8,6 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
@@ -65,7 +64,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
                     LocalInfo::ROOT_DIR_KEY => $rootDir,
                     LocalInfo::HOST_KEY => $host,
                 ],
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
             ]),
             new FilePathValidator()
         );
@@ -84,7 +82,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => 'rootDir',
                 ],
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
             ]),
             new FilePathValidator()
         );
@@ -115,7 +112,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $resolver = new LocalSystemResolver(
             new LocalInfo($serverName, [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
                 LocalInfo::BUCKETS_KEY => [
                     $bucketName => [
@@ -155,7 +151,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
             new LocalInfo($serverName, [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => $options,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::BUCKETS_KEY => [
                     $bucketName => [
                         LocalInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory]

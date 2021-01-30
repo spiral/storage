@@ -13,7 +13,6 @@ use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
@@ -64,7 +63,6 @@ class AdapterFactoryTest extends AbstractUnitTest
             'debugLocalServer',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
         );
@@ -128,7 +126,6 @@ class AdapterFactoryTest extends AbstractUnitTest
             'debugAwsS3Server',
             [
                 LocalInfo::ADAPTER_KEY => AwsS3V3Adapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::AWS_S3,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
         );
@@ -160,7 +157,6 @@ class AdapterFactoryTest extends AbstractUnitTest
                 'someName',
                 [
                     ServerInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    ServerInfo::DRIVER_KEY => AdapterName::LOCAL,
                     ServerInfo::OPTIONS_KEY => [],
                 ],
             ]

@@ -8,7 +8,6 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
@@ -70,7 +69,7 @@ class ResolveManagerTest extends AbstractUnitTest
      *
      * @throws \ReflectionException
      */
-    public function testPrepareResolverByDriver(ServerInfoInterface $serverInfo, string $expectedClass): void
+    public function testPrepareResolverByServerInfo(ServerInfoInterface $serverInfo, string $expectedClass): void
     {
         $resolveManager = $this->buildResolveManager();
 
@@ -83,17 +82,19 @@ class ResolveManagerTest extends AbstractUnitTest
      * @throws StorageException
      * @throws \ReflectionException
      */
-    public function testPrepareResolverByUnknownDriver(): void
+    public function testPrepareResolverByUnknownAdapter(): void
     {
         $resolveManager = $this->buildResolveManager();
         $serverInfo = $this->buildLocalInfo();
 
-        $unknownDriver = 'unknownDriver';
+        $unknownAdapter = \DateTime::class;
 
-        $this->setProtectedProperty($serverInfo, 'driver', $unknownDriver);
+        $this->setProtectedProperty($serverInfo, 'class', $unknownAdapter);
 
         $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage('No resolver was detected for driver ' . $unknownDriver);
+        $this->expectExceptionMessage(
+            'No resolver was detected by provided adapter for server ' . $serverInfo->getName()
+        );
 
         $this->callNotPublicMethod($resolveManager, 'prepareResolverByServerInfo', [$serverInfo]);
     }
@@ -113,7 +114,6 @@ class ResolveManagerTest extends AbstractUnitTest
                 static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription(),
                 static::LOCAL_SERVER_2 => [
                     LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                     LocalInfo::OPTIONS_KEY => [
                         LocalInfo::ROOT_DIR_KEY => static::LOCAL_SERVER_ROOT_2,
                         LocalInfo::HOST_KEY => static::LOCAL_SERVER_HOST_2,

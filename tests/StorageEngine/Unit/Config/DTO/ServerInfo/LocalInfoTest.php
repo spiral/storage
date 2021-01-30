@@ -7,7 +7,6 @@ namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
@@ -35,7 +34,6 @@ class LocalInfoTest extends AbstractUnitTest
             $serverName,
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
         );
@@ -71,7 +69,6 @@ class LocalInfoTest extends AbstractUnitTest
             $serverName,
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
         );
@@ -91,7 +88,6 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/dir/',
                     LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
@@ -119,7 +115,6 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/dir/',
                     LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
@@ -138,7 +133,6 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
                     LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
@@ -152,7 +146,6 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
                     LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
@@ -167,7 +160,6 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
                     LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
@@ -196,7 +188,6 @@ class LocalInfoTest extends AbstractUnitTest
             'someServer',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
                     LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,

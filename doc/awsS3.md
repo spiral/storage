@@ -25,7 +25,6 @@ return [
     'servers' => [
         'aws' => [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
-            'driver' => \Spiral\StorageEngine\Enum\AdapterName::AWS_S3,
             'options' => [
                 'bucket' => env('AWS_BUCKET'),
                 'client' => [
@@ -51,7 +50,6 @@ return [
     'servers' => [
         'aws' => [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
-            'driver' => \Spiral\StorageEngine\Enum\AdapterName::AWS_S3,
             'options' => [
                 'bucket' => env('AWS_BUCKET'),
                 'client' => [

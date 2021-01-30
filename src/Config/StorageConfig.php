@@ -9,7 +9,6 @@ use Spiral\Core\InjectableConfig;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 
 class StorageConfig extends InjectableConfig
@@ -67,15 +66,16 @@ class StorageConfig extends InjectableConfig
 
         $serverInfo = $this->config[static::SERVERS_KEY][$serverLabel];
 
-        switch ($this->extractServerDriver($serverInfo)) {
-            case AdapterName::LOCAL:
+        switch ($this->extractServerAdapter($serverInfo)) {
+            case \League\Flysystem\Local\LocalFilesystemAdapter::class:
                 $serverInfoDTO = new LocalInfo($serverLabel, $serverInfo);
                 break;
-            case AdapterName::AWS_S3:
+            case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
+            case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
                 $serverInfoDTO = new AwsS3Info($serverLabel, $serverInfo);
                 break;
             default:
-                throw new ConfigException('Driver can\'t be identified for server ' . $serverLabel);
+                throw new ConfigException('Adapter can\'t be identified for server ' . $serverLabel);
         }
 
         $this->serversInfo[$serverLabel] = $serverInfoDTO;
@@ -83,10 +83,10 @@ class StorageConfig extends InjectableConfig
         return $serverInfoDTO;
     }
 
-    private function extractServerDriver(array $serverInfo): ?string
+    private function extractServerAdapter(array $serverInfo): ?string
     {
-        return array_key_exists(ServerInfoInterface::DRIVER_KEY, $serverInfo)
-            ? $serverInfo[ServerInfoInterface::DRIVER_KEY]
+        return array_key_exists(ServerInfoInterface::ADAPTER_KEY, $serverInfo)
+            ? $serverInfo[ServerInfoInterface::ADAPTER_KEY]
             : null;
     }
 }

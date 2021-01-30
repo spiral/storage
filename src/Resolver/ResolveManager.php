@@ -7,7 +7,6 @@ namespace Spiral\StorageEngine\Resolver;
 use Spiral\Core\Container\SingletonInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
@@ -93,13 +92,16 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      */
     protected function prepareResolverByServerInfo(ServerInfoInterface $serverInfo): ResolverInterface
     {
-        switch ($serverInfo->getDriver()) {
-            case AdapterName::LOCAL:
+        switch ($serverInfo->getAdapterClass()) {
+            case \League\Flysystem\Local\LocalFilesystemAdapter::class:
                 return new LocalSystemResolver($serverInfo, $this->filePathValidator);
-            case AdapterName::AWS_S3:
+            case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
+            case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
                 return new AwsS3Resolver($serverInfo, $this->filePathValidator);
             default:
-                throw new ResolveException('No resolver was detected for driver ' . $serverInfo->getDriver());
+                throw new ResolveException(
+                    'No resolver was detected by provided adapter for server ' . $serverInfo->getName()
+                );
         }
     }
 }

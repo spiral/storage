@@ -8,8 +8,6 @@ interface ServerInfoInterface
 {
     public const ADAPTER_KEY = 'adapter';
 
-    public const DRIVER_KEY = 'driver';
-
     public const VISIBILITY_KEY = 'visibility';
 
     /**
@@ -20,8 +18,6 @@ interface ServerInfoInterface
     public function getAdapterClass(): string;
 
     public function getName(): string;
-
-    public function getDriver(): string;
 
     /**
      * Check if adapter for server should be configured with additional params

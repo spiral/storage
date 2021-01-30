@@ -7,58 +7,12 @@ namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class ServerInfoTest extends AbstractUnitTest
 {
-    /**
-     * @throws StorageException
-     */
-    public function testValidateUnknownDriverFailed(): void
-    {
-        $serverName = 'someServer';
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server driver for %s was not identified', $serverName));
-
-        new LocalInfo(
-            $serverName,
-            [
-                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => 'missedDriver',
-                LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
-                ],
-            ]
-        );
-    }
-
-    /**
-     * @throws StorageException
-     */
-    public function testValidateNoDriverFailed(): void
-    {
-        $serverName = 'someServer';
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server driver for %s was not identified', $serverName));
-
-        new LocalInfo(
-            $serverName,
-            [
-                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
-                ],
-            ]
-        );
-    }
-
     /**
      * @throws StorageException
      */
@@ -71,17 +25,14 @@ class ServerInfoTest extends AbstractUnitTest
 
         new LocalInfo(
             $serverName,
-            [
-                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
-            ]
+            [LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class]
         );
     }
 
     /**
      * @throws StorageException
      */
-    public function testValidateNoClassFailed(): void
+    public function testValidateNoAdapterClassFailed(): void
     {
         $serverName = 'someServer';
 
@@ -91,7 +42,6 @@ class ServerInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
                     LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,

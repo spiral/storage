@@ -7,7 +7,6 @@ namespace Spiral\StorageEngine\Tests\Traits;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
 trait StorageConfigTrait
@@ -16,7 +15,6 @@ trait StorageConfigTrait
     {
         if (empty($servers)) {
             $servers[ServerTestInterface::SERVER_NAME] = [
-                LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => ServerTestInterface::ROOT_DIR,

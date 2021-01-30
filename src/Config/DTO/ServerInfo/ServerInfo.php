@@ -6,7 +6,6 @@ namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Config\DTO\Traits\ClassBasedTrait;
 
@@ -23,8 +22,6 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     protected string $name;
 
-    protected string $driver;
-
     /**
      * @param string $name
      * @param array $info
@@ -36,8 +33,6 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         $this->validateInfoSufficient($name, $info);
 
         $this->name = $name;
-
-        $this->driver = $info[static::DRIVER_KEY];
 
         $this->setClass($info[static::ADAPTER_KEY], \sprintf('Server %s class', $this->name));
 
@@ -77,11 +72,6 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         return $this->name;
     }
 
-    public function getDriver(): string
-    {
-        return $this->driver;
-    }
-
     public function isAdvancedUsage(): bool
     {
         foreach (static::ADDITIONAL_OPTIONS as $optionalOption => $type) {
@@ -95,15 +85,6 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     protected function validateInfoSufficient(string $serverName, array $info): void
     {
-        if (
-            !array_key_exists(static::DRIVER_KEY, $info)
-            || !in_array($info[static::DRIVER_KEY], AdapterName::ALL, true)
-        ) {
-            throw new ConfigException(
-                \sprintf('Server driver for %s was not identified', $serverName)
-            );
-        }
-
         if (!array_key_exists(static::ADAPTER_KEY, $info)) {
             throw new ConfigException(
                 \sprintf('Server %s needs adapter class defined', $serverName)
