@@ -107,7 +107,7 @@ class ResolveManagerTest extends AbstractUnitTest
      *
      * @throws StorageException
      */
-    public function testBuildUrlsList(array $filesList, array $expectedUrlsList): void
+    public function testBuildUrlsListNoException(array $filesList, array $expectedUrlsList): void
     {
         $resolveManager = $this->buildResolveManager(
             [
@@ -122,7 +122,7 @@ class ResolveManagerTest extends AbstractUnitTest
             ]
         );
 
-        $urlsList = $resolveManager->buildUrlsList($filesList);
+        $urlsList = $resolveManager->buildUrlsList($filesList, false);
 
         $this->assertInstanceOf(\Generator::class, $urlsList);
 
@@ -132,7 +132,7 @@ class ResolveManagerTest extends AbstractUnitTest
     /**
      * @throws StorageException
      */
-    public function testBuildUrlUnknownServer(): void
+    public function testBuildUrlUnknownServerNoException(): void
     {
         $unknownServer = 'unknownServer';
 
@@ -143,7 +143,7 @@ class ResolveManagerTest extends AbstractUnitTest
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(\sprintf('Server %s was not found', $unknownServer));
 
-        $resolveManager->buildUrl('unknownServer://someFile.txt');
+        $resolveManager->buildUrl('unknownServer://someFile.txt', false);
     }
 
     /**
@@ -161,19 +161,19 @@ class ResolveManagerTest extends AbstractUnitTest
         $this->expectException(ResolveException::class);
         $this->expectExceptionMessage('Url can\'t be built by filepath ' . $filePath);
 
-        $resolveManager->buildUrl($filePath, true);
+        $resolveManager->buildUrl($filePath);
     }
 
     /**
      * @throws StorageException
      */
-    public function testBuildUrlWrongFormatServer(): void
+    public function testBuildUrlWrongFormatServerNoException(): void
     {
         $resolveManager = $this->buildResolveManager(
             [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
         );
 
-        $this->assertNull($resolveManager->buildUrl('unknownServer:\\/someFile.txt'));
+        $this->assertNull($resolveManager->buildUrl('unknownServer:\\/someFile.txt', false));
     }
 
     public function getFileLists(): array
@@ -200,6 +200,18 @@ class ResolveManagerTest extends AbstractUnitTest
                     \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $fileTxt),
                     \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
                     \sprintf('%s%s', static::LOCAL_SERVER_HOST_2, $specificCsvFile),
+                ]
+            ],
+            [
+                [
+                    \sprintf('%s://%s', static::LOCAL_SERVER_1, $fileTxt),
+                    \sprintf('%s://%s', static::LOCAL_SERVER_1, $specificCsvFile),
+                    \sprintf('%s:-/+/%s', static::LOCAL_SERVER_2, $specificCsvFile),
+                ],
+                [
+                    \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $fileTxt),
+                    \sprintf('%s%s', ServerTestInterface::CONFIG_HOST, $specificCsvFile),
+                    null,
                 ]
             ],
         ];
