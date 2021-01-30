@@ -26,14 +26,14 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testValidateSimple(): void
     {
         $options = [
-            AwsS3Info::BUCKET => 'debugBucket',
-            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET_KEY => 'debugBucket',
+            AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
         ];
 
         $serverInfo = new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
@@ -55,14 +55,14 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testValidateSimpleAsync(): void
     {
         $options = [
-            AwsS3Info::BUCKET => 'debugBucket',
-            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET_KEY => 'debugBucket',
+            AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
         ];
 
         $serverInfo = new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AsyncAwsS3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AsyncAwsS3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
@@ -81,17 +81,17 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testAdvancedUsage(): void
     {
         $options = [
-            AwsS3Info::BUCKET => 'debugBucket',
-            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
-            AwsS3Info::PATH_PREFIX => 'somePrefix',
-            AwsS3Info::VISIBILITY => $this->getAwsS3VisibilityOption(),
-            AwsS3Info::URL_EXPIRES => new \DateTime('+5 days'),
+            AwsS3Info::BUCKET_KEY => 'debugBucket',
+            AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+            AwsS3Info::PATH_PREFIX_KEY => 'somePrefix',
+            AwsS3Info::VISIBILITY_KEY => $this->getAwsS3VisibilityOption(),
+            AwsS3Info::URL_EXPIRES_KEY => new \DateTime('+5 days'),
         ];
 
         $serverInfo = new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
@@ -99,7 +99,7 @@ class AwsS3InfoTest extends AbstractUnitTest
 
         $this->assertTrue($serverInfo->isAdvancedUsage());
         foreach ($options as $optionKey => $optionVal) {
-            if ($optionKey === AwsS3Info::URL_EXPIRES) {
+            if ($optionKey === AwsS3Info::URL_EXPIRES_KEY) {
                 continue;
             }
 
@@ -110,7 +110,7 @@ class AwsS3InfoTest extends AbstractUnitTest
         $this->assertInstanceOf(PortableVisibilityConverter::class, $visibilityConvertor);
         $this->assertSame($visibilityConvertor, $serverInfo->getVisibiltyConverter());
 
-        $this->assertEquals($options[AwsS3Info::URL_EXPIRES], $serverInfo->getUrlExpires());
+        $this->assertEquals($options[AwsS3Info::URL_EXPIRES_KEY], $serverInfo->getUrlExpires());
     }
 
     /**
@@ -119,16 +119,16 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testAdvancedUsageAsync(): void
     {
         $options = [
-            AwsS3Info::BUCKET => 'debugBucket',
-            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
-            AwsS3Info::PATH_PREFIX => 'somePrefix',
-            AwsS3Info::VISIBILITY => $this->getAwsS3VisibilityOption(),
+            AwsS3Info::BUCKET_KEY => 'debugBucket',
+            AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+            AwsS3Info::PATH_PREFIX_KEY => 'somePrefix',
+            AwsS3Info::VISIBILITY_KEY => $this->getAwsS3VisibilityOption(),
         ];
 
         $advancedAwsS3Info = new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AsyncAwsS3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AsyncAwsS3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
@@ -147,14 +147,14 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testGetClient(): void
     {
         $options = [
-            AwsS3Info::BUCKET => 'debugBucket',
-            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
+            AwsS3Info::BUCKET_KEY => 'debugBucket',
+            AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
         ];
 
         $serverInfo = new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
@@ -177,9 +177,9 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testWrongUrlExpires(string $serverName, $expires, string $errorMsg): void
     {
         $options = [
-            AwsS3Info::BUCKET => 'debugBucket',
-            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
-            AwsS3Info::URL_EXPIRES => $expires,
+            AwsS3Info::BUCKET_KEY => 'debugBucket',
+            AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+            AwsS3Info::URL_EXPIRES_KEY => $expires,
         ];
 
         $this->expectException(ConfigException::class);
@@ -188,7 +188,7 @@ class AwsS3InfoTest extends AbstractUnitTest
         new AwsS3Info(
             $serverName,
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
@@ -212,7 +212,7 @@ class AwsS3InfoTest extends AbstractUnitTest
         new AwsS3Info(
             $serverName,
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
@@ -232,12 +232,12 @@ class AwsS3InfoTest extends AbstractUnitTest
         new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET => 'someBucket',
-                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
-                    AwsS3Info::VISIBILITY => 12,
+                    AwsS3Info::BUCKET_KEY => 'someBucket',
+                    AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::VISIBILITY_KEY => 12,
                 ],
             ]
         );
@@ -254,15 +254,15 @@ class AwsS3InfoTest extends AbstractUnitTest
         new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET => 'someBucket',
-                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
-                    AwsS3Info::VISIBILITY => [
+                    AwsS3Info::BUCKET_KEY => 'someBucket',
+                    AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::VISIBILITY_KEY => [
                         AwsS3Info::CLASS_KEY => PortableVisibilityConverter::class,
                         AwsS3Info::OPTIONS_KEY => [
-                            AwsS3Info::VISIBILITY => 12,
+                            AwsS3Info::VISIBILITY_KEY => 12,
                         ]
                     ],
                 ],
@@ -283,12 +283,12 @@ class AwsS3InfoTest extends AbstractUnitTest
         new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET => 'someBucket',
-                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
-                    AwsS3Info::PATH_PREFIX => [1, 2],
+                    AwsS3Info::BUCKET_KEY => 'someBucket',
+                    AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::PATH_PREFIX_KEY => [1, 2],
                 ],
             ]
         );
@@ -302,11 +302,11 @@ class AwsS3InfoTest extends AbstractUnitTest
         $simpleAwsS3 = new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET => 'debugBucket',
-                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::BUCKET_KEY => 'debugBucket',
+                    AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
                 ],
             ]
         );
@@ -316,12 +316,12 @@ class AwsS3InfoTest extends AbstractUnitTest
         $advancedAwsS3Info = new AwsS3Info(
             'someServer',
             [
-                AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
-                    AwsS3Info::BUCKET => 'debugBucket',
-                    AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
-                    AwsS3Info::PATH_PREFIX => 'somePrefix',
+                    AwsS3Info::BUCKET_KEY => 'debugBucket',
+                    AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+                    AwsS3Info::PATH_PREFIX_KEY => 'somePrefix',
                 ],
             ]
         );
@@ -365,12 +365,12 @@ class AwsS3InfoTest extends AbstractUnitTest
             ],
             [
                 $serverName,
-                [AwsS3Info::CLIENT => 'client'],
+                [AwsS3Info::CLIENT_KEY => 'client'],
                 'Option bucket not detected for server ' . $serverName,
             ],
             [
                 'someServer',
-                [AwsS3Info::BUCKET => 'someBucket'],
+                [AwsS3Info::BUCKET_KEY => 'someBucket'],
                 'Option client not detected for server someServer',
             ],
         ];

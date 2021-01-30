@@ -11,21 +11,21 @@ use Spiral\StorageEngine\Exception\StorageException;
 
 class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 {
-    public const BUCKET = 'bucket';
-    public const CLIENT = 'client';
-    public const PATH_PREFIX = 'path-prefix';
-    public const URL_EXPIRES = 'url-expires';
+    public const BUCKET_KEY = 'bucket';
+    public const CLIENT_KEY = 'client';
+    public const PATH_PREFIX_KEY = 'path-prefix';
+    public const URL_EXPIRES_KEY = 'url-expires';
 
     protected const SERVER_INFO_TYPE = 'awsS3';
 
     protected const REQUIRED_OPTIONS = [
-        self::BUCKET => self::STRING_TYPE,
-        self::CLIENT => self::ARRAY_TYPE,
+        self::BUCKET_KEY => self::STRING_TYPE,
+        self::CLIENT_KEY => self::ARRAY_TYPE,
     ];
 
     protected const ADDITIONAL_OPTIONS = [
-        self::PATH_PREFIX => self::STRING_TYPE,
-        self::VISIBILITY => self::ARRAY_TYPE,
+        self::PATH_PREFIX_KEY => self::STRING_TYPE,
+        self::VISIBILITY_KEY => self::ARRAY_TYPE,
     ];
 
     protected AwsClientInfo $clientInfo;
@@ -44,17 +44,17 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
      */
     public function constructSpecific(array $info): void
     {
-        $this->clientInfo = new AwsClientInfo($this->getOption(static::CLIENT));
+        $this->clientInfo = new AwsClientInfo($this->getOption(static::CLIENT_KEY));
 
-        if ($this->hasOption(static::VISIBILITY)) {
-            $this->visibilityConverter = new AwsVisibilityConverter($this->getOption(static::VISIBILITY));
+        if ($this->hasOption(static::VISIBILITY_KEY)) {
+            $this->visibilityConverter = new AwsVisibilityConverter($this->getOption(static::VISIBILITY_KEY));
         }
 
         if (
             array_key_exists(static::OPTIONS_KEY, $info)
-            && array_key_exists(static::URL_EXPIRES, $info[static::OPTIONS_KEY])
+            && array_key_exists(static::URL_EXPIRES_KEY, $info[static::OPTIONS_KEY])
         ) {
-            $this->setUrlExpires($info[static::OPTIONS_KEY][static::URL_EXPIRES]);
+            $this->setUrlExpires($info[static::OPTIONS_KEY][static::URL_EXPIRES_KEY]);
         }
     }
 

@@ -31,11 +31,11 @@ trait AwsS3ServerBuilderTrait
     protected function buildAwsS3ServerDescription(): array
     {
         return [
-            AwsS3Info::ADAPTER => AwsS3V3Adapter::class,
+            AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
             AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
             AwsS3Info::OPTIONS_KEY => [
-                AwsS3Info::BUCKET => 'debugBucket',
-                AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
+                AwsS3Info::BUCKET_KEY => 'debugBucket',
+                AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
             ],
         ];
     }
@@ -57,7 +57,7 @@ trait AwsS3ServerBuilderTrait
         return [
             AwsS3Info::CLASS_KEY => PortableVisibilityConverter::class,
             AwsS3Info::OPTIONS_KEY => [
-                AwsS3Info::VISIBILITY => Visibility::PUBLIC,
+                AwsS3Info::VISIBILITY_KEY => Visibility::PUBLIC,
             ]
         ];
     }

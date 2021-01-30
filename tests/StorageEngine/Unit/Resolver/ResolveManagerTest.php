@@ -112,11 +112,11 @@ class ResolveManagerTest extends AbstractUnitTest
             [
                 static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription(),
                 static::LOCAL_SERVER_2 => [
-                    LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                    LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                     LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                     LocalInfo::OPTIONS_KEY => [
-                        LocalInfo::ROOT_DIR => static::LOCAL_SERVER_ROOT_2,
-                        LocalInfo::HOST => static::LOCAL_SERVER_HOST_2,
+                        LocalInfo::ROOT_DIR_KEY => static::LOCAL_SERVER_ROOT_2,
+                        LocalInfo::HOST_KEY => static::LOCAL_SERVER_HOST_2,
                     ],
                 ],
             ]

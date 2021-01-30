@@ -60,10 +60,10 @@ class LocalSystemResolverTest extends AbstractUnitTest
     ): void {
         $resolver = new LocalSystemResolver(
             new LocalInfo($serverName, [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => $rootDir,
-                    LocalInfo::HOST => $host,
+                    LocalInfo::ROOT_DIR_KEY => $rootDir,
+                    LocalInfo::HOST_KEY => $host,
                 ],
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
             ]),
@@ -80,9 +80,9 @@ class LocalSystemResolverTest extends AbstractUnitTest
     {
         $resolver = new LocalSystemResolver(
             new LocalInfo('someServer', [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => 'rootDir',
+                    LocalInfo::ROOT_DIR_KEY => 'rootDir',
                 ],
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
             ]),
@@ -108,13 +108,13 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $bucketDirectory = 'debug/dir1/';
 
         $options = [
-            LocalInfo::ROOT_DIR => '/some/root/',
-            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+            LocalInfo::ROOT_DIR_KEY => '/some/root/',
+            LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
         ];
 
         $resolver = new LocalSystemResolver(
             new LocalInfo($serverName, [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
                 LocalInfo::BUCKETS_KEY => [
@@ -127,7 +127,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         );
 
         $this->assertEquals(
-            $options[LocalInfo::ROOT_DIR] . $bucketDirectory,
+            $options[LocalInfo::ROOT_DIR_KEY] . $bucketDirectory,
             $resolver->buildBucketPath($bucketName)
         );
     }
@@ -147,13 +147,13 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $missedBucket = 'missedBucket';
 
         $options = [
-            LocalInfo::ROOT_DIR => '/some/root/',
-            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+            LocalInfo::ROOT_DIR_KEY => '/some/root/',
+            LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
         ];
 
         $resolver = new LocalSystemResolver(
             new LocalInfo($serverName, [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => $options,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::BUCKETS_KEY => [

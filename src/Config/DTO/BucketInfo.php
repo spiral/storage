@@ -12,8 +12,6 @@ class BucketInfo implements OptionsBasedInterface, BucketInfoInterface
 {
     use OptionsTrait;
 
-    public const DIRECTORY_KEY = 'directory';
-
     public string $name;
 
     public ServerInfoInterface $serverInfo;

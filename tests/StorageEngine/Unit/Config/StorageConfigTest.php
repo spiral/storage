@@ -65,10 +65,10 @@ class StorageConfigTest extends AbstractUnitTest
                 'servers' => [
                     $localServer => [
                         ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
-                        ServerInfoInterface::ADAPTER => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
                         OptionsBasedInterface::OPTIONS_KEY => [
-                            LocalInfo::ROOT_DIR => $rootDir,
-                            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                            LocalInfo::ROOT_DIR_KEY => $rootDir,
+                            LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
                         ],
                     ],
                 ],
@@ -93,7 +93,7 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     $localServer => [
-                        ServerInfoInterface::ADAPTER => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]
@@ -120,7 +120,7 @@ class StorageConfigTest extends AbstractUnitTest
                 'servers' => [
                     $localServer => [
                         ServerInfoInterface::DRIVER_KEY => 'missingAdapter',
-                        ServerInfoInterface::ADAPTER => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]
@@ -147,7 +147,7 @@ class StorageConfigTest extends AbstractUnitTest
                 'servers' => [
                     'local' => [
                         ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
-                        ServerInfoInterface::ADAPTER => LocalFilesystemAdapter::class,
+                        ServerInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
                     ],
                 ],
             ]

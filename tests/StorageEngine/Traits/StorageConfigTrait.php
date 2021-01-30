@@ -17,10 +17,10 @@ trait StorageConfigTrait
         if (empty($servers)) {
             $servers[ServerTestInterface::SERVER_NAME] = [
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => ServerTestInterface::ROOT_DIR,
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_KEY => ServerTestInterface::ROOT_DIR,
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
                 ],
             ];
         }

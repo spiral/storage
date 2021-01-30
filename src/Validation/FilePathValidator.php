@@ -22,7 +22,7 @@ class FilePathValidator implements SingletonInterface, FilePathValidatorInterfac
     public function validateFilePath(string $filePath): void
     {
         if (!preg_match(\sprintf('/^%s$/', $this->getFilePathPattern()), $filePath)) {
-            throw new ValidationException('File name is not suitable by format');
+            throw new ValidationException('File path is not suitable by format');
         }
     }
 

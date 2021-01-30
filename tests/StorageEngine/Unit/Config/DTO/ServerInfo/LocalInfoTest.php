@@ -19,8 +19,8 @@ class LocalInfoTest extends AbstractUnitTest
      */
     public function testValidateSimple(): void
     {
-        $rootDirOption = LocalInfo::ROOT_DIR;
-        $hostOption = LocalInfo::HOST;
+        $rootDirOption = LocalInfo::ROOT_DIR_KEY;
+        $hostOption = LocalInfo::HOST_KEY;
 
         $missedOption = 'missedOption';
 
@@ -34,7 +34,7 @@ class LocalInfoTest extends AbstractUnitTest
         $serverInfo = new LocalInfo(
             $serverName,
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
@@ -70,7 +70,7 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
@@ -90,12 +90,12 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             'someServer',
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/dir/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                    LocalInfo::VISIBILITY => 12,
+                    LocalInfo::ROOT_DIR_KEY => '/some/dir/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::VISIBILITY_KEY => 12,
                 ],
             ]
         );
@@ -118,11 +118,11 @@ class LocalInfoTest extends AbstractUnitTest
         new LocalInfo(
             'someServer',
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/dir/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_KEY => '/some/dir/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
                     $label => 'MyFlag',
                 ],
             ]
@@ -137,11 +137,11 @@ class LocalInfoTest extends AbstractUnitTest
         $simpleLocal = new LocalInfo(
             'someServer',
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
                 ],
             ]
         );
@@ -151,12 +151,12 @@ class LocalInfoTest extends AbstractUnitTest
         $baseAdvancedUsage = new LocalInfo(
             'someServer',
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                    LocalInfo::WRITE_FLAGS => LOCK_EX,
+                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::WRITE_FLAGS_KEY => LOCK_EX,
                 ],
             ]
         );
@@ -166,14 +166,14 @@ class LocalInfoTest extends AbstractUnitTest
         $advancedUsage = new LocalInfo(
             'someServer',
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                    LocalInfo::WRITE_FLAGS => LOCK_EX,
-                    LocalInfo::LINK_HANDLING => LocalFilesystemAdapter::DISALLOW_LINKS,
-                    LocalInfo::VISIBILITY => [
+                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::WRITE_FLAGS_KEY => LOCK_EX,
+                    LocalInfo::LINK_HANDLING_KEY => LocalFilesystemAdapter::DISALLOW_LINKS,
+                    LocalInfo::VISIBILITY_KEY => [
                         'file' => [
                             'public' => 0640,
                             'private' => 0604,
@@ -195,17 +195,17 @@ class LocalInfoTest extends AbstractUnitTest
         $baseAdvancedUsage = new LocalInfo(
             'someServer',
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-                    LocalInfo::WRITE_FLAGS => '15',
+                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::WRITE_FLAGS_KEY => '15',
                 ],
             ]
         );
 
-        $this->assertIsInt($baseAdvancedUsage->getOption(LocalInfo::WRITE_FLAGS));
+        $this->assertIsInt($baseAdvancedUsage->getOption(LocalInfo::WRITE_FLAGS_KEY));
     }
 
     public function getMissedRequiredOptions(): array
@@ -221,7 +221,7 @@ class LocalInfoTest extends AbstractUnitTest
             [
                 'someServer',
                 [
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
                 ],
                 'Option rootDir not detected for server someServer'
             ]
@@ -231,8 +231,8 @@ class LocalInfoTest extends AbstractUnitTest
     public function getOptionalIntOptions(): array
     {
         return [
-            [LocalInfo::WRITE_FLAGS],
-            [LocalInfo::LINK_HANDLING]
+            [LocalInfo::WRITE_FLAGS_KEY],
+            [LocalInfo::LINK_HANDLING_KEY]
         ];
     }
 }
