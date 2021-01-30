@@ -71,12 +71,14 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
-        } catch (ResolveException $e) {
+        } catch (ResolveException|StorageException $e) {
             if ($useException) {
                 throw $e;
             }
+        }
 
-            return null;
+        if ($useException) {
+            throw new ResolveException('Url can\'t be built by filepath ' . $filePath);
         }
 
         return null;

@@ -52,7 +52,7 @@ class StorageEngineBootloader extends Bootloader
         $storageEngine->init($servers);
     }
 
-    public function getMountManager(StorageEngine $storageEngine): FilesystemOperator
+    public function getMountManager(StorageEngine $storageEngine): ?FilesystemOperator
     {
         return $storageEngine->getMountManager();
     }
