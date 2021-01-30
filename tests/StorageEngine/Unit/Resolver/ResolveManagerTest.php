@@ -149,6 +149,24 @@ class ResolveManagerTest extends AbstractUnitTest
     /**
      * @throws StorageException
      */
+    public function testBuildUrlThrowException(): void
+    {
+        $filePath = 'someServer:/+/someFile.txt';
+
+        $resolveManager = $this->buildResolveManager(
+            [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+        );
+
+
+        $this->expectException(ResolveException::class);
+        $this->expectExceptionMessage('Url can\'t be built by filepath ' . $filePath);
+
+        $resolveManager->buildUrl($filePath, true);
+    }
+
+    /**
+     * @throws StorageException
+     */
     public function testBuildUrlWrongFormatServer(): void
     {
         $resolveManager = $this->buildResolveManager(

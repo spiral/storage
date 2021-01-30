@@ -79,10 +79,9 @@ class StorageConfigTest extends AbstractUnitTest
     }
 
     /**
-     * @throws \ReflectionException
      * @throws StorageException
      */
-    public function testBuildServerInfoUnknownAdapter(): void
+    public function testBuildServerInfoUnknownServer(): void
     {
         $anotherServer = 'another';
 
@@ -105,6 +104,29 @@ class StorageConfigTest extends AbstractUnitTest
         );
 
         $config->buildServerInfo($anotherServer);
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testBuildServerInfoUnknownAdapter(): void
+    {
+        $serverName = 'another';
+
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    $serverName => [
+                        ServerInfoInterface::ADAPTER_KEY => \DateTime::class,
+                    ],
+                ],
+            ]
+        );
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Adapter can\'t be identified for server ' . $serverName);
+
+        $config->buildServerInfo($serverName);
     }
 
     public function testGetServersKeys(): void

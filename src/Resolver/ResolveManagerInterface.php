@@ -35,6 +35,7 @@ interface ResolveManagerInterface
      * @return string|null
      *
      * @throws ResolveException
+     * @throws StorageException
      */
     public function buildUrl(string $filePath, bool $useException = false): ?string;
 }
