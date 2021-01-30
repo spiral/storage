@@ -39,7 +39,7 @@ trait OptionsTrait
             case OptionsBasedInterface::STRING_TYPE:
                 return is_string($optionVal);
             case OptionsBasedInterface::BOOL_TYPE:
-                return is_bool($optionVal) || in_array($optionVal, [0, 1]);
+                return is_bool($optionVal) || in_array($optionVal, [0, 1, '0', '1'], true);
             case OptionsBasedInterface::ARRAY_TYPE:
                 return is_array($optionVal);
             case OptionsBasedInterface::MIXED_TYPE:

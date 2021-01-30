@@ -107,6 +107,9 @@ class OptionsTraitTest extends AbstractUnitTest
         );
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testValidateRequiredOptionsPassed(): void
     {
         $requiredOptions = array_keys(self::BASIC_OPTIONS);
@@ -122,6 +125,9 @@ class OptionsTraitTest extends AbstractUnitTest
         $this->expectNotToPerformAssertions();
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testValidateRequiredOptionsFailed(): void
     {
         $reqOption = 'reqOption';

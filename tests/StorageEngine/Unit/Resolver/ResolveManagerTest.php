@@ -47,6 +47,10 @@ class ResolveManagerTest extends AbstractUnitTest
         $this->assertSame($resolver, $resolveManager->getResolver('local'));
     }
 
+    /**
+     * @throws ResolveException
+     * @throws StorageException
+     */
     public function testGetResolverFailed(): void
     {
         $resolveManager = $this->buildResolveManager(
@@ -217,6 +221,11 @@ class ResolveManagerTest extends AbstractUnitTest
         ];
     }
 
+    /**
+     * @return array[]
+     *
+     * @throws StorageException
+     */
     public function getServerInfoListForResolversPrepare(): array
     {
         return [

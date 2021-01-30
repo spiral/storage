@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
-use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\ValidationException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;

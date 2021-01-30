@@ -50,7 +50,6 @@ class StorageConfigTest extends AbstractUnitTest
     }
 
     /**
-     * @throws \ReflectionException
      * @throws StorageException
      */
     public function testBuildServerInfoForLocalCheckForce(): void

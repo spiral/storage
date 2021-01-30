@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
-use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\ValidationException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Resolver\FilePathResolver;
@@ -34,7 +33,7 @@ class FilePathResolverTest extends AbstractUnitTest
      * @param string $filePath
      * @param string $expectedFilePath
      *
-     * @throws \Spiral\StorageEngine\Exception\ResolveException
+     * @throws ValidationException
      */
     public function testBuildServerFilePath(string $server, string $filePath, string $expectedFilePath): void
     {
@@ -44,7 +43,7 @@ class FilePathResolverTest extends AbstractUnitTest
     }
 
     /**
-     * @throws \Spiral\StorageEngine\Exception\ValidationException
+     * @throws ValidationException
      */
     public function testBuildServerFilePathForServerFilePath(): void
     {
