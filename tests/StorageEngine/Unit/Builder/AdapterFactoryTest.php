@@ -117,7 +117,7 @@ class AdapterFactoryTest extends AbstractUnitTest
     {
         $options = [
             AwsS3Info::BUCKET_KEY => 'testBucket',
-            AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+            AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
             AwsS3Info::PATH_PREFIX_KEY => '/some/prefix/',
             AwsS3Info::VISIBILITY_KEY => $this->getAwsS3VisibilityOption(),
         ];
