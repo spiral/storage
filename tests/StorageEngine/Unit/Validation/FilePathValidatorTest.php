@@ -24,7 +24,7 @@ class FilePathValidatorTest extends AbstractUnitTest
 
         if (!$expectedResult) {
             $this->expectException(ValidationException::class);
-            $this->expectExceptionMessage('File name is not suitable by format');
+            $this->expectExceptionMessage('File path is not suitable by format');
         }
 
         $filePathValidator->validateFilePath($filePath);

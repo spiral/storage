@@ -44,11 +44,11 @@ class AdapterFactoryTest extends AbstractUnitTest
     public function testBuildAdvancedLocalServer(): void
     {
         $options = [
-            LocalInfo::ROOT_DIR => ServerTestInterface::ROOT_DIR,
-            LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
-            LocalInfo::WRITE_FLAGS => LOCK_NB,
-            LocalInfo::LINK_HANDLING => LocalFilesystemAdapter::SKIP_LINKS,
-            LocalInfo::VISIBILITY => [
+            LocalInfo::ROOT_DIR_KEY => ServerTestInterface::ROOT_DIR,
+            LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+            LocalInfo::WRITE_FLAGS_KEY => LOCK_NB,
+            LocalInfo::LINK_HANDLING_KEY => LocalFilesystemAdapter::SKIP_LINKS,
+            LocalInfo::VISIBILITY_KEY => [
                 'file' => [
                     'public' => 0777,
                     'private' => 0644,
@@ -63,7 +63,7 @@ class AdapterFactoryTest extends AbstractUnitTest
         $info = new LocalInfo(
             'debugLocalServer',
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
@@ -75,15 +75,15 @@ class AdapterFactoryTest extends AbstractUnitTest
 
 
         $this->assertEquals(
-            $options[LocalInfo::LINK_HANDLING],
+            $options[LocalInfo::LINK_HANDLING_KEY],
             $this->getProtectedProperty($adapter, 'linkHandling')
         );
         $this->assertEquals(
-            $options[LocalInfo::WRITE_FLAGS],
+            $options[LocalInfo::WRITE_FLAGS_KEY],
             $this->getProtectedProperty($adapter, 'writeFlags')
         );
         $this->assertEquals(
-            PortableVisibilityConverter::fromArray($options[LocalInfo::VISIBILITY]),
+            PortableVisibilityConverter::fromArray($options[LocalInfo::VISIBILITY_KEY]),
             $this->getProtectedProperty($adapter, 'visibility')
         );
     }
@@ -102,7 +102,7 @@ class AdapterFactoryTest extends AbstractUnitTest
         $this->assertInstanceOf(AwsS3V3Adapter::class, $adapter);
 
         $this->assertEquals(
-            $serverDescription[AwsS3Info::OPTIONS_KEY][AwsS3Info::BUCKET],
+            $serverDescription[AwsS3Info::OPTIONS_KEY][AwsS3Info::BUCKET_KEY],
             $this->getProtectedProperty($adapter, 'bucket')
         );
         $this->assertSame(
@@ -118,16 +118,16 @@ class AdapterFactoryTest extends AbstractUnitTest
     public function testBuildAdvancedAwsS3Server(): void
     {
         $options = [
-            AwsS3Info::BUCKET => 'testBucket',
-            AwsS3Info::CLIENT => $this->getAwsS3ClientDescription(),
-            AwsS3Info::PATH_PREFIX => '/some/prefix/',
-            AwsS3Info::VISIBILITY => $this->getAwsS3VisibilityOption(),
+            AwsS3Info::BUCKET_KEY => 'testBucket',
+            AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+            AwsS3Info::PATH_PREFIX_KEY => '/some/prefix/',
+            AwsS3Info::VISIBILITY_KEY => $this->getAwsS3VisibilityOption(),
         ];
 
         $info = new AwsS3Info(
             'debugAwsS3Server',
             [
-                LocalInfo::ADAPTER => AwsS3V3Adapter::class,
+                LocalInfo::ADAPTER_KEY => AwsS3V3Adapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::AWS_S3,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
@@ -139,7 +139,7 @@ class AdapterFactoryTest extends AbstractUnitTest
 
 
         $this->assertEquals(
-            new PathPrefixer($options[AwsS3Info::PATH_PREFIX]),
+            new PathPrefixer($options[AwsS3Info::PATH_PREFIX_KEY]),
             $this->getProtectedProperty($adapter, 'prefixer')
         );
         $this->assertEquals(
@@ -159,7 +159,7 @@ class AdapterFactoryTest extends AbstractUnitTest
             [
                 'someName',
                 [
-                    ServerInfo::ADAPTER => LocalFilesystemAdapter::class,
+                    ServerInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                     ServerInfo::DRIVER_KEY => AdapterName::LOCAL,
                     ServerInfo::OPTIONS_KEY => [],
                 ],

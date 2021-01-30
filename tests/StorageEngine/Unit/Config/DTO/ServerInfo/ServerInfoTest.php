@@ -27,11 +27,11 @@ class ServerInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => 'missedDriver',
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
                 ],
             ]
         );
@@ -50,10 +50,10 @@ class ServerInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
                 ],
             ]
         );
@@ -72,7 +72,7 @@ class ServerInfoTest extends AbstractUnitTest
         new LocalInfo(
             $serverName,
             [
-                LocalInfo::ADAPTER => LocalFilesystemAdapter::class,
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
             ]
         );
@@ -93,8 +93,8 @@ class ServerInfoTest extends AbstractUnitTest
             [
                 LocalInfo::DRIVER_KEY => AdapterName::LOCAL,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR => '/some/root/',
-                    LocalInfo::HOST => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
                 ],
             ]
         );

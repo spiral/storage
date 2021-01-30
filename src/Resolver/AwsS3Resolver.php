@@ -25,7 +25,7 @@ class AwsS3Resolver extends AbstractResolver
                 $s3Client->getCommand(
                     'GetObject',
                     [
-                        'Bucket' => $this->serverInfo->getOption(AwsS3Info::BUCKET),
+                        'Bucket' => $this->serverInfo->getOption(AwsS3Info::BUCKET_KEY),
                         'Key' => $this->normalizePathForServer($filePath),
                     ]
                 ),

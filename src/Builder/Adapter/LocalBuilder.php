@@ -21,7 +21,7 @@ class LocalBuilder extends AbstractBuilder
         $adapterClass = $this->serverInfo->getAdapterClass();
 
         return new $adapterClass(
-            $this->serverInfo->getOption(LocalInfo::ROOT_DIR)
+            $this->serverInfo->getOption(LocalInfo::ROOT_DIR_KEY)
         );
     }
 
@@ -30,15 +30,15 @@ class LocalBuilder extends AbstractBuilder
         $adapterClass = $this->serverInfo->getAdapterClass();
 
         return new $adapterClass(
-            $this->serverInfo->getOption(LocalInfo::ROOT_DIR),
-            $this->serverInfo->hasOption(LocalInfo::VISIBILITY)
-                ? PortableVisibilityConverter::fromArray($this->serverInfo->getOption(LocalInfo::VISIBILITY))
+            $this->serverInfo->getOption(LocalInfo::ROOT_DIR_KEY),
+            $this->serverInfo->hasOption(LocalInfo::VISIBILITY_KEY)
+                ? PortableVisibilityConverter::fromArray($this->serverInfo->getOption(LocalInfo::VISIBILITY_KEY))
                 : null,
-            $this->serverInfo->hasOption(LocalInfo::WRITE_FLAGS)
-                ? $this->serverInfo->getOption(LocalInfo::WRITE_FLAGS)
+            $this->serverInfo->hasOption(LocalInfo::WRITE_FLAGS_KEY)
+                ? $this->serverInfo->getOption(LocalInfo::WRITE_FLAGS_KEY)
                 : \LOCK_EX,
-            $this->serverInfo->hasOption(LocalInfo::LINK_HANDLING)
-                ? $this->serverInfo->getOption(LocalInfo::LINK_HANDLING)
+            $this->serverInfo->hasOption(LocalInfo::LINK_HANDLING_KEY)
+                ? $this->serverInfo->getOption(LocalInfo::LINK_HANDLING_KEY)
                 : $adapterClass::DISALLOW_LINKS,
         );
     }

@@ -21,7 +21,7 @@ class AwsS3Builder extends AbstractBuilder
 
         return new $adapterClass(
             $this->serverInfo->getClient(),
-            $this->serverInfo->getOption(AwsS3Info::BUCKET)
+            $this->serverInfo->getOption(AwsS3Info::BUCKET_KEY)
         );
     }
 
@@ -31,9 +31,9 @@ class AwsS3Builder extends AbstractBuilder
 
         return new $adapterClass(
             $this->serverInfo->getClient(),
-            $this->serverInfo->getOption(AwsS3Info::BUCKET),
-            $this->serverInfo->hasOption(AwsS3Info::PATH_PREFIX)
-                ? $this->serverInfo->getOption(AwsS3Info::PATH_PREFIX)
+            $this->serverInfo->getOption(AwsS3Info::BUCKET_KEY),
+            $this->serverInfo->hasOption(AwsS3Info::PATH_PREFIX_KEY)
+                ? $this->serverInfo->getOption(AwsS3Info::PATH_PREFIX_KEY)
                 : '',
             $this->serverInfo->getVisibiltyConverter()
         );

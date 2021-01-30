@@ -28,7 +28,7 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
      */
     public function buildUrl(string $filePath): ?string
     {
-        if (!$this->serverInfo->hasOption(LocalInfo::HOST)) {
+        if (!$this->serverInfo->hasOption(LocalInfo::HOST_KEY)) {
             throw new ResolveException(
                 \sprintf('Url can\'t be built for server %s - host was not defined', $this->serverInfo->getName())
             );
@@ -36,7 +36,7 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
 
         return \sprintf(
             '%s%s',
-            $this->serverInfo->getOption(LocalInfo::HOST),
+            $this->serverInfo->getOption(LocalInfo::HOST_KEY),
             $this->normalizePathForServer($filePath)
         );
     }
@@ -58,7 +58,7 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
 
         return \sprintf(
             '%s%s',
-            $this->serverInfo->getOption(LocalInfo::ROOT_DIR),
+            $this->serverInfo->getOption(LocalInfo::ROOT_DIR_KEY),
             $bucket->getDirectory()
         );
     }

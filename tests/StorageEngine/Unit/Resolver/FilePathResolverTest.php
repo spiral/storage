@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use Spiral\StorageEngine\Exception\ResolveException;
+use Spiral\StorageEngine\Exception\ValidationException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Resolver\FilePathResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
@@ -43,15 +44,15 @@ class FilePathResolverTest extends AbstractUnitTest
     }
 
     /**
-     * @throws \Spiral\StorageEngine\Exception\ResolveException
+     * @throws \Spiral\StorageEngine\Exception\ValidationException
      */
     public function testBuildServerFilePathForServerFilePath(): void
     {
         $filePath = 'aws://someDir/file1.txt';
         $resolver = new FilePathResolver(new FilePathValidator());
 
-        $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage(\sprintf('Filepath %s already contains server key', $filePath));
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('File path is not suitable by format');
 
         $resolver->buildServerFilePath('local', $filePath);
     }
