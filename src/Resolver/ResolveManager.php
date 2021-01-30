@@ -52,17 +52,17 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     /**
      * @inheritDoc
      */
-    public function buildUrlsList(array $files): \Generator
+    public function buildUrlsList(array $files, bool $throwException = true): \Generator
     {
         foreach ($files as $filePath) {
-            yield $this->buildUrl($filePath);
+            yield $this->buildUrl($filePath, $throwException);
         }
     }
 
     /**
      * @inheritDoc
      */
-    public function buildUrl(string $filePath, bool $useException = false): ?string
+    public function buildUrl(string $filePath, bool $throwException = true): ?string
     {
         try {
             $fileInfo = $this->filePathResolver->parseServerFilePathToStructure($filePath);
@@ -71,13 +71,13 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
-        } catch (ResolveException|StorageException $e) {
-            if ($useException) {
+        } catch (ResolveException | StorageException $e) {
+            if ($throwException) {
                 throw $e;
             }
         }
 
-        if ($useException) {
+        if ($throwException) {
             throw new ResolveException('Url can\'t be built by filepath ' . $filePath);
         }
 
