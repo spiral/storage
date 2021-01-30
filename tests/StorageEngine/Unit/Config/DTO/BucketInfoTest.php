@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Config\DTO;
 
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
+use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
@@ -14,7 +15,7 @@ class BucketInfoTest extends AbstractUnitTest
 
     /**
      * @throws \ReflectionException
-     * @throws \Spiral\StorageEngine\Exception\StorageException
+     * @throws StorageException
      */
     public function testGetDirectory(): void
     {

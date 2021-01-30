@@ -182,6 +182,9 @@ class LocalInfoTest extends AbstractUnitTest
         $this->assertTrue($advancedUsage->isAdvancedUsage());
     }
 
+    /**
+     * @throws StorageException
+     */
     public function testIntParamsUsage(): void
     {
         $baseAdvancedUsage = new LocalInfo(

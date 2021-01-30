@@ -7,6 +7,7 @@ namespace Spiral\StorageEngine\Tests\Unit;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use Spiral\StorageEngine\Builder\AdapterFactory;
+use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 
@@ -15,7 +16,7 @@ class StorageEngineTest extends AbstractUnitTest
     use LocalServerBuilderTrait;
 
     /**
-     * @throws \Spiral\StorageEngine\Exception\StorageException
+     * @throws StorageException
      */
     public function testInit(): void
     {

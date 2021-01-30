@@ -139,6 +139,9 @@ class AwsS3InfoTest extends AbstractUnitTest
         $this->assertSame($visibilityConvertor, $advancedAwsS3Info->getVisibiltyConverter());
     }
 
+    /**
+     * @throws StorageException
+     */
     public function testGetClient(): void
     {
         $options = [

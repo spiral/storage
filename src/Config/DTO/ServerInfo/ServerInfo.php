@@ -123,10 +123,8 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
             return static::REQUIRED_OPTIONS[$option];
         }
 
-        if (array_key_exists($option, static::ADDITIONAL_OPTIONS)) {
-            return static::ADDITIONAL_OPTIONS[$option];
-        }
-
-        return null;
+        return array_key_exists($option, static::ADDITIONAL_OPTIONS)
+            ? static::ADDITIONAL_OPTIONS[$option]
+            : null;
     }
 }

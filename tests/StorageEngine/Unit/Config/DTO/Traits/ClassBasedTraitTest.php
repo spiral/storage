@@ -22,6 +22,9 @@ class ClassBasedTraitTest extends AbstractUnitTest
         $this->trait = $this->getMockForTrait(ClassBasedTrait::class);
     }
 
+    /**
+     * @throws StorageException
+     */
     public function testSetClass(): void
     {
         $this->assertInstanceOf(get_class($this->trait), $this->trait->setClass(static::class));
@@ -39,6 +42,9 @@ class ClassBasedTraitTest extends AbstractUnitTest
         $this->trait->setClass($wrongClass);
     }
 
+    /**
+     * @throws StorageException
+     */
     public function testGetClass(): void
     {
         $this->trait->setClass(static::class);

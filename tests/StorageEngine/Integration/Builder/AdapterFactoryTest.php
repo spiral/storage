@@ -7,9 +7,11 @@ namespace Spiral\StorageEngine\Tests\Integration\Builder;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemException;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\TestCase;
+use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 
@@ -27,8 +29,8 @@ class AdapterFactoryTest extends TestCase
     }
 
     /**
-     * @throws \League\Flysystem\FilesystemException
-     * @throws \Spiral\StorageEngine\Exception\StorageException
+     * @throws FilesystemException
+     * @throws StorageException
      */
     public function testBuildLocalServer(): void
     {
@@ -37,8 +39,8 @@ class AdapterFactoryTest extends TestCase
     }
 
     /**
-     * @throws \League\Flysystem\FilesystemException
-     * @throws \Spiral\StorageEngine\Exception\StorageException
+     * @throws FilesystemException
+     * @throws StorageException
      */
     private function checkLocalServerListing(): void
     {
@@ -132,8 +134,8 @@ class AdapterFactoryTest extends TestCase
     }
 
     /**
-     * @throws \League\Flysystem\FilesystemException
-     * @throws \Spiral\StorageEngine\Exception\StorageException
+     * @throws FilesystemException
+     * @throws StorageException
      */
     private function checkLocalServerRead(): void
     {

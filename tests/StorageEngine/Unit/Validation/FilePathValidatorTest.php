@@ -16,7 +16,7 @@ class FilePathValidatorTest extends AbstractUnitTest
      * @param string $filePath
      * @param bool $expectedResult
      *
-     * @throws \Spiral\StorageEngine\Exception\ValidationException
+     * @throws ValidationException
      */
     public function testValidateFilePath(string $filePath, bool $expectedResult): void
     {
@@ -40,7 +40,7 @@ class FilePathValidatorTest extends AbstractUnitTest
      * @param string $filePath
      * @param bool $expectedResult
      *
-     * @throws \Spiral\StorageEngine\Exception\ValidationException
+     * @throws ValidationException
      */
     public function testValidateServerFilePath(string $filePath, bool $expectedResult): void
     {

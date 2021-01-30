@@ -7,6 +7,7 @@ namespace Spiral\StorageEngine\Tests\Unit\Bootloader;
 use League\Flysystem\MountManager;
 use Spiral\StorageEngine\Bootloader\StorageEngineBootloader;
 use Spiral\StorageEngine\Config\StorageConfig;
+use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
@@ -16,7 +17,7 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
     use LocalServerBuilderTrait;
 
     /**
-     * @throws \Spiral\StorageEngine\Exception\StorageException
+     * @throws StorageException
      */
     public function testInit(): void
     {
@@ -40,7 +41,7 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
     }
 
     /**
-     * @throws \Spiral\StorageEngine\Exception\StorageException
+     * @throws StorageException
      */
     public function testGetMountManager(): void
     {
