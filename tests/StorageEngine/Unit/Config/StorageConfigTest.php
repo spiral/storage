@@ -7,12 +7,10 @@ namespace Spiral\StorageEngine\Tests\Unit\Config;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ClassBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
@@ -64,7 +62,6 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     $localServer => [
-                        ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
                         ServerInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
                         OptionsBasedInterface::OPTIONS_KEY => [
                             LocalInfo::ROOT_DIR_KEY => $rootDir,
@@ -85,59 +82,6 @@ class StorageConfigTest extends AbstractUnitTest
      * @throws \ReflectionException
      * @throws StorageException
      */
-    public function testBuildServerInfoNoDriver(): void
-    {
-        $localServer = 'local';
-
-        $config = new StorageConfig(
-            [
-                'servers' => [
-                    $localServer => [
-                        ServerInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    ],
-                ],
-            ]
-        );
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(
-            'Driver can\'t be identified for server ' . $localServer
-        );
-
-        $config->buildServerInfo($localServer);
-    }
-
-    /**
-     * @throws \ReflectionException
-     * @throws StorageException
-     */
-    public function testBuildServerInfoUnknownDriver(): void
-    {
-        $localServer = 'local';
-
-        $config = new StorageConfig(
-            [
-                'servers' => [
-                    $localServer => [
-                        ServerInfoInterface::DRIVER_KEY => 'missingAdapter',
-                        ServerInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    ],
-                ],
-            ]
-        );
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(
-            'Driver can\'t be identified for server ' . $localServer
-        );
-
-        $config->buildServerInfo($localServer);
-    }
-
-    /**
-     * @throws \ReflectionException
-     * @throws StorageException
-     */
     public function testBuildServerInfoUnknownAdapter(): void
     {
         $anotherServer = 'another';
@@ -146,7 +90,6 @@ class StorageConfigTest extends AbstractUnitTest
             [
                 'servers' => [
                     'local' => [
-                        ServerInfoInterface::DRIVER_KEY => AdapterName::LOCAL,
                         ServerInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
                     ],
                 ],

@@ -10,7 +10,6 @@ use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
@@ -34,7 +33,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
@@ -63,7 +61,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AsyncAwsS3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
@@ -92,7 +89,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
@@ -129,7 +125,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AsyncAwsS3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
@@ -155,7 +150,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
@@ -189,7 +183,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             $serverName,
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
@@ -213,7 +206,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             $serverName,
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
@@ -233,7 +225,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_KEY => 'someBucket',
                     AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
@@ -255,7 +246,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_KEY => 'someBucket',
                     AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
@@ -284,7 +274,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_KEY => 'someBucket',
                     AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
@@ -303,7 +292,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_KEY => 'debugBucket',
                     AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
@@ -317,7 +305,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             'someServer',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
                 AwsS3Info::OPTIONS_KEY => [
                     AwsS3Info::BUCKET_KEY => 'debugBucket',
                     AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),

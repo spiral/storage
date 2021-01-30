@@ -25,7 +25,6 @@ return [
     'servers' => [
         'aws' => [
             'adapter' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
-            'driver' => \Spiral\StorageEngine\Enum\AdapterName::LOCAL,
             'options' => [
                 'rootDir' => '/tmp/',
                 'host' => 'http://localhost/files/',
@@ -42,7 +41,6 @@ return [
     'servers' => [
         'aws' => [
             'adapter' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
-            'driver' => \Spiral\StorageEngine\Enum\AdapterName::LOCAL,
             'options' => [
                 'rootDir' => '/tmp/',
                 'host' => 'http://localhost/files/',

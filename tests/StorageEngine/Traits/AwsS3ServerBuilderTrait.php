@@ -10,7 +10,6 @@ use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Enum\AdapterName;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
@@ -32,7 +31,6 @@ trait AwsS3ServerBuilderTrait
     {
         return [
             AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-            AwsS3Info::DRIVER_KEY => AdapterName::AWS_S3,
             AwsS3Info::OPTIONS_KEY => [
                 AwsS3Info::BUCKET_KEY => 'debugBucket',
                 AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
