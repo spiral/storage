@@ -11,7 +11,7 @@ To work with local file server you should use one of specific adapters:
 
 ## Required options
 - `bucket` - used bucket name
-- `client` - S3Client with options
+- `client` - S3Client 
 
 ## Additional options
 - `path-prefix` - optional path prefix
@@ -27,16 +27,15 @@ return [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'options' => [
                 'bucket' => env('AWS_BUCKET'),
-                'client' => [
-                    'class' => \Aws\S3\S3Client::class,
-                    'options' => [
+                'client' => new \Aws\S3\S3Client(
+                    [
                         'version' => 'latest',
                         'region' => env('AWS_REGION'),
                         'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
                         'use_path_style_endpoint' => true,
                         'endpoint' => env('AWS_PUBLIC_URL')
-                    ],
-                ],
+                    ]
+                ), 
             ]
         ],
     ],
@@ -52,17 +51,16 @@ return [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'options' => [
                 'bucket' => env('AWS_BUCKET'),
-                'client' => [
-                    'class' => \Aws\S3\S3Client::class,
-                    'options' => [
+                'client' => new \Aws\S3\S3Client(
+                    [
                         'version' => 'latest',
                         'region' => env('AWS_REGION'),
                         'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
                         'use_path_style_endpoint' => true,
                         'endpoint' => env('AWS_PUBLIC_URL'),
                         'url-expires' => '+48hours',
-                    ],
-                ],
+                    ]
+                ),
                 'path-prefix' => '/some/prefixDir/',
                 'visibility' => 'public',
             ]

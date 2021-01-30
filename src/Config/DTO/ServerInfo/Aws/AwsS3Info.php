@@ -20,15 +20,13 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 
     protected const REQUIRED_OPTIONS = [
         self::BUCKET_KEY => self::STRING_TYPE,
-        self::CLIENT_KEY => self::ARRAY_TYPE,
+        self::CLIENT_KEY => self::MIXED_TYPE,
     ];
 
     protected const ADDITIONAL_OPTIONS = [
         self::PATH_PREFIX_KEY => self::STRING_TYPE,
         self::VISIBILITY_KEY => self::ARRAY_TYPE,
     ];
-
-    protected AwsClientInfo $clientInfo;
 
     protected ?AwsVisibilityConverter $visibilityConverter = null;
 
@@ -44,8 +42,6 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
      */
     public function constructSpecific(array $info): void
     {
-        $this->clientInfo = new AwsClientInfo($this->getOption(static::CLIENT_KEY));
-
         if ($this->hasOption(static::VISIBILITY_KEY)) {
             $this->visibilityConverter = new AwsVisibilityConverter($this->getOption(static::VISIBILITY_KEY));
         }
@@ -67,7 +63,7 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 
     public function getClient()
     {
-        return $this->clientInfo->getClient();
+        return $this->getOption(static::CLIENT_KEY);
     }
 
     /**

@@ -33,21 +33,18 @@ trait AwsS3ServerBuilderTrait
             AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
             AwsS3Info::OPTIONS_KEY => [
                 AwsS3Info::BUCKET_KEY => 'debugBucket',
-                AwsS3Info::CLIENT_KEY => $this->getAwsS3ClientDescription(),
+                AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
             ],
         ];
     }
 
-    protected function getAwsS3ClientDescription(): array
+    protected function getAwsS3Client(): S3Client
     {
-        return [
-            AwsS3Info::CLASS_KEY => S3Client::class,
-            AwsS3Info::OPTIONS_KEY => [
-                'credentials' => new Credentials('someKey', 'someSecret'),
-                'version' => 'latest',
-                'region' => 'west',
-            ],
-        ];
+        return new S3Client([
+            'credentials' => new Credentials('someKey', 'someSecret'),
+            'version' => 'latest',
+            'region' => 'west',
+        ]);
     }
 
     protected function getAwsS3VisibilityOption(): array
