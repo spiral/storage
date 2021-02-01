@@ -13,7 +13,7 @@ StorageEngine based on 2 classes:
     * build server path for filepaths storage
     * parse file path from db format to identify used server
     * build url for file download
-    * can be replaced with your specific class by implementing `\Spiral\StorageEngine\Resolver\ResolveManagerInterface` and binding it
+    * can be replaced with your specific class by implementing `\Spiral\StorageEngine\ResolveManagerInterface` and binding it
 
 # Supported file servers
 Current release provides ability to work with:
