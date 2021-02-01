@@ -7,17 +7,18 @@ namespace Spiral\StorageEngine;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\MountManager;
 use Spiral\Core\Container\SingletonInterface;
-use Spiral\StorageEngine\Resolver\FilePathResolverInterface;
+use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Resolver\UriResolverInterface;
 
 class StorageEngine implements StorageInterface, SingletonInterface
 {
     protected ?MountManager $mountManager = null;
 
-    private FilePathResolverInterface $filePathResolver;
+    private UriResolverInterface $uriResolver;
 
-    public function __construct(FilePathResolverInterface $filePathResolver)
+    public function __construct(UriResolverInterface $uriResolver)
     {
-        $this->filePathResolver = $filePathResolver;
+        $this->uriResolver = $uriResolver;
     }
 
     /**
@@ -28,13 +29,53 @@ class StorageEngine implements StorageInterface, SingletonInterface
         $this->mountManager = new MountManager($servers);
     }
 
-    public function isInitiated(): bool
+    /**
+     * @param bool $throwException
+     *
+     * @return bool
+     *
+     * @throws StorageException
+     */
+    public function isInitiated($throwException = true): bool
     {
-        return $this->mountManager instanceof MountManager;
+        $result = $this->mountManager instanceof FilesystemOperator;
+
+        if (!$result && $throwException) {
+            throw new StorageException('Storage engine was not initiated!');
+        }
+
+        return $result;
     }
 
-    public function getMountManager(): ?MountManager
+    public function getMountManager(): ?FilesystemOperator
     {
         return $this->mountManager;
+    }
+
+    /**
+     * @param string $uri
+     *
+     * @return bool
+     *
+     * @throws StorageException
+     */
+    public function fileExists(string $uri): bool
+    {
+        try {
+            $this->isInitiated();
+
+            $uriStructure = $this->uriResolver->parseUriToStructure($uri);
+
+            return $this->getMountManager()->fileExists(
+                $this->uriResolver->buildUri(
+                    $uriStructure->serverName,
+                    $uriStructure->filePath
+                )
+            );
+        } catch (StorageException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            throw new StorageException($e->getMessage(), $e->getCode());
+        }
     }
 }

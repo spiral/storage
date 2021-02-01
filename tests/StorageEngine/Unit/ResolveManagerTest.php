@@ -11,14 +11,12 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
-use Spiral\StorageEngine\Resolver\FilePathResolver;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\ResolveManager;
-use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class ResolveManagerTest extends AbstractUnitTest
 {
@@ -152,16 +150,17 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testBuildUrlThrowException(): void
     {
-        $filePath = 'someServer:/+/someFile.txt';
+        $uri = 'someServer:/+/someFile.txt';
 
         $resolveManager = $this->buildResolveManager(
             [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
         );
 
         $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage('Url can\'t be built by filepath ' . $filePath);
+        $this->expectExceptionMessage(
+            \sprintf('File %s can\'t be identified', $uri));
 
-        $resolveManager->buildUrl($filePath);
+        $resolveManager->buildUrl($uri);
     }
 
     /**
@@ -251,7 +250,7 @@ class ResolveManagerTest extends AbstractUnitTest
 
         return new ResolveManager(
             $this->buildStorageConfig($servers),
-            $this->getFilePathResolver(),
+            $this->getUriResolver(),
             $filePathValidator
         );
     }

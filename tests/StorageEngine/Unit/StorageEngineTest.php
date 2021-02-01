@@ -22,9 +22,9 @@ class StorageEngineTest extends AbstractUnitTest
     {
         $localInfo = $this->buildLocalInfo('local');
 
-        $engine = new StorageEngine($this->getFilePathResolver());
+        $engine = new StorageEngine($this->getUriResolver());
 
-        $this->assertFalse($engine->isInitiated());
+        $this->assertFalse($engine->isInitiated(false));
         $this->assertNull($engine->getMountManager());
 
         $engine->init(
@@ -35,11 +35,24 @@ class StorageEngineTest extends AbstractUnitTest
             ]
         );
 
-        $this->assertTrue($engine->isInitiated());
+        $this->assertTrue($engine->isInitiated(false));
 
         $mountManager = $engine->getMountManager();
 
         $this->assertInstanceOf(MountManager::class, $mountManager);
         $this->assertSame($mountManager, $engine->getMountManager());
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testIsInitiatedThrowsException(): void
+    {
+        $engine = new StorageEngine($this->getUriResolver());
+
+        $this->expectExceptionMessage(StorageException::class);
+        $this->expectExceptionMessage('Storage engine was not initiated!');
+
+        $engine->isInitiated();
     }
 }

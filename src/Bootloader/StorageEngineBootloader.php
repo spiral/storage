@@ -10,8 +10,8 @@ use Spiral\Boot\Bootloader\Bootloader;
 use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\FilePathResolver;
-use Spiral\StorageEngine\Resolver\FilePathResolverInterface;
+use Spiral\StorageEngine\Resolver\UriResolver;
+use Spiral\StorageEngine\Resolver\UriResolverInterface;
 use Spiral\StorageEngine\ResolveManager;
 use Spiral\StorageEngine\ResolveManagerInterface;
 use Spiral\StorageEngine\StorageEngine;
@@ -24,7 +24,7 @@ class StorageEngineBootloader extends Bootloader
     protected const BINDINGS = [
         StorageInterface::class => StorageEngine::class,
         ResolveManagerInterface::class => ResolveManager::class,
-        FilePathResolverInterface::class => FilePathResolver::class,
+        UriResolverInterface::class => UriResolver::class,
         FilesystemOperator::class => [self::class, 'getMountManager'],
         FilePathValidatorInterface::class => FilePathValidator::class,
     ];

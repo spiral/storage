@@ -16,7 +16,7 @@ class AwsS3Resolver extends AbstractResolver
      */
     protected ServerInfoInterface $serverInfo;
 
-    public function buildUrl(string $filePath): ?string
+    public function buildUrl(string $uri): ?string
     {
         $s3Client = $this->serverInfo->getClient();
 
@@ -26,7 +26,7 @@ class AwsS3Resolver extends AbstractResolver
                     'GetObject',
                     [
                         'Bucket' => $this->serverInfo->getOption(AwsS3Info::BUCKET_KEY),
-                        'Key' => $this->normalizePathForServer($filePath),
+                        'Key' => $this->normalizeFilePathToUri($uri),
                     ]
                 ),
                 $this->serverInfo->getUrlExpires()

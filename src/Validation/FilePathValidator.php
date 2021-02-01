@@ -12,7 +12,7 @@ class FilePathValidator implements SingletonInterface, FilePathValidatorInterfac
     public const SERVER_PATTERN = '(?\'' . self::FILE_PATH_SERVER_PART . '\'[\w\-]*)';
     public const FILE_PATH_PATTERN = '(?\'' . self::FILE_PATH_PART . '\'[\w\-+_\(\)\/\.,=\*\s]*)';
 
-    public const SERVER_FILE_PATH_PATTERN = '/^' . self::SERVER_PATTERN . ':\/\/' . self::FILE_PATH_PATTERN . '$/';
+    public const URI_PATTERN = '/^' . self::SERVER_PATTERN . ':\/\/' . self::FILE_PATH_PATTERN . '$/';
 
     /**
      * @param string $filePath
@@ -27,14 +27,14 @@ class FilePathValidator implements SingletonInterface, FilePathValidatorInterfac
     }
 
     /**
-     * @param string $filePath
+     * @param string $uri
      *
      * @throws ValidationException
      */
-    public function validateServerFilePath(string $filePath): void
+    public function validateUri(string $uri): void
     {
-        if (!preg_match($this->getServerFilePathPattern(), $filePath)) {
-            throw new ValidationException('Server file path is not suitable by format');
+        if (!preg_match($this->getUriPattern(), $uri)) {
+            throw new ValidationException('Uri is not suitable by format');
         }
     }
 
@@ -43,8 +43,8 @@ class FilePathValidator implements SingletonInterface, FilePathValidatorInterfac
         return static::FILE_PATH_PATTERN;
     }
 
-    public function getServerFilePathPattern(): string
+    public function getUriPattern(): string
     {
-        return static::SERVER_FILE_PATH_PATTERN;
+        return static::URI_PATTERN;
     }
 }

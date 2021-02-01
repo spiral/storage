@@ -22,17 +22,17 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      */
     protected array $resolvers = [];
 
-    private Resolver\FilePathResolverInterface $filePathResolver;
+    private Resolver\UriResolverInterface $uriResolver;
 
     private FilePathValidatorInterface $filePathValidator;
 
     public function __construct(
         StorageConfig $storageConfig,
-        Resolver\FilePathResolverInterface $filePathResolver,
+        Resolver\UriResolverInterface $uriResolver,
         FilePathValidatorInterface $filePathValidator
     ) {
         $this->storageConfig = $storageConfig;
-        $this->filePathResolver = $filePathResolver;
+        $this->uriResolver = $uriResolver;
         $this->filePathValidator = $filePathValidator;
     }
 
@@ -41,20 +41,20 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      */
     public function buildUrlsList(array $files, bool $throwException = true): \Generator
     {
-        foreach ($files as $filePath) {
-            yield $this->buildUrl($filePath, $throwException);
+        foreach ($files as $uri) {
+            yield $this->buildUrl($uri, $throwException);
         }
     }
 
     /**
      * @inheritDoc
      */
-    public function buildUrl(string $filePath, bool $throwException = true): ?string
+    public function buildUrl(string $uri, bool $throwException = true): ?string
     {
         try {
-            $fileInfo = $this->filePathResolver->parseServerFilePathToStructure($filePath);
+            $fileInfo = $this->uriResolver->parseUriToStructure($uri);
 
-            if ($fileInfo instanceof Resolver\DTO\ServerFilePathStructure && $fileInfo->isIdentified()) {
+            if ($fileInfo instanceof Resolver\DTO\UriStructure && $fileInfo->isIdentified()) {
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
@@ -65,7 +65,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         }
 
         if ($throwException) {
-            throw new ResolveException('Url can\'t be built by filepath ' . $filePath);
+            throw new ResolveException('Url can\'t be built by uri ' . $uri);
         }
 
         return null;

@@ -11,7 +11,7 @@ use Spiral\StorageEngine\Validation\FilePathValidator;
 class FilePathValidatorTest extends AbstractUnitTest
 {
     /**
-     * @dataProvider getFilePathValidateList
+     * @dataProvider getFilePathListToValidate
      *
      * @param string $filePath
      * @param bool $expectedResult
@@ -35,30 +35,30 @@ class FilePathValidatorTest extends AbstractUnitTest
     }
 
     /**
-     * @dataProvider getServerFilePathValidateList
+     * @dataProvider getUriListToValidate
      *
      * @param string $filePath
      * @param bool $expectedResult
      *
      * @throws ValidationException
      */
-    public function testValidateServerFilePath(string $filePath, bool $expectedResult): void
+    public function testValidateUri(string $filePath, bool $expectedResult): void
     {
         $filePathValidator = $this->getFilePathValidator();
 
         if (!$expectedResult) {
             $this->expectException(ValidationException::class);
-            $this->expectExceptionMessage('Server file path is not suitable by format');
+            $this->expectExceptionMessage('Uri is not suitable by format');
         }
 
-        $filePathValidator->validateServerFilePath($filePath);
+        $filePathValidator->validateUri($filePath);
 
         if ($expectedResult === true) {
             $this->expectNotToPerformAssertions();
         }
     }
 
-    public function getFilePathValidateList(): array
+    public function getFilePathListToValidate(): array
     {
         return [
             ['file.txt', true],
@@ -70,7 +70,7 @@ class FilePathValidatorTest extends AbstractUnitTest
         ];
     }
 
-    public function getServerFilePathValidateList(): array
+    public function getUriListToValidate(): array
     {
         return [
             ['aws://file.txt', true],

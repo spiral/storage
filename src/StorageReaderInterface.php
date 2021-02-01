@@ -6,4 +6,5 @@ namespace Spiral\StorageEngine;
 
 interface StorageReaderInterface
 {
+    public function fileExists(string $uri): bool;
 }

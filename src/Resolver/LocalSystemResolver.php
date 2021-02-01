@@ -20,13 +20,13 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
     protected ServerInfoInterface $serverInfo;
 
     /**
-     * @param string $filePath
+     * @param string $uri
      *
      * @return string|null
      *
      * @throws ResolveException
      */
-    public function buildUrl(string $filePath): ?string
+    public function buildUrl(string $uri): ?string
     {
         if (!$this->serverInfo->hasOption(LocalInfo::HOST_KEY)) {
             throw new ResolveException(
@@ -37,7 +37,7 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
         return \sprintf(
             '%s%s',
             $this->serverInfo->getOption(LocalInfo::HOST_KEY),
-            $this->normalizePathForServer($filePath)
+            $this->normalizeFilePathToUri($uri)
         );
     }
 

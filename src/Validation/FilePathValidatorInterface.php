@@ -13,7 +13,7 @@ interface FilePathValidatorInterface
 
     public function getFilePathPattern(): string;
 
-    public function getServerFilePathPattern(): string;
+    public function getUriPattern(): string;
 
     /**
      * @param string $filePath
@@ -23,9 +23,9 @@ interface FilePathValidatorInterface
     public function validateFilePath(string $filePath): void;
 
     /**
-     * @param string $filePath
+     * @param string $uri
      *
      * @throws ValidationException
      */
-    public function validateServerFilePath(string $filePath): void;
+    public function validateUri(string $uri): void;
 }

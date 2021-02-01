@@ -44,7 +44,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
      *
      * @param string $serverName
      * @param string $host
-     * @param string $filePath
+     * @param string $uri
      * @param string $rootDir
      * @param string $expectedUrl
      *
@@ -54,7 +54,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         string $serverName,
         string $host,
         string $rootDir,
-        string $filePath,
+        string $uri,
         string $expectedUrl
     ): void {
         $resolver = new LocalSystemResolver(
@@ -68,7 +68,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
             $this->getFilePathValidator()
         );
 
-        $this->assertEquals($expectedUrl, $resolver->buildUrl($filePath));
+        $this->assertEquals($expectedUrl, $resolver->buildUrl($uri));
     }
 
     /**
@@ -169,18 +169,18 @@ class LocalSystemResolverTest extends AbstractUnitTest
     }
 
     /**
-     * @dataProvider getFilePathListForNormalize
+     * @dataProvider getUriListForNormalize
      *
      * @param string $filePath
-     * @param string $expectedFilePath
+     * @param string $uri
      *
      * @throws StorageException
      */
-    public function testNormalizePathForServer(string $filePath, string $expectedFilePath): void
+    public function testNormalizePathForServer(string $filePath, string $uri): void
     {
         $resolver = new LocalSystemResolver($this->buildLocalInfo(), $this->getFilePathValidator());
 
-        $this->assertEquals($expectedFilePath, $resolver->normalizePathForServer($filePath));
+        $this->assertEquals($uri, $resolver->normalizeFilePathToUri($filePath));
     }
 
     public function getFileUrlList(): array
@@ -206,7 +206,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         ];
     }
 
-    public function getFilePathListForNormalize(): array
+    public function getUriListForNormalize(): array
     {
         $serverName = ServerTestInterface::SERVER_NAME;
 
