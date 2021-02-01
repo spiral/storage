@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Tests\Unit\Resolver;
+namespace Spiral\StorageEngine\Tests\Unit;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
@@ -17,7 +17,6 @@ use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
-use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 use Spiral\StorageEngine\ResolveManager;
 use Spiral\StorageEngine\Validation\FilePathValidator;
 
@@ -139,16 +138,13 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testBuildUrlUnknownServerNoException(): void
     {
-        $unknownServer = 'unknownServer';
-
         $resolveManager = $this->buildResolveManager(
             [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
         );
 
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server %s was not found', $unknownServer));
-
-        $resolveManager->buildUrl('unknownServer://someFile.txt', false);
+        $this->assertNull(
+            $resolveManager->buildUrl('unknownServer://someFile.txt', false)
+        );
     }
 
     /**
@@ -161,7 +157,6 @@ class ResolveManagerTest extends AbstractUnitTest
         $resolveManager = $this->buildResolveManager(
             [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
         );
-
 
         $this->expectException(ResolveException::class);
         $this->expectExceptionMessage('Url can\'t be built by filepath ' . $filePath);
@@ -179,6 +174,21 @@ class ResolveManagerTest extends AbstractUnitTest
         );
 
         $this->assertNull($resolveManager->buildUrl('unknownServer:\\/someFile.txt', false));
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testBuildUrlWrongFormatServerThrowsException(): void
+    {
+        $resolveManager = $this->buildResolveManager(
+            [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+        );
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Server unknownServer was not found');
+
+        $resolveManager->buildUrl('unknownServer://someFile.txt');
     }
 
     public function getFileLists(): array
