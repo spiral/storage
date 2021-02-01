@@ -29,7 +29,7 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
             ]
         );
 
-        $engine = new StorageEngine();
+        $engine = new StorageEngine($this->getFilePathResolver());
 
         $this->assertFalse($engine->isInitiated());
 
@@ -53,7 +53,7 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
             ]
         );
 
-        $engine = new StorageEngine();
+        $engine = new StorageEngine($this->getFilePathResolver());
 
         $bootloader = new StorageEngineBootloader($config);
 

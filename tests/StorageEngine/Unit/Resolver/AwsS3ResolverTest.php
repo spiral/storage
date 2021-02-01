@@ -34,7 +34,7 @@ class AwsS3ResolverTest extends AbstractUnitTest
             )
         );
 
-        new AwsS3Resolver($this->buildLocalInfo(), new FilePathValidator());
+        new AwsS3Resolver($this->buildLocalInfo(), $this->getFilePathValidator());
     }
 
     /**
@@ -73,7 +73,7 @@ class AwsS3ResolverTest extends AbstractUnitTest
 
         $resolver = new AwsS3Resolver(
             new AwsS3Info($serverName, $serverDescription),
-            new FilePathValidator()
+            $this->getFilePathValidator()
         );
 
         $this->assertEquals($uri, $resolver->buildUrl('somefile.txt'));

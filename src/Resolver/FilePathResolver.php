@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
+use Spiral\Core\Container\SingletonInterface;
 use Spiral\StorageEngine\Exception\ValidationException;
 use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
-class FilePathResolver implements FilePathResolverInterface
+class FilePathResolver implements FilePathResolverInterface, SingletonInterface
 {
     public const SERVER_PATH_SEPARATOR = '://';
 

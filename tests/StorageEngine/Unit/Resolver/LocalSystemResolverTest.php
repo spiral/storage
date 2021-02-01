@@ -36,7 +36,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
             )
         );
 
-        new LocalSystemResolver($this->buildAwsS3Info(), new FilePathValidator());
+        new LocalSystemResolver($this->buildAwsS3Info(), $this->getFilePathValidator());
     }
 
     /**
@@ -65,7 +65,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
                     LocalInfo::HOST_KEY => $host,
                 ],
             ]),
-            new FilePathValidator()
+            $this->getFilePathValidator()
         );
 
         $this->assertEquals($expectedUrl, $resolver->buildUrl($filePath));
@@ -83,7 +83,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
                     LocalInfo::ROOT_DIR_KEY => 'rootDir',
                 ],
             ]),
-            new FilePathValidator()
+            $this->getFilePathValidator()
         );
 
         $this->expectException(ResolveException::class);
@@ -119,7 +119,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
                     ],
                 ],
             ]),
-            new FilePathValidator()
+            $this->getFilePathValidator()
         );
 
         $this->assertEquals(
@@ -157,7 +157,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
                     ],
                 ],
             ]),
-            new FilePathValidator()
+            $this->getFilePathValidator()
         );
 
         $this->expectException(StorageException::class);
@@ -178,7 +178,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
      */
     public function testNormalizePathForServer(string $filePath, string $expectedFilePath): void
     {
-        $resolver = new LocalSystemResolver($this->buildLocalInfo(), new FilePathValidator());
+        $resolver = new LocalSystemResolver($this->buildLocalInfo(), $this->getFilePathValidator());
 
         $this->assertEquals($expectedFilePath, $resolver->normalizePathForServer($filePath));
     }

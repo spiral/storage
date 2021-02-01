@@ -20,7 +20,7 @@ class FilePathValidatorTest extends AbstractUnitTest
      */
     public function testValidateFilePath(string $filePath, bool $expectedResult): void
     {
-        $filePathValidator = new FilePathValidator();
+        $filePathValidator = $this->getFilePathValidator();
 
         if (!$expectedResult) {
             $this->expectException(ValidationException::class);
@@ -44,7 +44,7 @@ class FilePathValidatorTest extends AbstractUnitTest
      */
     public function testValidateServerFilePath(string $filePath, bool $expectedResult): void
     {
-        $filePathValidator = new FilePathValidator();
+        $filePathValidator = $this->getFilePathValidator();
 
         if (!$expectedResult) {
             $this->expectException(ValidationException::class);

@@ -18,7 +18,7 @@ class ServerFilePathStructureTest extends AbstractUnitTest
      */
     public function testIsIdentified(string $filePath, bool $expectedResult): void
     {
-        $filePathValidator = new FilePathValidator();
+        $filePathValidator = $this->getFilePathValidator();
 
         $structure = new ServerFilePathStructure($filePath, $filePathValidator->getServerFilePathPattern());
 

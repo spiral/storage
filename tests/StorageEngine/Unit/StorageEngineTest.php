@@ -22,7 +22,7 @@ class StorageEngineTest extends AbstractUnitTest
     {
         $localInfo = $this->buildLocalInfo('local');
 
-        $engine = new StorageEngine();
+        $engine = new StorageEngine($this->getFilePathResolver());
 
         $this->assertFalse($engine->isInitiated());
         $this->assertNull($engine->getMountManager());

@@ -7,10 +7,18 @@ namespace Spiral\StorageEngine;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\MountManager;
 use Spiral\Core\Container\SingletonInterface;
+use Spiral\StorageEngine\Resolver\FilePathResolverInterface;
 
-class StorageEngine implements SingletonInterface
+class StorageEngine implements StorageInterface, SingletonInterface
 {
-    private ?MountManager $mountManager = null;
+    protected ?MountManager $mountManager = null;
+
+    private FilePathResolverInterface $filePathResolver;
+
+    public function __construct(FilePathResolverInterface $filePathResolver)
+    {
+        $this->filePathResolver = $filePathResolver;
+    }
 
     /**
      * @param array<string, FilesystemOperator> $servers

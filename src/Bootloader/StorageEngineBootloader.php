@@ -15,12 +15,14 @@ use Spiral\StorageEngine\Resolver\FilePathResolverInterface;
 use Spiral\StorageEngine\ResolveManager;
 use Spiral\StorageEngine\ResolveManagerInterface;
 use Spiral\StorageEngine\StorageEngine;
+use Spiral\StorageEngine\StorageInterface;
 use Spiral\StorageEngine\Validation\FilePathValidator;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class StorageEngineBootloader extends Bootloader
 {
     protected const BINDINGS = [
+        StorageInterface::class => StorageEngine::class,
         ResolveManagerInterface::class => ResolveManager::class,
         FilePathResolverInterface::class => FilePathResolver::class,
         FilesystemOperator::class => [self::class, 'getMountManager'],
@@ -35,11 +37,11 @@ class StorageEngineBootloader extends Bootloader
     }
 
     /**
-     * @param StorageEngine $storageEngine
+     * @param StorageInterface $storageEngine
      *
      * @throws StorageException
      */
-    public function boot(StorageEngine $storageEngine): void
+    public function boot(StorageInterface $storageEngine): void
     {
         $servers = [];
 
@@ -52,7 +54,7 @@ class StorageEngineBootloader extends Bootloader
         $storageEngine->init($servers);
     }
 
-    public function getMountManager(StorageEngine $storageEngine): ?FilesystemOperator
+    public function getMountManager(StorageInterface $storageEngine): ?FilesystemOperator
     {
         return $storageEngine->getMountManager();
     }

@@ -21,7 +21,7 @@ class FilePathResolverTest extends AbstractUnitTest
      */
     public function testParseFilePath(string $filePath, ?ServerFilePathStructure $filePathStructure = null): void
     {
-        $resolver = new FilePathResolver(new FilePathValidator());
+        $resolver = $this->getFilePathResolver();
 
         $this->assertEquals($filePathStructure, $resolver->parseServerFilePathToStructure($filePath));
     }
@@ -37,7 +37,7 @@ class FilePathResolverTest extends AbstractUnitTest
      */
     public function testBuildServerFilePath(string $server, string $filePath, string $expectedFilePath): void
     {
-        $resolver = new FilePathResolver(new FilePathValidator());
+        $resolver = $this->getFilePathResolver();
 
         $this->assertEquals($expectedFilePath, $resolver->buildServerFilePath($server, $filePath));
     }
@@ -48,7 +48,7 @@ class FilePathResolverTest extends AbstractUnitTest
     public function testBuildServerFilePathForServerFilePath(): void
     {
         $filePath = 'aws://someDir/file1.txt';
-        $resolver = new FilePathResolver(new FilePathValidator());
+        $resolver = $this->getFilePathResolver();
 
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('File path is not suitable by format');
@@ -58,7 +58,7 @@ class FilePathResolverTest extends AbstractUnitTest
 
     public function getServerFilePathsList(): array
     {
-        $filePathValidator = new FilePathValidator();
+        $filePathValidator = $this->getFilePathValidator();
 
         $fileTxt = 'file.txt';
         $dirFile = 'some/debug/dir/file1.csv';

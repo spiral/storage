@@ -247,11 +247,11 @@ class ResolveManagerTest extends AbstractUnitTest
 
     private function buildResolveManager(?array $servers = null): ResolveManager
     {
-        $filePathValidator = new FilePathValidator();
+        $filePathValidator = $this->getFilePathValidator();
 
         return new ResolveManager(
             $this->buildStorageConfig($servers),
-            new FilePathResolver($filePathValidator),
+            $this->getFilePathResolver(),
             $filePathValidator
         );
     }

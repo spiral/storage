@@ -25,8 +25,8 @@ interface ResolveManagerInterface
     /**
      * @param string $filePath
      * @param bool $throwException
-     *  true - throw exception in case any url can't be built
-     *  false - return null instead of url in case one url can't be built
+     *  true - throw exception in case url can't be built
+     *  false - return null instead of url in case url can't be built
      *
      * @return string|null
      *
