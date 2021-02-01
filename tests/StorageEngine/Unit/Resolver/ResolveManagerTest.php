@@ -18,7 +18,7 @@ use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
-use Spiral\StorageEngine\Resolver\ResolveManager;
+use Spiral\StorageEngine\ResolveManager;
 use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class ResolveManagerTest extends AbstractUnitTest
@@ -34,23 +34,24 @@ class ResolveManagerTest extends AbstractUnitTest
     private const LOCAL_SERVER_HOST_2 = 'http://my.images.com/';
 
     /**
-     * @throws StorageException
+     * @throws \ReflectionException
      */
     public function testGetResolver(): void
     {
+        $serverName = 'local';
+
         $resolveManager = $this->buildResolveManager(
-            ['local' => $this->buildLocalInfoDescription()]
+            [$serverName => $this->buildLocalInfoDescription()]
         );
 
-        $resolver = $resolveManager->getResolver('local');
+        $resolver = $this->callNotPublicMethod($resolveManager, 'getResolver', [$serverName]);
         $this->assertInstanceOf(LocalSystemResolver::class, $resolver);
-        $this->assertSame($resolver, $resolveManager->getResolver('local'));
+        $this->assertSame(
+            $resolver,
+            $this->callNotPublicMethod($resolveManager, 'getResolver', [$serverName])
+        );
     }
 
-    /**
-     * @throws ResolveException
-     * @throws StorageException
-     */
     public function testGetResolverFailed(): void
     {
         $resolveManager = $this->buildResolveManager(
@@ -62,7 +63,7 @@ class ResolveManagerTest extends AbstractUnitTest
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(\sprintf('Server %s was not found', $missedServer));
 
-        $resolveManager->getResolver($missedServer);
+        $this->callNotPublicMethod($resolveManager, 'getResolver', [$missedServer]);
     }
 
     /**

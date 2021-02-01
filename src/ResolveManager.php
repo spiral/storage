@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\StorageEngine;
 
 use Spiral\Core\Container\SingletonInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\DTO\ServerFilePathStructure;
+use Spiral\StorageEngine\Resolver as Resolver;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
@@ -17,36 +17,22 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     protected StorageConfig $storageConfig;
 
     /**
-     * @var ResolverInterface[]
+     * @var Resolver\ResolverInterface[]
      */
     protected array $resolvers = [];
 
-    private FilePathResolverInterface $filePathResolver;
+    private Resolver\FilePathResolverInterface $filePathResolver;
 
     private FilePathValidatorInterface $filePathValidator;
 
     public function __construct(
         StorageConfig $storageConfig,
-        FilePathResolverInterface $filePathResolver,
+        Resolver\FilePathResolverInterface $filePathResolver,
         FilePathValidatorInterface $filePathValidator
     ) {
         $this->storageConfig = $storageConfig;
         $this->filePathResolver = $filePathResolver;
         $this->filePathValidator = $filePathValidator;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getResolver(string $serverKey): ResolverInterface
-    {
-        if (!array_key_exists($serverKey, $this->resolvers)) {
-            $this->resolvers[$serverKey] = $this->prepareResolverByServerInfo(
-                $this->storageConfig->buildServerInfo($serverKey)
-            );
-        }
-
-        return $this->resolvers[$serverKey];
     }
 
     /**
@@ -67,7 +53,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         try {
             $fileInfo = $this->filePathResolver->parseServerFilePathToStructure($filePath);
 
-            if ($fileInfo instanceof ServerFilePathStructure && $fileInfo->isIdentified()) {
+            if ($fileInfo instanceof Resolver\DTO\ServerFilePathStructure && $fileInfo->isIdentified()) {
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
@@ -85,21 +71,40 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     }
 
     /**
-     * @param ServerInfoInterface $serverInfo
+     * @param string $serverKey
      *
-     * @return ResolverInterface
+     * @return Resolver\ResolverInterface
      *
      * @throws ResolveException
      * @throws StorageException
      */
-    protected function prepareResolverByServerInfo(ServerInfoInterface $serverInfo): ResolverInterface
+    protected function getResolver(string $serverKey): Resolver\ResolverInterface
+    {
+        if (!array_key_exists($serverKey, $this->resolvers)) {
+            $this->resolvers[$serverKey] = $this->prepareResolverByServerInfo(
+                $this->storageConfig->buildServerInfo($serverKey)
+            );
+        }
+
+        return $this->resolvers[$serverKey];
+    }
+
+    /**
+     * @param ServerInfoInterface $serverInfo
+     *
+     * @return Resolver\ResolverInterface
+     *
+     * @throws ResolveException
+     * @throws StorageException
+     */
+    protected function prepareResolverByServerInfo(ServerInfoInterface $serverInfo): Resolver\ResolverInterface
     {
         switch ($serverInfo->getAdapterClass()) {
             case \League\Flysystem\Local\LocalFilesystemAdapter::class:
-                return new LocalSystemResolver($serverInfo, $this->filePathValidator);
+                return new Resolver\LocalSystemResolver($serverInfo, $this->filePathValidator);
             case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
             case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
-                return new AwsS3Resolver($serverInfo, $this->filePathValidator);
+                return new Resolver\AwsS3Resolver($serverInfo, $this->filePathValidator);
             default:
                 throw new ResolveException(
                     'No resolver was detected by provided adapter for server ' . $serverInfo->getName()

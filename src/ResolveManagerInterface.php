@@ -2,23 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\StorageEngine;
 
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 
 interface ResolveManagerInterface
 {
-    /**
-     * @param string $serverKey
-     *
-     * @return ResolverInterface
-     *
-     * @throws ResolveException
-     * @throws StorageException
-     */
-    public function getResolver(string $serverKey): ResolverInterface;
-
     /**
      * @param string[] $files
      * @param bool $throwException
