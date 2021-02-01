@@ -7,6 +7,7 @@ namespace Spiral\StorageEngine;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\MountManager;
 use Spiral\Core\Container\SingletonInterface;
+use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\UriResolverInterface;
 
@@ -72,10 +73,10 @@ class StorageEngine implements StorageInterface, SingletonInterface
                     $uriStructure->filePath
                 )
             );
-        } catch (StorageException $e) {
+        } catch (StorageException | ConfigException $e) {
             throw $e;
         } catch (\Throwable $e) {
-            throw new StorageException($e->getMessage(), $e->getCode());
+            throw new StorageException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

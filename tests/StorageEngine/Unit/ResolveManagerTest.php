@@ -158,7 +158,8 @@ class ResolveManagerTest extends AbstractUnitTest
 
         $this->expectException(ResolveException::class);
         $this->expectExceptionMessage(
-            \sprintf('File %s can\'t be identified', $uri));
+            \sprintf('File %s can\'t be identified', $uri)
+        );
 
         $resolveManager->buildUrl($uri);
     }
