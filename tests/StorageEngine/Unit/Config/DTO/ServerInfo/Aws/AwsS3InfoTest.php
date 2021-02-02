@@ -44,7 +44,6 @@ class AwsS3InfoTest extends AbstractUnitTest
         }
 
         $this->assertNull($serverInfo->getVisibiltyConverter());
-        $this->assertEquals('+24hours', $serverInfo->getUrlExpires());
     }
 
     /**
@@ -82,7 +81,6 @@ class AwsS3InfoTest extends AbstractUnitTest
             AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
             AwsS3Info::PATH_PREFIX_KEY => 'somePrefix',
             AwsS3Info::VISIBILITY_KEY => $this->getAwsS3VisibilityOption(),
-            AwsS3Info::URL_EXPIRES_KEY => new \DateTime('+5 days'),
         ];
 
         $serverInfo = new AwsS3Info(
@@ -95,18 +93,12 @@ class AwsS3InfoTest extends AbstractUnitTest
 
         $this->assertTrue($serverInfo->isAdvancedUsage());
         foreach ($options as $optionKey => $optionVal) {
-            if ($optionKey === AwsS3Info::URL_EXPIRES_KEY) {
-                continue;
-            }
-
             $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
         }
 
         $visibilityConvertor = $serverInfo->getVisibiltyConverter();
         $this->assertInstanceOf(PortableVisibilityConverter::class, $visibilityConvertor);
         $this->assertSame($visibilityConvertor, $serverInfo->getVisibiltyConverter());
-
-        $this->assertEquals($options[AwsS3Info::URL_EXPIRES_KEY], $serverInfo->getUrlExpires());
     }
 
     /**
@@ -160,35 +152,6 @@ class AwsS3InfoTest extends AbstractUnitTest
         $client = $serverInfo->getClient();
         $this->assertInstanceOf(S3Client::class, $client);
         $this->assertSame($client, $serverInfo->getClient());
-    }
-
-    /**
-     * @dataProvider getWrongUrlExpiresList
-     *
-     * @param string $serverName
-     * @param $expires
-     * @param string $errorMsg
-     *
-     * @throws StorageException
-     */
-    public function testWrongUrlExpires(string $serverName, $expires, string $errorMsg): void
-    {
-        $options = [
-            AwsS3Info::BUCKET_KEY => 'debugBucket',
-            AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
-            AwsS3Info::URL_EXPIRES_KEY => $expires,
-        ];
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage($errorMsg);
-
-        new AwsS3Info(
-            $serverName,
-            [
-                AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
-                AwsS3Info::OPTIONS_KEY => $options,
-            ]
-        );
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
 
-use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\SpecificConfigurableServerInfo;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -14,7 +13,6 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
     public const BUCKET_KEY = 'bucket';
     public const CLIENT_KEY = 'client';
     public const PATH_PREFIX_KEY = 'path-prefix';
-    public const URL_EXPIRES_KEY = 'url-expires';
 
     protected const SERVER_INFO_TYPE = 'awsS3';
 
@@ -45,13 +43,6 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
         if ($this->hasOption(static::VISIBILITY_KEY)) {
             $this->visibilityConverter = new AwsVisibilityConverter($this->getOption(static::VISIBILITY_KEY));
         }
-
-        if (
-            array_key_exists(static::OPTIONS_KEY, $info)
-            && array_key_exists(static::URL_EXPIRES_KEY, $info[static::OPTIONS_KEY])
-        ) {
-            $this->setUrlExpires($info[static::OPTIONS_KEY][static::URL_EXPIRES_KEY]);
-        }
     }
 
     public function getVisibiltyConverter()
@@ -64,32 +55,5 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
     public function getClient()
     {
         return $this->getOption(static::CLIENT_KEY);
-    }
-
-    /**
-     * @param string|\DateTimeInterface $expires
-     *
-     * @return $this
-     */
-    public function setUrlExpires($expires): self
-    {
-        if (empty($expires) || (!is_string($expires) && !$expires instanceof \DateTimeInterface)) {
-            throw new ConfigException(
-                'Url expires should be string or DateTimeInterface implemented object for server '
-                . $this->getName()
-            );
-        }
-
-        $this->urlExpires = $expires;
-
-        return $this;
-    }
-
-    /**
-     * @return \DateTimeInterface|string
-     */
-    public function getUrlExpires()
-    {
-        return $this->urlExpires;
     }
 }

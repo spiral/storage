@@ -21,12 +21,13 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
 
     /**
      * @param string $uri
+     * @param array $options
      *
      * @return string|null
      *
      * @throws ResolveException
      */
-    public function buildUrl(string $uri): ?string
+    public function buildUrl(string $uri, array $options = []): ?string
     {
         if (!$this->serverInfo->hasOption(LocalInfo::HOST_KEY)) {
             throw new ResolveException(

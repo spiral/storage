@@ -11,16 +11,20 @@ class AwsS3Resolver extends AbstractResolver
 {
     protected const SERVER_INFO_CLASS = AwsS3Info::class;
 
+    public const EXPIRES_OPTION = 'expires';
+
+    private const DEFAULT_URL_EXPIRES = '+24hours';
+
     /**
      * @var ServerInfoInterface|AwsS3Info
      */
     protected ServerInfoInterface $serverInfo;
 
-    public function buildUrl(string $uri): ?string
+    public function buildUrl(string $uri, array $options = []): ?string
     {
         $s3Client = $this->serverInfo->getClient();
 
-        return  (string)$s3Client
+        return (string)$s3Client
             ->createPresignedRequest(
                 $s3Client->getCommand(
                     'GetObject',
@@ -29,7 +33,9 @@ class AwsS3Resolver extends AbstractResolver
                         'Key' => $this->normalizeFilePathToUri($uri),
                     ]
                 ),
-                $this->serverInfo->getUrlExpires()
+                array_key_exists(static::EXPIRES_OPTION, $options)
+                    ? $options[static::EXPIRES_OPTION]
+                    : static::DEFAULT_URL_EXPIRES
             )
             ->getUri();
     }

@@ -62,17 +62,17 @@ class AwsS3ResolverTest extends AbstractUnitTest
 
         $requestMock = $this->createMock(RequestInterface::class);
 
-        $requestMock->expects($this->once())
+        $requestMock->expects($this->exactly(2))
             ->method('getUri')
             ->willReturn($uri);
 
         $s3Client = $this->createMock(S3Client::class);
 
-        $s3Client->expects($this->once())
+        $s3Client->expects($this->exactly(2))
             ->method('createPresignedRequest')
             ->willReturn($requestMock);
 
-        $s3Client->expects($this->once())
+        $s3Client->expects($this->exactly(2))
             ->method('getCommand')
             ->willReturn($commandMock);
 
@@ -93,5 +93,7 @@ class AwsS3ResolverTest extends AbstractUnitTest
         );
 
         $this->assertEquals($uri, $resolver->buildUrl('somefile.txt'));
+
+        $this->assertEquals($uri, $resolver->buildUrl('somefile.txt', [AwsS3Resolver::EXPIRES_OPTION => '+1hour']));
     }
 }
