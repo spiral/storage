@@ -70,7 +70,7 @@ abstract class AbstractResolver implements ResolverInterface
 
             return $uriStructure->isIdentified() ? $uriStructure->filePath : $filePath;
         } catch (ValidationException $e) {
-            // if filePath is not uri we supposes it is short form of filepath - without server name
+            // if filePath is not uri we suppose it is short form of filepath - without server name
         }
 
         return $filePath;

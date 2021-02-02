@@ -8,6 +8,8 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Resolver\AwsS3Resolver;
+use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
@@ -39,6 +41,7 @@ class LocalInfoTest extends AbstractUnitTest
         );
 
         $this->assertEquals(LocalFilesystemAdapter::class, $serverInfo->getAdapterClass());
+        $this->assertEquals(LocalSystemResolver::class, $serverInfo->getResolverClass());
         $this->assertEquals($serverName, $serverInfo->getName());
 
         foreach ($options as $optionKey => $optionVal) {
@@ -49,6 +52,28 @@ class LocalInfoTest extends AbstractUnitTest
 
             $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
         }
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testGetResolver(): void
+    {
+        $serverName = 'someServer';
+        $serverInfo = new LocalInfo(
+            $serverName,
+            [
+                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                // wrong resolver but you can define any resolver
+                LocalInfo::RESOLVER_KEY => AwsS3Resolver::class,
+                LocalInfo::OPTIONS_KEY => [
+                    LocalInfo::ROOT_DIR_KEY => '/some/root/',
+                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                ],
+            ]
+        );
+
+        $this->assertEquals(AwsS3Resolver::class, $serverInfo->getResolverClass());
     }
 
     /**

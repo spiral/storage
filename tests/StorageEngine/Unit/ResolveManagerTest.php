@@ -80,7 +80,7 @@ class ResolveManagerTest extends AbstractUnitTest
             ]
         );
 
-        $resolver = $this->callNotPublicMethod($resolveManager, 'prepareResolverForServer', [$serverInfo->getName()]);
+        $resolver = $this->callNotPublicMethod($resolveManager, 'prepareResolverForServer', [$serverInfo]);
 
         $this->assertInstanceOf($expectedClass, $resolver);
     }

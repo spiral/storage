@@ -82,34 +82,22 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     protected function getResolver(string $serverKey): Resolver\ResolverInterface
     {
         if (!array_key_exists($serverKey, $this->resolvers)) {
-            $this->resolvers[$serverKey] = $this->prepareResolverForServer($serverKey);
+            $this->resolvers[$serverKey] = $this->prepareResolverForServer(
+                $this->storageConfig->buildServerInfo($serverKey)
+            );
         }
 
         return $this->resolvers[$serverKey];
     }
 
-    /**
-     * @param string $serverKey
-     *
-     * @return Resolver\ResolverInterface
-     *
-     * @throws ResolveException
-     * @throws StorageException
-     */
-    protected function prepareResolverForServer(string $serverKey): Resolver\ResolverInterface
+    protected function prepareResolverForServer(ServerInfoInterface $serverInfo): Resolver\ResolverInterface
     {
-        $serverInfo = $this->storageConfig->buildServerInfo($serverKey);
+        $resolverClass = $serverInfo->getResolverClass();
 
-        switch ($serverInfo->getAdapterClass()) {
-            case \League\Flysystem\Local\LocalFilesystemAdapter::class:
-                return new Resolver\LocalSystemResolver($this->storageConfig, $this->filePathValidator, $serverKey);
-            case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
-            case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
-                return new Resolver\AwsS3Resolver($this->storageConfig, $this->filePathValidator, $serverKey);
-            default:
-                throw new ResolveException(
-                    'No resolver was detected by provided adapter for server ' . $serverInfo->getName()
-                );
-        }
+        return new $resolverClass(
+            $this->storageConfig,
+            $this->filePathValidator,
+            $serverInfo->getName()
+        );
     }
 }

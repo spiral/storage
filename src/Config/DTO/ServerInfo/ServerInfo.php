@@ -22,6 +22,10 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     protected string $name;
 
+    protected string $adapter;
+
+    protected string $resolver;
+
     /**
      * @param string $name
      * @param array $info
@@ -34,7 +38,13 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
         $this->name = $name;
 
-        $this->setClass($info[static::ADAPTER_KEY], \sprintf('Server %s class', $this->name));
+        $this->checkClass($info[static::ADAPTER_KEY], \sprintf('Server %s adapter', $this->name));
+        $this->adapter = $info[static::ADAPTER_KEY];
+
+        if (array_key_exists(static::RESOLVER_KEY, $info)) {
+            $this->checkClass($info[static::RESOLVER_KEY], \sprintf('Server %s resolver', $this->name));
+            $this->resolver = $info[static::RESOLVER_KEY];
+        }
 
         $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
 
@@ -64,7 +74,12 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     public function getAdapterClass(): string
     {
-        return $this->getClass();
+        return $this->adapter;
+    }
+
+    public function getResolverClass(): string
+    {
+        return $this->resolver;
     }
 
     public function getName(): string

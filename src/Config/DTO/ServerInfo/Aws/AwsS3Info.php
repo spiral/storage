@@ -7,6 +7,7 @@ namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\SpecificConfigurableServerInfo;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Resolver\AwsS3Resolver;
 
 class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 {
@@ -26,12 +27,9 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
         self::VISIBILITY_KEY => self::ARRAY_TYPE,
     ];
 
-    protected ?AwsVisibilityConverter $visibilityConverter = null;
+    protected string $resolver = AwsS3Resolver::class;
 
-    /**
-     * @var string|\DateTimeInterface
-     */
-    protected $urlExpires = '+24hours';
+    protected ?AwsVisibilityConverter $visibilityConverter = null;
 
     /**
      * @param array $info

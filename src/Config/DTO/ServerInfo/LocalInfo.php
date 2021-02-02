@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
+use Spiral\StorageEngine\Resolver\LocalSystemResolver;
+
 class LocalInfo extends ServerInfo
 {
     public const ROOT_DIR_KEY = 'rootDir';
@@ -23,6 +25,8 @@ class LocalInfo extends ServerInfo
         self::LINK_HANDLING_KEY => self::INT_TYPE,
         self::HOST_KEY => self::STRING_TYPE,
     ];
+
+    protected string $resolver = LocalSystemResolver::class;
 
     public function isAdvancedUsage(): bool
     {
