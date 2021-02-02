@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
+use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Exception\ValidationException;
 use Spiral\StorageEngine\Resolver\DTO\UriStructure;
@@ -14,19 +16,30 @@ abstract class AbstractResolver implements ResolverInterface
 {
     protected const SERVER_INFO_CLASS = '';
 
-    protected ServerInfoInterface $serverInfo;
-
     protected FilePathValidatorInterface $filePathValidator;
 
+    protected ServerInfoInterface $serverInfo;
+
     /**
-     * @param ServerInfoInterface $serverInfo
+     * @var BucketInfoInterface[]
+     */
+    protected array $buckets = [];
+
+    /**
+     * @param StorageConfig $storageConfig
      * @param FilePathValidatorInterface $filePathValidator
+     * @param string $serverKey
      *
      * @throws StorageException
      */
-    public function __construct(ServerInfoInterface $serverInfo, FilePathValidatorInterface $filePathValidator)
-    {
+    public function __construct(
+        StorageConfig $storageConfig,
+        FilePathValidatorInterface $filePathValidator,
+        string $serverKey
+    ) {
         $requiredClass = static::SERVER_INFO_CLASS;
+
+        $serverInfo = $storageConfig->buildServerInfo($serverKey);
 
         if (empty($requiredClass) || !$serverInfo instanceof $requiredClass) {
             throw new StorageException(
@@ -38,8 +51,11 @@ abstract class AbstractResolver implements ResolverInterface
             );
         }
 
-        $this->serverInfo = $serverInfo;
         $this->filePathValidator = $filePathValidator;
+
+        $this->serverInfo = $serverInfo;
+
+        $this->buckets = $storageConfig->getServerBuckets($serverKey);
     }
 
     public function normalizeFilePathToUri(string $filePath): string

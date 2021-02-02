@@ -6,6 +6,7 @@ namespace Spiral\StorageEngine\Tests\Unit\Config;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
@@ -154,6 +155,124 @@ class StorageConfigTest extends AbstractUnitTest
 
         $this->assertTrue($config->hasServer($localServer));
         $this->assertFalse($config->hasServer('missing'));
+    }
+
+    public function testBuildBucketInfo(): void
+    {
+        $localServer = 'local';
+        $awsServer = 'aws';
+
+        $localBucket1 = 'local1B';
+        $localBucket2 = 'local2B';
+
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    $localServer => $this->buildLocalInfoDescription(),
+                    $awsServer => $this->buildAwsS3ServerDescription(),
+                ],
+                'buckets' => [
+                    $localBucket1 => [
+                        BucketInfoInterface::SERVER_KEY => $localServer,
+                        BucketInfoInterface::DIRECTORY_KEY => '/dir1',
+                    ],
+                    $localBucket2 => [
+                        BucketInfoInterface::SERVER_KEY => $localServer,
+                        BucketInfoInterface::DIRECTORY_KEY => '/dir2',
+                    ]
+                ],
+            ]
+        );
+
+        $bucketInfo = $config->buildBucketInfo($localBucket1);
+        $this->assertInstanceOf(BucketInfoInterface::class, $bucketInfo);
+
+        $this->assertSame($bucketInfo, $config->buildBucketInfo($localBucket1));
+    }
+
+    public function testBuildBucketInfoForMissedBucket(): void
+    {
+        $localServer = 'local';
+        $awsServer = 'aws';
+
+        $localBucket1 = 'local1B';
+        $missedBucket = 'missedB';
+
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    $localServer => $this->buildLocalInfoDescription(),
+                    $awsServer => $this->buildAwsS3ServerDescription(),
+                ],
+                'buckets' => [
+                    $localBucket1 => [
+                        BucketInfoInterface::SERVER_KEY => $localServer,
+                        BucketInfoInterface::DIRECTORY_KEY => '/dir1',
+                    ],
+                ],
+            ]
+        );
+
+        $this->expectException(StorageException::class);
+        $this->expectExceptionMessage('Bucket missedB was not found');
+
+        $config->buildBucketInfo($missedBucket);
+    }
+
+    public function testGetServerBuckets(): void
+    {
+        $localServer = 'local';
+        $awsServer = 'aws';
+
+        $localBucket1 = 'local1B';
+        $localBucket2 = 'local2B';
+
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    $localServer => $this->buildLocalInfoDescription(),
+                    $awsServer => $this->buildAwsS3ServerDescription(),
+                ],
+                'buckets' => [
+                    $localBucket1 => [
+                        BucketInfoInterface::SERVER_KEY => $localServer,
+                        BucketInfoInterface::DIRECTORY_KEY => '/dir1',
+                    ],
+                    $localBucket2 => [
+                        BucketInfoInterface::SERVER_KEY => $localServer,
+                        BucketInfoInterface::DIRECTORY_KEY => '/dir2',
+                    ]
+                ],
+            ]
+        );
+
+        $this->assertEquals([], $config->getServerBuckets($awsServer));
+        $this->assertEquals([$localBucket1, $localBucket2], array_keys($config->getServerBuckets($localServer)));
+    }
+
+    public function testGetServerBucketsForMissedServer(): void
+    {
+        $localServer = 'local';
+        $local2Server = 'local2';
+
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    $localServer => $this->buildLocalInfoDescription(),
+                ],
+                'buckets' => [
+                    'local1B' => [
+                        BucketInfoInterface::SERVER_KEY => $local2Server,
+                        BucketInfoInterface::DIRECTORY_KEY => '/dir1',
+                    ],
+                ],
+            ]
+        );
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Server local2 was not found');
+
+        $config->getServerBuckets($local2Server);
     }
 
     public function getServersListForBuild(): array

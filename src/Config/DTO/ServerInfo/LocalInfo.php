@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
-use Spiral\StorageEngine\Config\DTO\Traits\BucketsTrait;
-
-class LocalInfo extends ServerInfo implements BucketsBasedInterface
+class LocalInfo extends ServerInfo
 {
-    use BucketsTrait;
-
     public const ROOT_DIR_KEY = 'rootDir';
     public const WRITE_FLAGS_KEY = 'write-flags';
     public const LINK_HANDLING_KEY = 'link-handling';
@@ -27,15 +23,6 @@ class LocalInfo extends ServerInfo implements BucketsBasedInterface
         self::LINK_HANDLING_KEY => self::INT_TYPE,
         self::HOST_KEY => self::STRING_TYPE,
     ];
-
-    public function __construct(string $name, array $info)
-    {
-        parent::__construct($name, $info);
-
-        if (array_key_exists(BucketsBasedInterface::BUCKETS_KEY, $info)) {
-            $this->constructBuckets($info[static::BUCKETS_KEY], $this);
-        }
-    }
 
     public function isAdvancedUsage(): bool
     {

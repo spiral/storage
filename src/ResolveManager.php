@@ -82,30 +82,30 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     protected function getResolver(string $serverKey): Resolver\ResolverInterface
     {
         if (!array_key_exists($serverKey, $this->resolvers)) {
-            $this->resolvers[$serverKey] = $this->prepareResolverByServerInfo(
-                $this->storageConfig->buildServerInfo($serverKey)
-            );
+            $this->resolvers[$serverKey] = $this->prepareResolverForServer($serverKey);
         }
 
         return $this->resolvers[$serverKey];
     }
 
     /**
-     * @param ServerInfoInterface $serverInfo
+     * @param string $serverKey
      *
      * @return Resolver\ResolverInterface
      *
      * @throws ResolveException
      * @throws StorageException
      */
-    protected function prepareResolverByServerInfo(ServerInfoInterface $serverInfo): Resolver\ResolverInterface
+    protected function prepareResolverForServer(string $serverKey): Resolver\ResolverInterface
     {
+        $serverInfo = $this->storageConfig->buildServerInfo($serverKey);
+
         switch ($serverInfo->getAdapterClass()) {
             case \League\Flysystem\Local\LocalFilesystemAdapter::class:
-                return new Resolver\LocalSystemResolver($serverInfo, $this->filePathValidator);
+                return new Resolver\LocalSystemResolver($this->storageConfig, $this->filePathValidator, $serverKey);
             case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
             case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
-                return new Resolver\AwsS3Resolver($serverInfo, $this->filePathValidator);
+                return new Resolver\AwsS3Resolver($this->storageConfig, $this->filePathValidator, $serverKey);
             default:
                 throw new ResolveException(
                     'No resolver was detected by provided adapter for server ' . $serverInfo->getName()

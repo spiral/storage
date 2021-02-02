@@ -50,7 +50,7 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
      */
     public function buildBucketPath(string $bucketName): string
     {
-        if (!($bucket = $this->serverInfo->getBucket($bucketName)) instanceof BucketInfoInterface) {
+        if (!($bucket = $this->getBucketInfo($bucketName)) instanceof BucketInfoInterface) {
             throw new StorageException(
                 \sprintf('Bucket `%s` is not defined for server `%s`', $bucketName, $this->serverInfo->getName())
             );
@@ -61,5 +61,10 @@ class LocalSystemResolver extends AbstractResolver implements BucketResolverInte
             $this->serverInfo->getOption(LocalInfo::ROOT_DIR_KEY),
             $bucket->getDirectory()
         );
+    }
+
+    public function getBucketInfo(string $key): ?BucketInfoInterface
+    {
+        return array_key_exists($key, $this->buckets) ? $this->buckets[$key] : null;
     }
 }

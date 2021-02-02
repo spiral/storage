@@ -27,6 +27,11 @@ class BucketInfo implements OptionsBasedInterface, BucketInfoInterface
         }
     }
 
+    public function getServerKey(): string
+    {
+        return $this->serverInfo->getName();
+    }
+
     public function getDirectory(): ?string
     {
         return $this->getOption(static::DIRECTORY_KEY);

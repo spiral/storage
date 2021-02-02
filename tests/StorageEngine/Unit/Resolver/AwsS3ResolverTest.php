@@ -10,15 +10,17 @@ use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use Psr\Http\Message\RequestInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
+use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
-use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class AwsS3ResolverTest extends AbstractUnitTest
 {
     use LocalServerBuilderTrait;
+    use AwsS3ServerBuilderTrait;
 
     /**
      * @throws StorageException
@@ -34,7 +36,18 @@ class AwsS3ResolverTest extends AbstractUnitTest
             )
         );
 
-        new AwsS3Resolver($this->buildLocalInfo(), $this->getFilePathValidator());
+        new AwsS3Resolver(
+            new StorageConfig(
+                [
+                    'servers' => [
+                        'local' => $this->buildLocalInfoDescription(),
+                        'aws' => $this->buildAwsS3ServerDescription(),
+                    ]
+                ]
+            ),
+            $this->getFilePathValidator(),
+            'local'
+        );
     }
 
     /**
@@ -72,8 +85,11 @@ class AwsS3ResolverTest extends AbstractUnitTest
         ];
 
         $resolver = new AwsS3Resolver(
-            new AwsS3Info($serverName, $serverDescription),
-            $this->getFilePathValidator()
+            new StorageConfig(
+                ['servers' => [$serverName => $serverDescription]]
+            ),
+            $this->getFilePathValidator(),
+            $serverName
         );
 
         $this->assertEquals($uri, $resolver->buildUrl('somefile.txt'));

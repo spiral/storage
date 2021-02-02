@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
+use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
+
 interface BucketResolverInterface
 {
     /**
@@ -14,4 +16,6 @@ interface BucketResolverInterface
      * @return string|null
      */
     public function buildBucketPath(string $bucketName): ?string;
+
+    public function getBucketInfo(string $key): ?BucketInfoInterface;
 }
