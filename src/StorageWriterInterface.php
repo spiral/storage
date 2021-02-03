@@ -14,9 +14,19 @@ interface StorageWriterInterface
 
     public function setVisibility(string $uri, string $visibility): void;
 
-    public function copy(string $sourceUri, string $destinationServer, ?string $targetFilePath = null, array $config = []);
+    public function copy(
+        string $sourceUri,
+        string $destinationServer,
+        ?string $targetFilePath = null,
+        array $config = []
+    );
 
-    public function move(string $sourceUri, string $destinationServer, ?string $targetFilePath = null, array $config = []);
+    public function move(
+        string $sourceUri,
+        string $destinationServer,
+        ?string $targetFilePath = null,
+        array $config = []
+    );
 
     public function delete(string $uri): void;
 }

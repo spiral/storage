@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine;
 
+use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Spiral\Core\Container\SingletonInterface;
+use Spiral\StorageEngine\Builder\AdapterFactory;
+use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\FileOperationException;
 use Spiral\StorageEngine\Exception\MountException;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -19,20 +22,28 @@ class StorageEngine implements StorageInterface, SingletonInterface
      */
     protected array $fileSystems = [];
 
+    private StorageConfig $config;
+
     private UriResolverInterface $uriResolver;
 
     /**
+     * @param StorageConfig $config
      * @param UriResolverInterface $uriResolver
-     * @param array<string,FilesystemOperator> $filesystems
      *
      * @throws StorageException
      */
-    public function __construct(UriResolverInterface $uriResolver, array $filesystems = [])
+    public function __construct(StorageConfig $config, UriResolverInterface $uriResolver)
     {
+        $this->config = $config;
         $this->uriResolver = $uriResolver;
 
-        if (!empty($filesystems)) {
-            $this->mountFileSystems($filesystems);
+        if (!empty($config->getServersKeys())) {
+            foreach ($config->getServersKeys() as $serverKey) {
+                $this->mountFilesystem(
+                    $serverKey,
+                    new Filesystem(AdapterFactory::build($this->config->buildServerInfo($serverKey)))
+                );
+            }
         }
     }
 
@@ -369,8 +380,12 @@ class StorageEngine implements StorageInterface, SingletonInterface
      * @throws FileOperationException
      * @throws StorageException
      */
-    public function move(string $sourceUri, string $destinationServer, ?string $targetFilePath = null, array $config = []): void
-    {
+    public function move(
+        string $sourceUri,
+        string $destinationServer,
+        ?string $targetFilePath = null,
+        array $config = []
+    ): void {
         /** @var FilesystemOperator $sourceFilesystem */
         /* @var FilesystemOperator $destinationFilesystem */
         [$sourceFilesystem, $sourcePath] = $this->determineFilesystemAndPath($sourceUri);
@@ -395,8 +410,12 @@ class StorageEngine implements StorageInterface, SingletonInterface
      * @throws FileOperationException
      * @throws StorageException
      */
-    public function copy(string $sourceUri, string $destinationServer, ?string $targetFilePath = null, array $config = []): void
-    {
+    public function copy(
+        string $sourceUri,
+        string $destinationServer,
+        ?string $targetFilePath = null,
+        array $config = []
+    ): void {
         /** @var FilesystemOperator $sourceFilesystem */
         /* @var FilesystemOperator $destinationFilesystem */
         [$sourceFilesystem, $sourcePath] = $this->determineFilesystemAndPath($sourceUri);
@@ -450,7 +469,12 @@ class StorageEngine implements StorageInterface, SingletonInterface
             $sourceFilesystem->copy($sourcePath, $destinationPath);
         } catch (FilesystemException $e) {
             throw new FileOperationException(
-                \sprintf('Unable to copy file from `%s` to `%s`: %s', $sourcePath, $destinationPath, $e->getMessage()),
+                \sprintf(
+                    'Unable to copy file from `%s` to `%s`: %s',
+                    $sourcePath,
+                    $destinationPath,
+                    $e->getMessage()
+                ),
                 $e->getCode(),
                 $e
             );
@@ -502,7 +526,12 @@ class StorageEngine implements StorageInterface, SingletonInterface
             $sourceFilesystem->move($sourcePath, $destinationPath);
         } catch (FilesystemException $e) {
             throw new FileOperationException(
-                \sprintf('Unable to move file from `%s` to `%s`: %s', $sourcePath, $destinationPath, $e->getMessage()),
+                \sprintf(
+                    'Unable to move file from `%s` to `%s`: %s',
+                    $sourcePath,
+                    $destinationPath,
+                    $e->getMessage()
+                ),
                 $e->getCode(),
                 $e
             );

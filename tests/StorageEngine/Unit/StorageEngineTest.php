@@ -7,6 +7,7 @@ namespace Spiral\StorageEngine\Tests\Unit;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemOperator;
 use Spiral\StorageEngine\Builder\AdapterFactory;
+use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\MountException;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -35,7 +36,9 @@ class StorageEngineTest extends AbstractUnitTest
             )
         );
 
-        $this->storage = new StorageEngine($this->getUriResolver());
+        $storageConfig = new StorageConfig(['servers' => []]);
+
+        $this->storage = new StorageEngine($storageConfig, $this->getUriResolver());
         $this->storage->mountFilesystem(ServerTestInterface::SERVER_NAME, $this->localFileSystem);
     }
 
@@ -47,24 +50,25 @@ class StorageEngineTest extends AbstractUnitTest
         $local1Name = 'local1';
         $local2Name = 'local2';
 
-        $local1Fs = new Filesystem(AdapterFactory::build($this->buildLocalInfo($local1Name)));
-        $local2Fs = new Filesystem(AdapterFactory::build($this->buildLocalInfo($local2Name)));
+        $storageConfig = new StorageConfig(
+            [
+                'servers' => [
+                    $local1Name => $this->buildLocalInfoDescription(),
+                    $local2Name => $this->buildLocalInfoDescription(),
+                ],
+            ]
+        );
 
-        $fsList = [
-            $local1Name => $local1Fs,
-            $local2Name => $local2Fs,
-        ];
+        $storage = new StorageEngine($storageConfig, $this->getUriResolver());
 
-        $storage = new StorageEngine($this->getUriResolver(), $fsList);
-
-        foreach ($fsList as $key => $filesystem) {
+        foreach ([$local1Name, $local2Name] as $key) {
             $this->assertTrue($storage->isFileSystemExists($key));
-            $this->assertSame($filesystem, $storage->getFileSystem($key));
+            $this->assertInstanceOf(FilesystemOperator::class, $storage->getFileSystem($key));
         }
 
         $this->assertFalse($storage->isFileSystemExists(ServerTestInterface::SERVER_NAME));
 
-        $this->assertEquals(array_keys($fsList), $storage->extractMountedFileSystemsKeys());
+        $this->assertEquals([$local1Name, $local2Name], $storage->extractMountedFileSystemsKeys());
     }
 
     public function testIsFileSystemExists(): void
@@ -113,7 +117,7 @@ class StorageEngineTest extends AbstractUnitTest
         $this->expectException(MountException::class);
         $this->expectExceptionMessage($expectedMsg);
 
-        new StorageEngine($this->getUriResolver(), $filesystems);
+        $this->storage->mountFileSystems($filesystems);
     }
 
     /**
@@ -174,13 +178,16 @@ class StorageEngineTest extends AbstractUnitTest
         $local2Name = 'local2';
         $local2Fs = new Filesystem(AdapterFactory::build($this->buildLocalInfo($local2Name)));
 
-        $storage = new StorageEngine(
-            $this->getUriResolver(),
+        $storageConfig = new StorageConfig(
             [
-                $localName => $localFs,
-                $local2Name => $local2Fs,
+                'servers' => [
+                    $localName => $this->buildLocalInfoDescription(),
+                    $local2Name => $this->buildLocalInfoDescription(),
+                ],
             ]
         );
+
+        $storage = new StorageEngine($storageConfig, $this->getUriResolver());
 
         return [
             [

@@ -8,6 +8,7 @@ use League\Flysystem\Filesystem;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use Spiral\StorageEngine\Builder\AdapterFactory;
+use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\AbstractTest;
@@ -109,13 +110,12 @@ class StorageEngineForLocalTest extends AbstractTest
      */
     private function buildStorageForServer(string $name): StorageEngine
     {
-        $storageEngine = new StorageEngine($this->getUriResolver());
-
-        $storageEngine->mountFilesystem(
-            $name,
-            new Filesystem(AdapterFactory::build($this->buildLocalInfo($name, true)))
+        $storageConfig = new StorageConfig(
+            [
+                'servers' => [$name => $this->buildLocalInfoDescription(true)]
+            ]
         );
 
-        return $storageEngine;
+        return new StorageEngine($storageConfig, $this->getUriResolver());
     }
 }
