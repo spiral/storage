@@ -71,6 +71,34 @@ class StorageEngineTest extends AbstractUnitTest
         $this->assertEquals([$local1Name, $local2Name], $storage->extractMountedFileSystemsKeys());
     }
 
+    /**
+     * @throws StorageException
+     */
+    public function testMountFileSystems(): void
+    {
+        $local1Name = 'local1';
+        $local2Name = 'local2';
+
+        $storageConfig = new StorageConfig(
+            [
+                'servers' => [
+                    $local1Name => $this->buildLocalInfoDescription(),
+                ],
+            ]
+        );
+
+        $storage = new StorageEngine($storageConfig, $this->getUriResolver());
+
+        $mountedFs = new Filesystem(AdapterFactory::build($this->buildLocalInfo()));
+        $storage->mountFilesystem($local2Name, $mountedFs);
+
+        $this->assertTrue($storage->isFileSystemExists($local2Name));
+        $this->assertSame($mountedFs, $storage->getFileSystem($local2Name));
+
+        $this->assertEquals([$local1Name, $local2Name], $storage->extractMountedFileSystemsKeys());
+
+    }
+
     public function testIsFileSystemExists(): void
     {
         $this->assertTrue($this->storage->isFileSystemExists(ServerTestInterface::SERVER_NAME));

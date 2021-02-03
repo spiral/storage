@@ -130,11 +130,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
             return $filePath;
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                'Unable to create tmp file: ' . $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -154,11 +150,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->fileExists($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to check file existence for `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -178,11 +170,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->read($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to read file from `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -202,11 +190,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->readStream($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to read file from `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -226,11 +210,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->lastModified($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to retrieve the last modified for file at `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -250,11 +230,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->fileSize($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to retrieve the file size for file at `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -274,11 +250,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->mimeType($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to retrieve the mime type for file at `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -298,11 +270,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->visibility($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to retrieve the visibility for file at `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -329,11 +297,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
             return $uri;
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to write file at `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -388,11 +352,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             $filesystem->delete($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to delete file `%s`: %s', $uri, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -493,16 +453,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             $sourceFilesystem->copy($sourcePath, $destinationPath);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf(
-                    'Unable to copy file from `%s` to `%s`: %s',
-                    $sourcePath,
-                    $destinationPath,
-                    $e->getMessage()
-                ),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -527,11 +478,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
             $stream = $sourceFilesystem->readStream($sourcePath);
             $destinationFilesystem->writeStream($destinationPath, $stream, compact('visibility'));
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to copy file from `%s` to `%s`: %s', $sourcePath, $destinationPath, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -550,16 +497,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             $sourceFilesystem->move($sourcePath, $destinationPath);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf(
-                    'Unable to move file from `%s` to `%s`: %s',
-                    $sourcePath,
-                    $destinationPath,
-                    $e->getMessage()
-                ),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -576,11 +514,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
             $this->copy($source, $destination);
             $this->delete($source);
         } catch (FilesystemException $e) {
-            throw new FileOperationException(
-                \sprintf('Unable to move file from `%s` to `%s`: %s', $source, $destination, $e->getMessage()),
-                $e->getCode(),
-                $e
-            );
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }
