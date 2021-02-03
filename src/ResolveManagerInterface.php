@@ -23,15 +23,15 @@ interface ResolveManagerInterface
     public function buildUrlsList(array $files, bool $throwException = true): \Generator;
 
     /**
-     * @param string $filePath
+     * @param string $uri
      * @param bool $throwException
-     *  true - throw exception in case any url can't be built
-     *  false - return null instead of url in case one url can't be built
+     *  true - throw exception in case url can't be built
+     *  false - return null instead of url in case url can't be built
      *
      * @return string|null
      *
      * @throws ResolveException
      * @throws StorageException
      */
-    public function buildUrl(string $filePath, bool $throwException = true): ?string;
+    public function buildUrl(string $uri, bool $throwException = true): ?string;
 }

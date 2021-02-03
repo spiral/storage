@@ -6,6 +6,8 @@ namespace Spiral\StorageEngine\Config;
 
 use Spiral\Core\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
+use Spiral\StorageEngine\Config\DTO\BucketInfo;
+use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
@@ -16,17 +18,26 @@ class StorageConfig extends InjectableConfig
     public const CONFIG = 'storage';
 
     private const SERVERS_KEY = 'servers';
+    private const BUCKETS_KEY = 'buckets';
 
     protected $config = [
         self::SERVERS_KEY   => [],
+        self::BUCKETS_KEY => [],
     ];
 
     /**
      * @var ServerInfoInterface[]
      *
-     * Internal list allows to keep once built server info
+     * Internal list allows to keep once built servers info
      */
     protected array $serversInfo = [];
+
+    /**
+     * @var BucketInfoInterface[]
+     *
+     * Internal list allows to keep once built buckets info
+     */
+    protected array $bucketsInfo = [];
 
     public function getServersKeys(): array
     {
@@ -38,49 +49,115 @@ class StorageConfig extends InjectableConfig
         return array_key_exists($key, $this->config[static::SERVERS_KEY]);
     }
 
+    public function hasBucket(string $key): bool
+    {
+        return array_key_exists($key, $this->config[static::BUCKETS_KEY]);
+    }
+
+    /**
+     * @param string $serverKey
+     *
+     * @return array
+     *
+     * @throws StorageException
+     */
+    public function getServerBuckets(string $serverKey): array
+    {
+        if (!array_key_exists(static::BUCKETS_KEY, $this->config)) {
+            return [];
+        }
+
+        foreach ($this->config[static::BUCKETS_KEY] as $bucketKey => $bucketDesc) {
+            if ($bucketDesc[BucketInfoInterface::SERVER_KEY] !== $serverKey) {
+                continue;
+            }
+
+            $this->buildBucketInfo($bucketKey);
+        }
+
+        return array_filter(
+            $this->bucketsInfo,
+            static fn (BucketInfoInterface $bucketInfo) => $bucketInfo->getServerKey()
+        );
+    }
+
     /**
      * Build server info by provided label
      * Force mode allows to rebuild server info for internal servers info list
      *
-     * @param string $serverLabel
+     * @param string $serverKey
      * @param bool|null $force
      *
      * @return ServerInfoInterface
      *
      * @throws StorageException
      */
-    public function buildServerInfo(string $serverLabel, ?bool $force = false): ServerInfoInterface
+    public function buildServerInfo(string $serverKey, ?bool $force = false): ServerInfoInterface
     {
-        if (!$this->hasServer($serverLabel)) {
+        if (!$this->hasServer($serverKey)) {
             throw new ConfigException(
+                \sprintf('Server %s was not found', $serverKey)
+            );
+        }
+
+        if (!$force && array_key_exists($serverKey, $this->serversInfo)) {
+            return $this->serversInfo[$serverKey];
+        }
+
+        $serverInfo = $this->config[static::SERVERS_KEY][$serverKey];
+
+        switch ($this->extractServerAdapter($serverInfo)) {
+            case \League\Flysystem\Local\LocalFilesystemAdapter::class:
+                $serverInfoDTO = new LocalInfo($serverKey, $serverInfo);
+                break;
+            case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
+            case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
+                $serverInfoDTO = new AwsS3Info($serverKey, $serverInfo);
+                break;
+            default:
+                throw new ConfigException('Adapter can\'t be identified for server ' . $serverKey);
+        }
+
+        $this->serversInfo[$serverKey] = $serverInfoDTO;
+
+        return $this->serversInfo[$serverKey];
+    }
+
+    /**
+     * Build bucket info by provided label
+     * Force mode allows to rebuild bucket info for internal list
+     *
+     * @param string $bucketLabel
+     * @param bool|null $force
+     *
+     * @return BucketInfoInterface
+     *
+     * @throws StorageException
+     */
+    public function buildBucketInfo(string $bucketLabel, ?bool $force = false): BucketInfoInterface
+    {
+        if (!$this->hasBucket($bucketLabel)) {
+            throw new StorageException(
                 \sprintf(
-                    'Server %s was not found',
-                    $serverLabel
+                    'Bucket %s was not found',
+                    $bucketLabel
                 )
             );
         }
 
-        if (!$force && array_key_exists($serverLabel, $this->serversInfo)) {
-            return $this->serversInfo[$serverLabel];
+        if (!$force && array_key_exists($bucketLabel, $this->bucketsInfo)) {
+            return $this->bucketsInfo[$bucketLabel];
         }
 
-        $serverInfo = $this->config[static::SERVERS_KEY][$serverLabel];
+        $bucketInfo = $this->config[static::BUCKETS_KEY][$bucketLabel];
 
-        switch ($this->extractServerAdapter($serverInfo)) {
-            case \League\Flysystem\Local\LocalFilesystemAdapter::class:
-                $serverInfoDTO = new LocalInfo($serverLabel, $serverInfo);
-                break;
-            case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
-            case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
-                $serverInfoDTO = new AwsS3Info($serverLabel, $serverInfo);
-                break;
-            default:
-                throw new ConfigException('Adapter can\'t be identified for server ' . $serverLabel);
-        }
+        $this->bucketsInfo[$bucketLabel] = new BucketInfo(
+            $bucketLabel,
+            $this->buildServerInfo($bucketInfo[BucketInfoInterface::SERVER_KEY]),
+            $bucketInfo
+        );
 
-        $this->serversInfo[$serverLabel] = $serverInfoDTO;
-
-        return $serverInfoDTO;
+        return $this->bucketsInfo[$bucketLabel];
     }
 
     private function extractServerAdapter(array $serverInfo): ?string

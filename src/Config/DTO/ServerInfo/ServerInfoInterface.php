@@ -8,14 +8,19 @@ interface ServerInfoInterface
 {
     public const ADAPTER_KEY = 'adapter';
 
+    public const RESOLVER_KEY = 'resolver';
+
     public const VISIBILITY_KEY = 'visibility';
 
     /**
-     * Get adapter class
-     *
      * @return string
      */
     public function getAdapterClass(): string;
+
+    /**
+     * @return string
+     */
+    public function getResolverClass(): string;
 
     public function getName(): string;
 

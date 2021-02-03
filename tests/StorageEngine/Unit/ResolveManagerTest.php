@@ -11,14 +11,12 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
-use Spiral\StorageEngine\Resolver\FilePathResolver;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\ResolveManager;
-use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class ResolveManagerTest extends AbstractUnitTest
 {
@@ -73,34 +71,18 @@ class ResolveManagerTest extends AbstractUnitTest
      *
      * @throws \ReflectionException
      */
-    public function testPrepareResolverByServerInfo(ServerInfoInterface $serverInfo, string $expectedClass): void
+    public function testPrepareResolverForServer(ServerInfoInterface $serverInfo, string $expectedClass): void
     {
-        $resolveManager = $this->buildResolveManager();
-
-        $resolver = $this->callNotPublicMethod($resolveManager, 'prepareResolverByServerInfo', [$serverInfo]);
-
-        $this->assertInstanceOf($expectedClass, $resolver);
-    }
-
-    /**
-     * @throws StorageException
-     * @throws \ReflectionException
-     */
-    public function testPrepareResolverByUnknownAdapter(): void
-    {
-        $resolveManager = $this->buildResolveManager();
-        $serverInfo = $this->buildLocalInfo();
-
-        $unknownAdapter = \DateTime::class;
-
-        $this->setProtectedProperty($serverInfo, 'class', $unknownAdapter);
-
-        $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage(
-            'No resolver was detected by provided adapter for server ' . $serverInfo->getName()
+        $resolveManager = $this->buildResolveManager(
+            [
+                'local' => $this->buildLocalInfoDescription(),
+                'aws' => $this->buildAwsS3ServerDescription(),
+            ]
         );
 
-        $this->callNotPublicMethod($resolveManager, 'prepareResolverByServerInfo', [$serverInfo]);
+        $resolver = $this->callNotPublicMethod($resolveManager, 'prepareResolverForServer', [$serverInfo]);
+
+        $this->assertInstanceOf($expectedClass, $resolver);
     }
 
     /**
@@ -152,16 +134,18 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testBuildUrlThrowException(): void
     {
-        $filePath = 'someServer:/+/someFile.txt';
+        $uri = 'someServer:/+/someFile.txt';
 
         $resolveManager = $this->buildResolveManager(
             [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
         );
 
         $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage('Url can\'t be built by filepath ' . $filePath);
+        $this->expectExceptionMessage(
+            \sprintf('File %s can\'t be identified', $uri)
+        );
 
-        $resolveManager->buildUrl($filePath);
+        $resolveManager->buildUrl($uri);
     }
 
     /**
@@ -240,19 +224,17 @@ class ResolveManagerTest extends AbstractUnitTest
     public function getServerInfoListForResolversPrepare(): array
     {
         return [
-            [$this->buildLocalInfo(), LocalSystemResolver::class],
-            [$this->buildAwsS3Info(), AwsS3Resolver::class]
+            [$this->buildLocalInfo('local'), LocalSystemResolver::class],
+            [$this->buildAwsS3Info('aws'), AwsS3Resolver::class]
         ];
     }
 
     private function buildResolveManager(?array $servers = null): ResolveManager
     {
-        $filePathValidator = new FilePathValidator();
-
         return new ResolveManager(
             $this->buildStorageConfig($servers),
-            new FilePathResolver($filePathValidator),
-            $filePathValidator
+            $this->getUriResolver(),
+            $this->getFilePathValidator()
         );
     }
 }

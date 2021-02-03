@@ -29,15 +29,15 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
             ]
         );
 
-        $engine = new StorageEngine();
+        $engine = new StorageEngine($this->getUriResolver());
 
-        $this->assertFalse($engine->isInitiated());
+        $this->assertFalse($engine->isInitiated(false));
 
         $bootloader = new StorageEngineBootloader($config);
 
         $bootloader->boot($engine);
 
-        $this->assertTrue($engine->isInitiated());
+        $this->assertTrue($engine->isInitiated(false));
     }
 
     /**
@@ -53,7 +53,7 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
             ]
         );
 
-        $engine = new StorageEngine();
+        $engine = new StorageEngine($this->getUriResolver());
 
         $bootloader = new StorageEngineBootloader($config);
 
@@ -63,6 +63,6 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
 
         $this->assertInstanceOf(MountManager::class, $bootloader->getMountManager($engine));
 
-        $this->assertTrue($engine->isInitiated());
+        $this->assertTrue($engine->isInitiated(false));
     }
 }

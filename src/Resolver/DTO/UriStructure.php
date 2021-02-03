@@ -6,7 +6,7 @@ namespace Spiral\StorageEngine\Resolver\DTO;
 
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
-class ServerFilePathStructure
+class UriStructure
 {
     public ?string $serverName = null;
 

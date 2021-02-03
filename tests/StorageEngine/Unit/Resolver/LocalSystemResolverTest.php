@@ -6,8 +6,10 @@ namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
+use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
@@ -15,7 +17,6 @@ use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
-use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class LocalSystemResolverTest extends AbstractUnitTest
 {
@@ -36,7 +37,13 @@ class LocalSystemResolverTest extends AbstractUnitTest
             )
         );
 
-        new LocalSystemResolver($this->buildAwsS3Info(), new FilePathValidator());
+        new LocalSystemResolver(
+            new StorageConfig(
+                ['servers' => ['aws' => $this->buildAwsS3ServerDescription()]]
+            ),
+            $this->getFilePathValidator(),
+            'aws'
+        );
     }
 
     /**
@@ -44,7 +51,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
      *
      * @param string $serverName
      * @param string $host
-     * @param string $filePath
+     * @param string $uri
      * @param string $rootDir
      * @param string $expectedUrl
      *
@@ -54,21 +61,28 @@ class LocalSystemResolverTest extends AbstractUnitTest
         string $serverName,
         string $host,
         string $rootDir,
-        string $filePath,
+        string $uri,
         string $expectedUrl
     ): void {
         $resolver = new LocalSystemResolver(
-            new LocalInfo($serverName, [
-                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_KEY => $rootDir,
-                    LocalInfo::HOST_KEY => $host,
-                ],
-            ]),
-            new FilePathValidator()
+            new StorageConfig(
+                [
+                    'servers' => [
+                        $serverName => [
+                            LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                            LocalInfo::OPTIONS_KEY => [
+                                LocalInfo::ROOT_DIR_KEY => $rootDir,
+                                LocalInfo::HOST_KEY => $host,
+                            ],
+                        ],
+                    ],
+                ]
+            ),
+            $this->getFilePathValidator(),
+            $serverName
         );
 
-        $this->assertEquals($expectedUrl, $resolver->buildUrl($filePath));
+        $this->assertEquals($expectedUrl, $resolver->buildUrl($uri));
     }
 
     /**
@@ -77,13 +91,20 @@ class LocalSystemResolverTest extends AbstractUnitTest
     public function testBuildUrlNoHost(): void
     {
         $resolver = new LocalSystemResolver(
-            new LocalInfo('someServer', [
-                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_KEY => 'rootDir',
-                ],
-            ]),
-            new FilePathValidator()
+            new StorageConfig(
+                [
+                    'servers' => [
+                        'someServer' => [
+                            LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                            LocalInfo::OPTIONS_KEY => [
+                                LocalInfo::ROOT_DIR_KEY => 'rootDir',
+                            ],
+                        ]
+                    ]
+                ]
+            ),
+            $this->getFilePathValidator(),
+            'someServer'
         );
 
         $this->expectException(ResolveException::class);
@@ -110,16 +131,24 @@ class LocalSystemResolverTest extends AbstractUnitTest
         ];
 
         $resolver = new LocalSystemResolver(
-            new LocalInfo($serverName, [
-                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::OPTIONS_KEY => $options,
-                LocalInfo::BUCKETS_KEY => [
-                    $bucketName => [
-                        LocalInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory]
+            new StorageConfig(
+                [
+                    'servers' => [
+                        $serverName => [
+                            LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                            LocalInfo::OPTIONS_KEY => $options,
+                        ],
                     ],
-                ],
-            ]),
-            new FilePathValidator()
+                    'buckets' => [
+                        $bucketName => [
+                            BucketInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory],
+                            BucketInfoInterface::SERVER_KEY => $serverName,
+                        ],
+                    ],
+                ]
+            ),
+            $this->getFilePathValidator(),
+            $serverName
         );
 
         $this->assertEquals(
@@ -148,16 +177,24 @@ class LocalSystemResolverTest extends AbstractUnitTest
         ];
 
         $resolver = new LocalSystemResolver(
-            new LocalInfo($serverName, [
-                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::OPTIONS_KEY => $options,
-                LocalInfo::BUCKETS_KEY => [
-                    $bucketName => [
-                        LocalInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory]
+            new StorageConfig(
+                [
+                    'servers' => [
+                        $serverName => [
+                            LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                            LocalInfo::OPTIONS_KEY => $options,
+                        ],
                     ],
-                ],
-            ]),
-            new FilePathValidator()
+                    'buckets' => [
+                        $bucketName => [
+                            BucketInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory],
+                            BucketInfo::SERVER_KEY => $serverName,
+                        ],
+                    ],
+                ]
+            ),
+            $this->getFilePathValidator(),
+            $serverName
         );
 
         $this->expectException(StorageException::class);
@@ -169,18 +206,28 @@ class LocalSystemResolverTest extends AbstractUnitTest
     }
 
     /**
-     * @dataProvider getFilePathListForNormalize
+     * @dataProvider getUriListForNormalize
      *
      * @param string $filePath
-     * @param string $expectedFilePath
+     * @param string $uri
      *
      * @throws StorageException
      */
-    public function testNormalizePathForServer(string $filePath, string $expectedFilePath): void
+    public function testNormalizePathForServer(string $filePath, string $uri): void
     {
-        $resolver = new LocalSystemResolver($this->buildLocalInfo(), new FilePathValidator());
+        $resolver = new LocalSystemResolver(
+            new StorageConfig(
+                [
+                    'servers' => [
+                        'local' => $this->buildLocalInfoDescription(),
+                    ],
+                ]
+            ),
+            $this->getFilePathValidator(),
+            'local'
+        );
 
-        $this->assertEquals($expectedFilePath, $resolver->normalizePathForServer($filePath));
+        $this->assertEquals($uri, $resolver->normalizeFilePathToUri($filePath));
     }
 
     public function getFileUrlList(): array
@@ -206,7 +253,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         ];
     }
 
-    public function getFilePathListForNormalize(): array
+    public function getUriListForNormalize(): array
     {
         $serverName = ServerTestInterface::SERVER_NAME;
 

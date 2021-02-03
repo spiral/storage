@@ -6,5 +6,5 @@ namespace Spiral\StorageEngine\Resolver;
 
 interface ResolverInterface
 {
-    public function buildUrl(string $filePath): ?string;
+    public function buildUrl(string $uri, array $options = []): ?string;
 }

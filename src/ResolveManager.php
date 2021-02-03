@@ -22,17 +22,17 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      */
     protected array $resolvers = [];
 
-    private Resolver\FilePathResolverInterface $filePathResolver;
+    private Resolver\UriResolverInterface $uriResolver;
 
     private FilePathValidatorInterface $filePathValidator;
 
     public function __construct(
         StorageConfig $storageConfig,
-        Resolver\FilePathResolverInterface $filePathResolver,
+        Resolver\UriResolverInterface $uriResolver,
         FilePathValidatorInterface $filePathValidator
     ) {
         $this->storageConfig = $storageConfig;
-        $this->filePathResolver = $filePathResolver;
+        $this->uriResolver = $uriResolver;
         $this->filePathValidator = $filePathValidator;
     }
 
@@ -41,20 +41,20 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      */
     public function buildUrlsList(array $files, bool $throwException = true): \Generator
     {
-        foreach ($files as $filePath) {
-            yield $this->buildUrl($filePath, $throwException);
+        foreach ($files as $uri) {
+            yield $this->buildUrl($uri, $throwException);
         }
     }
 
     /**
      * @inheritDoc
      */
-    public function buildUrl(string $filePath, bool $throwException = true): ?string
+    public function buildUrl(string $uri, bool $throwException = true): ?string
     {
         try {
-            $fileInfo = $this->filePathResolver->parseServerFilePathToStructure($filePath);
+            $fileInfo = $this->uriResolver->parseUriToStructure($uri);
 
-            if ($fileInfo instanceof Resolver\DTO\ServerFilePathStructure && $fileInfo->isIdentified()) {
+            if ($fileInfo instanceof Resolver\DTO\UriStructure && $fileInfo->isIdentified()) {
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
@@ -65,7 +65,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         }
 
         if ($throwException) {
-            throw new ResolveException('Url can\'t be built by filepath ' . $filePath);
+            throw new ResolveException('Url can\'t be built by uri ' . $uri);
         }
 
         return null;
@@ -82,7 +82,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     protected function getResolver(string $serverKey): Resolver\ResolverInterface
     {
         if (!array_key_exists($serverKey, $this->resolvers)) {
-            $this->resolvers[$serverKey] = $this->prepareResolverByServerInfo(
+            $this->resolvers[$serverKey] = $this->prepareResolverForServer(
                 $this->storageConfig->buildServerInfo($serverKey)
             );
         }
@@ -90,26 +90,14 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         return $this->resolvers[$serverKey];
     }
 
-    /**
-     * @param ServerInfoInterface $serverInfo
-     *
-     * @return Resolver\ResolverInterface
-     *
-     * @throws ResolveException
-     * @throws StorageException
-     */
-    protected function prepareResolverByServerInfo(ServerInfoInterface $serverInfo): Resolver\ResolverInterface
+    protected function prepareResolverForServer(ServerInfoInterface $serverInfo): Resolver\ResolverInterface
     {
-        switch ($serverInfo->getAdapterClass()) {
-            case \League\Flysystem\Local\LocalFilesystemAdapter::class:
-                return new Resolver\LocalSystemResolver($serverInfo, $this->filePathValidator);
-            case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
-            case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
-                return new Resolver\AwsS3Resolver($serverInfo, $this->filePathValidator);
-            default:
-                throw new ResolveException(
-                    'No resolver was detected by provided adapter for server ' . $serverInfo->getName()
-                );
-        }
+        $resolverClass = $serverInfo->getResolverClass();
+
+        return new $resolverClass(
+            $this->storageConfig,
+            $this->filePathValidator,
+            $serverInfo->getName()
+        );
     }
 }
