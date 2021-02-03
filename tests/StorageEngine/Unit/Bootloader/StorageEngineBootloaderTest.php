@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Tests\Unit\Bootloader;
 
-use League\Flysystem\MountManager;
+use League\Flysystem\FilesystemOperator;
 use Spiral\StorageEngine\Bootloader\StorageEngineBootloader;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -18,51 +18,31 @@ class StorageEngineBootloaderTest extends AbstractUnitTest
 
     /**
      * @throws StorageException
+     * @throws \ReflectionException
      */
-    public function testInit(): void
+    public function testBoot(): void
     {
+        $serverName = 'local';
+
         $config = new StorageConfig(
             [
                 'servers' => [
-                    'local' => $this->buildLocalInfoDescription(),
+                    $serverName => $this->buildLocalInfoDescription(),
                 ],
             ]
         );
 
         $engine = new StorageEngine($this->getUriResolver());
 
-        $this->assertFalse($engine->isInitiated(false));
+        $this->assertEmpty($this->getProtectedProperty($engine, 'fileSystems'));
 
         $bootloader = new StorageEngineBootloader($config);
 
         $bootloader->boot($engine);
 
-        $this->assertTrue($engine->isInitiated(false));
-    }
+        $this->assertNotEmpty($this->getProtectedProperty($engine, 'fileSystems'));
 
-    /**
-     * @throws StorageException
-     */
-    public function testGetMountManager(): void
-    {
-        $config = new StorageConfig(
-            [
-                'servers' => [
-                    'local' => $this->buildLocalInfoDescription(),
-                ],
-            ]
-        );
-
-        $engine = new StorageEngine($this->getUriResolver());
-
-        $bootloader = new StorageEngineBootloader($config);
-
-        $this->assertNull($bootloader->getMountManager($engine));
-
-        $bootloader->boot($engine);
-
-        $this->assertInstanceOf(MountManager::class, $bootloader->getMountManager($engine));
-
-        $this->assertTrue($engine->isInitiated(false));
+        $this->assertTrue($engine->isFileSystemExists($serverName));
+        $this->assertInstanceOf(FilesystemOperator::class, $engine->getFileSystem($serverName));
     }
 }

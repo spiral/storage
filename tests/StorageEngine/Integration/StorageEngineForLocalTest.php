@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Tests\Integration;
 
+use League\Flysystem\Filesystem;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
+use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\AbstractTest;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 
-class StorageEngineTest extends AbstractTest
+class StorageEngineForLocalTest extends AbstractTest
 {
     use LocalServerBuilderTrait;
 
@@ -40,19 +42,21 @@ class StorageEngineTest extends AbstractTest
             $this->rootDir
         );
 
+        $storageEngine = $this->buildStorageForServer('local');
+
         $this->assertTrue(
-            $this->buildStorageForLocal()->fileExists('local://file.txt')
+            $storageEngine->fileExists('local://file.txt')
         );
 
         $this->assertFalse(
-            $this->buildStorageForLocal()->fileExists('local://file2.txt')
+            $storageEngine->fileExists('local://file2.txt')
         );
     }
 
     /**
      * @throws StorageException
      */
-    public function testWrongLocalServerFileExistsThrowsException(): void
+    public function testWrongServerFileExistsThrowsException(): void
     {
         $file = 'file.txt';
         $fileContent = 'file text';
@@ -66,10 +70,10 @@ class StorageEngineTest extends AbstractTest
 
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage(
-            'Unable to resolve the filesystem mount because the mount (other) was not registered.'
+            'Server other was not identified'
         );
 
-        $this->buildStorageForLocal()->fileExists('other://file.txt');
+        $this->buildStorageForServer('local')->fileExists('other://file.txt');
     }
 
     /**
@@ -94,19 +98,22 @@ class StorageEngineTest extends AbstractTest
             \sprintf('File %s can\'t be identified', $uri)
         );
 
-        $this->buildStorageForLocal()->fileExists($uri);
+        $this->buildStorageForServer('local')->fileExists($uri);
     }
 
     /**
+     * @param string $name
      * @return StorageEngine
      *
      * @throws StorageException
      */
-    private function buildStorageForLocal(): StorageEngine
+    private function buildStorageForServer(string $name): StorageEngine
     {
         $storageEngine = new StorageEngine($this->getUriResolver());
-        $storageEngine->init(
-            ['local' => $this->buildLocalServer(true)]
+
+        $storageEngine->mountFilesystem(
+            $name,
+            new Filesystem(AdapterFactory::build($this->buildLocalInfo($name, true)))
         );
 
         return $storageEngine;

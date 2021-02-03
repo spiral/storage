@@ -8,9 +8,11 @@ use League\Flysystem\FilesystemOperator;
 
 interface StorageInterface extends StorageReaderInterface, StorageWriterInterface
 {
-    /**
-     * todo remove after refactoring
-     * @return FilesystemOperator|null
-     */
-    public function getMountManager(): ?FilesystemOperator;
+    public function mountFilesystem(string $key, FilesystemOperator $filesystem): void;
+
+    public function isFileSystemExists(string $key): bool;
+
+    public function getFileSystem(string $key): ?FilesystemOperator;
+
+    public function extractMountedFileSystemsKeys(): array;
 }
