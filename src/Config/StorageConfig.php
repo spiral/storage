@@ -19,10 +19,12 @@ class StorageConfig extends InjectableConfig
 
     private const SERVERS_KEY = 'servers';
     private const BUCKETS_KEY = 'buckets';
+    private const TMP_DIR_KEY = 'tmp-dir';
 
     protected $config = [
         self::SERVERS_KEY   => [],
         self::BUCKETS_KEY => [],
+        self::TMP_DIR_KEY => '',
     ];
 
     /**
@@ -39,9 +41,26 @@ class StorageConfig extends InjectableConfig
      */
     protected array $bucketsInfo = [];
 
+    public function __construct(array $config = [])
+    {
+        if (!array_key_exists(static::SERVERS_KEY, $config)) {
+            throw new ConfigException('Servers must be defined for storage work');
+        }
+
+        if (array_key_exists(static::TMP_DIR_KEY, $config) && !is_dir($config[static::TMP_DIR_KEY])) {
+            throw new ConfigException(
+                \sprintf('Defined tmp directory `%s` was not detected', $config[static::TMP_DIR_KEY])
+            );
+        }
+
+        parent::__construct($config);
+    }
+
     public function getServersKeys(): array
     {
-        return array_keys($this->config[static::SERVERS_KEY]);
+        return array_key_exists(static::SERVERS_KEY, $this->config)
+            ? array_keys($this->config[static::SERVERS_KEY])
+            : [];
     }
 
     public function hasServer(string $key): bool
@@ -49,9 +68,23 @@ class StorageConfig extends InjectableConfig
         return array_key_exists($key, $this->config[static::SERVERS_KEY]);
     }
 
+    public function getBucketsKeys(): array
+    {
+        return array_key_exists(static::BUCKETS_KEY, $this->config)
+            ? array_keys($this->config[static::BUCKETS_KEY])
+            : [];
+    }
+
     public function hasBucket(string $key): bool
     {
         return array_key_exists($key, $this->config[static::BUCKETS_KEY]);
+    }
+
+    public function getTmpDir(): string
+    {
+        return array_key_exists(static::TMP_DIR_KEY, $this->config)
+            ? $this->config[static::TMP_DIR_KEY]
+            : sys_get_temp_dir();
     }
 
     /**

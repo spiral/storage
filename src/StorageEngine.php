@@ -105,12 +105,37 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
     /**
      * @param string|null $uri
-     *
      * @return string
+     *
+     * @throws FileOperationException
+     * @throws StorageException
      */
     public function tempFilename(string $uri = null): string
     {
-        // TODO: Implement tempFilename() method.
+        try {
+            $prefix = 'tmpStorageFile_';
+
+            if ($uri !== null) {
+                /** @var FilesystemOperator $filesystem */
+                [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+                $content = $filesystem->read($path);
+                $prefix = basename($uri) . '_';
+            }
+
+            $filePath = tempnam($this->config->getTmpDir(), $prefix);
+
+            if (isset($content)) {
+                file_put_contents($filePath, $content);
+            }
+
+            return $filePath;
+        } catch (FilesystemException $e) {
+            throw new FileOperationException(
+                'Unable to create tmp file: ' . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
     }
 
     /**

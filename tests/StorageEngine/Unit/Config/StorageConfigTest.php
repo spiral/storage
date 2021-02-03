@@ -141,6 +141,20 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertEquals(array_keys($servers), $config->getServersKeys());
     }
 
+    public function testGetBucketsKeys(): void
+    {
+        $buckets = ['b1' => [], 'b2' => []];
+
+        $config = new StorageConfig(
+            [
+                'servers' => ['local' => []],
+                'buckets' => $buckets,
+            ]
+        );
+
+        $this->assertEquals(array_keys($buckets), $config->getBucketsKeys());
+    }
+
     public function testHasServer(): void
     {
         $localServer = 'local';
@@ -155,6 +169,57 @@ class StorageConfigTest extends AbstractUnitTest
 
         $this->assertTrue($config->hasServer($localServer));
         $this->assertFalse($config->hasServer('missing'));
+    }
+
+    public function testGetTmpDir(): void
+    {
+        $configBasic = new StorageConfig(
+            [
+                'servers' => ['local' => $this->buildLocalInfoDescription()],
+            ]
+        );
+
+        $this->assertEquals(sys_get_temp_dir(), $configBasic->getTmpDir());
+
+        $tmpDir = __DIR__;
+
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    'local' => [],
+                ],
+                'tmp-dir' => $tmpDir,
+            ]
+        );
+
+        $this->assertEquals($tmpDir, $config->getTmpDir());
+    }
+
+    public function testConstructorWrongTmpDirThrowsException(): void
+    {
+        $tmpDir = '/my+=Dir/some#3Dir/tmp';
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(
+            \sprintf('Defined tmp directory `%s` was not detected', $tmpDir)
+        );
+
+        new StorageConfig(
+            [
+                'servers' => [
+                    'local' => [],
+                ],
+                'tmp-dir' => $tmpDir,
+            ]
+        );
+    }
+
+    public function testConstructorNoServersThrowsException(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Servers must be defined for storage work');
+
+        new StorageConfig([]);
     }
 
     public function testBuildBucketInfo(): void
