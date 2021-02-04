@@ -23,8 +23,6 @@ trait StorageConfigTrait
             ];
         }
 
-        return new StorageConfig(
-            ['servers' => $servers]
-        );
+        return new StorageConfig(['servers' => $servers]);
     }
 }

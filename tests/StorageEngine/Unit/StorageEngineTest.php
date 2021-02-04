@@ -14,10 +14,15 @@ use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 
+/**
+ * tests for basic StorageEngine methods
+ */
 class StorageEngineTest extends AbstractUnitTest
 {
     use LocalServerBuilderTrait;
+    use StorageConfigTrait;
 
     private StorageEngine $storage;
 
@@ -36,7 +41,9 @@ class StorageEngineTest extends AbstractUnitTest
             )
         );
 
-        $storageConfig = new StorageConfig(['servers' => []]);
+        $storageConfig = $this->buildStorageConfig(
+             ['default' => $this->buildLocalInfoDescription()]
+        );
 
         $this->storage = new StorageEngine($storageConfig, $this->getUriResolver());
         $this->storage->mountFilesystem(ServerTestInterface::SERVER_NAME, $this->localFileSystem);
@@ -113,7 +120,7 @@ class StorageEngineTest extends AbstractUnitTest
 
     public function testExtractMountedFileSystemsKeys(): void
     {
-        $this->assertEquals([ServerTestInterface::SERVER_NAME], $this->storage->extractMountedFileSystemsKeys());
+        $this->assertEquals(['default', ServerTestInterface::SERVER_NAME], $this->storage->extractMountedFileSystemsKeys());
     }
 
     /**
