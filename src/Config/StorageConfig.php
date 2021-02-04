@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config;
 
-use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;

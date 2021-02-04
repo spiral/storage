@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Config;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
-use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;

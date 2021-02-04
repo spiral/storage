@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\Traits;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
