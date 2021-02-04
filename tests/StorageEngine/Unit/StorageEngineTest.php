@@ -19,6 +19,8 @@ use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
  */
 class StorageEngineTest extends StorageEngineAbstractTest
 {
+    private const DEFAULT_SERVER_NAME = 'default';
+
     private StorageEngine $storage;
 
     private FilesystemOperator $localFileSystem;
@@ -37,7 +39,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
         );
 
         $storageConfig = $this->buildStorageConfig(
-             ['default' => $this->buildLocalInfoDescription()]
+            [static::DEFAULT_SERVER_NAME => $this->buildLocalInfoDescription()]
         );
 
         $this->storage = new StorageEngine($storageConfig, $this->getUriResolver());
@@ -129,7 +131,6 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $this->assertSame($mountedFs, $storage->getFileSystem($local2Name));
 
         $this->assertEquals([$local1Name, $local2Name], $storage->extractMountedFileSystemsKeys());
-
     }
 
     public function testIsFileSystemExists(): void
@@ -146,7 +147,10 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
     public function testExtractMountedFileSystemsKeys(): void
     {
-        $this->assertEquals(['default', ServerTestInterface::SERVER_NAME], $this->storage->extractMountedFileSystemsKeys());
+        $this->assertEquals(
+            [static::DEFAULT_SERVER_NAME, ServerTestInterface::SERVER_NAME],
+            $this->storage->extractMountedFileSystemsKeys()
+        );
     }
 
     /**

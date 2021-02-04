@@ -178,6 +178,9 @@ class StorageEngineForLocalTest extends AbstractTest
         $storageEngine->readStream('local://file_missed.txt');
     }
 
+    /**
+     * @throws StorageException
+     */
     public function testLastModified(): void
     {
         $today = new \DateTimeImmutable();

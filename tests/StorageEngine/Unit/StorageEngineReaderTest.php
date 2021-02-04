@@ -9,7 +9,6 @@ use League\Flysystem\UnableToCheckFileExistence;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use Spiral\StorageEngine\Exception\FileOperationException;
-use Spiral\StorageEngine\Exception\MountException;
 use Spiral\StorageEngine\Exception\StorageException;
 
 /**
@@ -291,17 +290,4 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
 
         $storage->visibility('local://file.txt');
     }
-
-    /*public function testFileSize(): void {
-        
-    }
-
-    public function testMimeType(): void {
-        
-    }
-
-    public function testVisibility(): void {
-        
-    }*/
 }
-

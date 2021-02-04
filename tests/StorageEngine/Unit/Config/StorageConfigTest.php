@@ -129,6 +129,9 @@ class StorageConfigTest extends AbstractUnitTest
         $config->buildServerInfo($serverName);
     }
 
+    /**
+     * @throws ConfigException
+     */
     public function testGetServersKeys(): void
     {
         $servers = [
@@ -141,6 +144,9 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertEquals(array_keys($servers), $config->getServersKeys());
     }
 
+    /**
+     * @throws ConfigException
+     */
     public function testGetBucketsKeys(): void
     {
         $buckets = ['b1' => [], 'b2' => []];
@@ -155,6 +161,9 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertEquals(array_keys($buckets), $config->getBucketsKeys());
     }
 
+    /**
+     * @throws ConfigException
+     */
     public function testHasServer(): void
     {
         $localServer = 'local';
@@ -171,6 +180,9 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertFalse($config->hasServer('missing'));
     }
 
+    /**
+     * @throws ConfigException
+     */
     public function testGetTmpDir(): void
     {
         $configBasic = new StorageConfig(
@@ -195,6 +207,9 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertEquals($tmpDir, $config->getTmpDir());
     }
 
+    /**
+     * @throws ConfigException
+     */
     public function testConstructorWrongTmpDirThrowsException(): void
     {
         $tmpDir = '/my+=Dir/some#3Dir/tmp';
@@ -214,6 +229,9 @@ class StorageConfigTest extends AbstractUnitTest
         );
     }
 
+    /**
+     * @throws ConfigException
+     */
     public function testConstructorNoServersThrowsException(): void
     {
         $this->expectException(ConfigException::class);
@@ -222,6 +240,10 @@ class StorageConfigTest extends AbstractUnitTest
         new StorageConfig([]);
     }
 
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
     public function testBuildBucketInfo(): void
     {
         $localServer = 'local';
@@ -255,6 +277,10 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertSame($bucketInfo, $config->buildBucketInfo($localBucket1));
     }
 
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
     public function testBuildBucketInfoForMissedBucket(): void
     {
         $localServer = 'local';
@@ -284,6 +310,10 @@ class StorageConfigTest extends AbstractUnitTest
         $config->buildBucketInfo($missedBucket);
     }
 
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
     public function testGetServerBuckets(): void
     {
         $localServer = 'local';
@@ -315,6 +345,10 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertEquals([$localBucket1, $localBucket2], array_keys($config->getServerBuckets($localServer)));
     }
 
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
     public function testGetServerBucketsForMissedServer(): void
     {
         $localServer = 'local';

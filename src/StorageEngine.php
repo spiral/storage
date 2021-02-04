@@ -329,7 +329,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         /** @var FilesystemOperator $filesystem */
         [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
 
-        try{
+        try {
             $filesystem->setVisibility($path, $visibility);
         } catch (FilesystemException $e) {
             throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
@@ -376,7 +376,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
             throw new MountException(\sprintf('Server %s was not identified', $destinationServer));
         }
 
-        try{
+        try {
             $sourceFilesystem === $destinationFilesystem
                 ? $this->moveInTheSameFilesystem(
                     $sourceFilesystem,

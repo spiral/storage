@@ -79,7 +79,7 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
 
         $fileName = 'newFile.txt';
         $fileContent = 'new File content';
-        
+
         $localServer = $this->createMock(FilesystemOperator::class);
         $localServer->expects($this->once())
             ->method('write')
@@ -145,7 +145,7 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
             '/^Unable to write file at location: newFile.txt. test reason/'
         );
 
-        $resource = fopen('php://memory', 'r+');
+        $resource = fopen('php://memory', 'rb+');
 
         $storage->writeStream(
             static::LOCAL_SERVER_NAME,

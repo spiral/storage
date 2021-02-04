@@ -6,7 +6,6 @@ namespace Spiral\StorageEngine\Tests\Unit\Validation;
 
 use Spiral\StorageEngine\Exception\ValidationException;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
-use Spiral\StorageEngine\Validation\FilePathValidator;
 
 class FilePathValidatorTest extends AbstractUnitTest
 {
