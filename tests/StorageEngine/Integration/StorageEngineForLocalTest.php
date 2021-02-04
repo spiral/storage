@@ -34,7 +34,6 @@ class StorageEngineForLocalTest extends AbstractTest
 
     /**
      * @throws StorageException
-     * @throws FileOperationException
      */
     public function testTempFilenameNoUri(): void
     {
@@ -52,7 +51,6 @@ class StorageEngineForLocalTest extends AbstractTest
 
     /**
      * @throws StorageException
-     * @throws FileOperationException
      */
     public function testTempFilenameUri(): void
     {
@@ -215,7 +213,6 @@ class StorageEngineForLocalTest extends AbstractTest
     }
 
     /**
-     * @throws FileOperationException
      * @throws StorageException
      */
     public function testFileSize(): void
@@ -248,7 +245,6 @@ class StorageEngineForLocalTest extends AbstractTest
     }
 
     /**
-     * @throws FileOperationException
      * @throws StorageException
      */
     public function testMimeType(): void
@@ -278,7 +274,6 @@ class StorageEngineForLocalTest extends AbstractTest
     }
 
     /**
-     * @throws FileOperationException
      * @throws StorageException
      */
     public function testVisibility(): void

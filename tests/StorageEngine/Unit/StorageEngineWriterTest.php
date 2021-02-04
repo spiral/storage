@@ -14,18 +14,12 @@ use League\Flysystem\UnableToWriteFile;
 use Spiral\StorageEngine\Exception\FileOperationException;
 use Spiral\StorageEngine\Exception\MountException;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\StorageEngine;
-use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 
 /**
  * tests for StorageWriterInterface methods
  */
-class StorageEngineWriterTest extends AbstractUnitTest
+class StorageEngineWriterTest extends StorageEngineAbstractTest
 {
-    use LocalServerBuilderTrait;
-    use StorageConfigTrait;
-
     private const LOCAL_SERVER_NAME = 'local';
 
     /**
@@ -466,15 +460,5 @@ class StorageEngineWriterTest extends AbstractUnitTest
         $this->expectExceptionMessage('Unable to move file from file.txt to movedFile.txt');
 
         $storage->copy($sourceUri, $destinationServer, $targetFilePath);
-    }
-
-    /**
-     * @return StorageEngine
-     *
-     * @throws StorageException
-     */
-    private function buildSimpleStorageEngine(): StorageEngine
-    {
-        return new StorageEngine($this->buildStorageConfig(), $this->getUriResolver());
     }
 }

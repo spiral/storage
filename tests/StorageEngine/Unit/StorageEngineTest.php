@@ -13,17 +13,12 @@ use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
-use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 
 /**
  * tests for basic StorageEngine methods
  */
-class StorageEngineTest extends AbstractUnitTest
+class StorageEngineTest extends StorageEngineAbstractTest
 {
-    use LocalServerBuilderTrait;
-    use StorageConfigTrait;
-
     private StorageEngine $storage;
 
     private FilesystemOperator $localFileSystem;
@@ -76,6 +71,37 @@ class StorageEngineTest extends AbstractUnitTest
         $this->assertFalse($storage->isFileSystemExists(ServerTestInterface::SERVER_NAME));
 
         $this->assertEquals([$local1Name, $local2Name], $storage->extractMountedFileSystemsKeys());
+    }
+
+    /**
+     * @throws StorageException
+     */
+    public function testMountSystems(): void
+    {
+        $local1Name = 'local1';
+        $local2Name = 'local2';
+
+        $fsList = [
+            $local1Name => new Filesystem(AdapterFactory::build($this->buildLocalInfo($local1Name))),
+            $local2Name => new Filesystem(AdapterFactory::build($this->buildLocalInfo($local2Name))),
+        ];
+
+        $storageConfig = $this->buildStorageConfig();
+
+        $storage = new StorageEngine($storageConfig, $this->getUriResolver());
+
+        $storage->mountFileSystems($fsList);
+
+        foreach ($fsList as $key => $fs) {
+            $this->assertTrue($storage->isFileSystemExists($key));
+            $this->assertInstanceOf(FilesystemOperator::class, $storage->getFileSystem($key));
+            $this->assertSame($fs, $storage->getFileSystem($key));
+        }
+
+        $this->assertEquals(
+            [ServerTestInterface::SERVER_NAME, $local1Name, $local2Name],
+            $storage->extractMountedFileSystemsKeys()
+        );
     }
 
     /**
