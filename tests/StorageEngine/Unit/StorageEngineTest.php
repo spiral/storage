@@ -72,11 +72,8 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $storage = new StorageEngine($storageConfig, $this->getUriResolver());
 
         foreach ([$local1Name, $local2Name] as $key) {
-            $this->assertTrue($storage->isFileSystemExists($key));
             $this->assertInstanceOf(FilesystemOperator::class, $storage->getFileSystem($key));
         }
-
-        $this->assertFalse($storage->isFileSystemExists(ServerTestInterface::SERVER_NAME));
 
         $this->assertEquals([$local1Name, $local2Name], $storage->extractMountedFileSystemsKeys());
     }
@@ -99,7 +96,6 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $storage = new StorageEngine($storageConfig, $this->getUriResolver());
 
         foreach ($fsList as $key => $fsInfoDescription) {
-            $this->assertTrue($storage->isFileSystemExists($key));
             $this->assertInstanceOf(FilesystemOperator::class, $storage->getFileSystem($key));
         }
 
@@ -111,14 +107,39 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
     public function testIsFileSystemExists(): void
     {
-        $this->assertTrue($this->storage->isFileSystemExists(ServerTestInterface::SERVER_NAME));
-        $this->assertFalse($this->storage->isFileSystemExists('missed'));
+        $this->assertTrue(
+            $this->callNotPublicMethod(
+                $this->storage,
+                'isFileSystemExists',
+                [ServerTestInterface::SERVER_NAME]
+            )
+        );
+        $this->assertFalse(
+            $this->callNotPublicMethod(
+                $this->storage,
+                'isFileSystemExists',
+                ['missed']
+            )
+        );
     }
 
+    /**
+     * @throws MountException
+     */
     public function testGetFileSystem(): void
     {
         $this->assertSame($this->localFileSystem, $this->storage->getFileSystem(ServerTestInterface::SERVER_NAME));
-        $this->assertNull($this->storage->getFileSystem('missed'));
+    }
+
+    /**
+     * @throws MountException
+     */
+    public function testGetMissedFileSystem(): void
+    {
+        $this->expectException(MountException::class);
+        $this->expectExceptionMessage('Server missed was not identified');
+
+        $this->storage->getFileSystem('missed');
     }
 
     public function testExtractMountedFileSystemsKeys(): void

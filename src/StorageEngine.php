@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine;
 
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Spiral\Core\Container\SingletonInterface;
@@ -50,40 +49,28 @@ class StorageEngine implements StorageInterface, SingletonInterface
                     );
                 }
 
-                $serverInfo = AdapterFactory::build($this->config->buildServerInfo($serverKey));
-
-                if (!$serverInfo instanceof FilesystemAdapter) {
-                    throw new MountException(
-                        \sprintf(
-                            'Server %s can\'t be mounted - filesystem has wrong type - %s received',
-                            $serverKey,
-                            gettype($serverInfo)
-                        )
-                    );
-                }
-
-                $this->mountFilesystem($serverKey,new Filesystem($serverInfo));
+                $this->mountFilesystem(
+                    $serverKey,
+                    new Filesystem(
+                        AdapterFactory::build($this->config->buildServerInfo($serverKey))
+                    )
+                );
             }
         }
     }
 
-    protected function mountFilesystem(string $key, FilesystemOperator $filesystem): void
+    /**
+     * @inheritDoc
+     */
+    public function getFileSystem(string $key): FilesystemOperator
     {
-        if ($this->isFileSystemExists($key)) {
-            return;
+        if (!$this->isFileSystemExists($key)) {
+            throw new MountException(
+                \sprintf('Server %s was not identified', $key)
+            );
         }
 
-        $this->fileSystems[$key] = $filesystem;
-    }
-
-    public function isFileSystemExists(string $key): bool
-    {
-        return array_key_exists($key, $this->fileSystems);
-    }
-
-    public function getFileSystem(string $key): ?FilesystemOperator
-    {
-        return $this->isFileSystemExists($key) ? $this->fileSystems[$key] : null;
+        return $this->fileSystems[$key];
     }
 
     public function extractMountedFileSystemsKeys(): array
@@ -360,10 +347,6 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
         $destinationFilesystem = $this->getFileSystem($destinationServer);
 
-        if ($destinationFilesystem === null) {
-            throw new MountException(\sprintf('Server %s was not identified', $destinationServer));
-        }
-
         try {
             $sourceFilesystem === $destinationFilesystem
                 ? $this->moveInTheSameFilesystem(
@@ -397,10 +380,6 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
         $destinationFilesystem = $this->getFileSystem($destinationServer);
 
-        if ($destinationFilesystem === null) {
-            throw new MountException(\sprintf('Server %s was not identified', $destinationServer));
-        }
-
         try {
             $sourceFilesystem === $destinationFilesystem ? $this->copyInSameFilesystem(
                 $sourceFilesystem,
@@ -420,24 +399,32 @@ class StorageEngine implements StorageInterface, SingletonInterface
         }
     }
 
+    protected function mountFilesystem(string $key, FilesystemOperator $filesystem): void
+    {
+        if ($this->isFileSystemExists($key)) {
+            return;
+        }
+
+        $this->fileSystems[$key] = $filesystem;
+    }
+
+    protected function isFileSystemExists(string $key): bool
+    {
+        return array_key_exists($key, $this->fileSystems);
+    }
+
     /**
      * @param string $uri
      *
      * @return array{0:FilesystemOperator, 1:string}
      *
-     * @throws StorageException
+     * @throws MountException
      */
     protected function determineFilesystemAndPath(string $uri): array
     {
         $uriStructure = $this->uriResolver->parseUriToStructure($uri);
 
-        if (!$this->isFileSystemExists($uriStructure->serverName)) {
-            throw new StorageException(
-                \sprintf('Server %s was not identified', $uriStructure->serverName)
-            );
-        }
-
-        return [$this->fileSystems[$uriStructure->serverName], $uriStructure->filePath];
+        return [$this->getFileSystem($uriStructure->serverName), $uriStructure->filePath];
     }
 
     /**

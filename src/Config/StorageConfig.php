@@ -143,7 +143,8 @@ class StorageConfig extends InjectableConfig
             throw new ConfigException(
                 \sprintf(
                     'Server info for %s was provided in wrong format, array expected, %s received',
-                    $serverKey, gettype($serverInfo)
+                    $serverKey,
+                    gettype($serverInfo)
                 )
             );
         }
