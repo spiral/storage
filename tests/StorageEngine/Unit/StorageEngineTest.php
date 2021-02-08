@@ -75,7 +75,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
             $this->assertInstanceOf(FilesystemOperator::class, $storage->getFileSystem($key));
         }
 
-        $this->assertEquals([$local1Name, $local2Name], $storage->extractMountedFileSystemsKeys());
+        $this->assertEquals([$local1Name, $local2Name], $storage->getFileSystemsNames());
     }
 
     /**
@@ -101,7 +101,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
         $this->assertEquals(
             [$local1Name, $local2Name],
-            $storage->extractMountedFileSystemsKeys()
+            $storage->getFileSystemsNames()
         );
     }
 
@@ -146,7 +146,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
     {
         $this->assertEquals(
             [static::DEFAULT_SERVER_NAME, ServerTestInterface::SERVER_NAME],
-            $this->storage->extractMountedFileSystemsKeys()
+            $this->storage->getFileSystemsNames()
         );
     }
 

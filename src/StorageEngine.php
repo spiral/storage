@@ -73,7 +73,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         return $this->fileSystems[$key];
     }
 
-    public function extractMountedFileSystemsKeys(): array
+    public function getFileSystemsNames(): array
     {
         return array_keys($this->fileSystems);
     }
@@ -92,7 +92,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
             if ($uri !== null) {
                 /** @var FilesystemOperator $filesystem */
                 [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-                $content = $filesystem->read($path);
+                $content = $filesystem->readStream($path);
                 $prefix = basename($uri) . '_';
             }
 
@@ -103,7 +103,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
             }
 
             return $filePath;
-        } catch (FilesystemException $e) {
+        } catch (\Throwable $e) {
             throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
     }
