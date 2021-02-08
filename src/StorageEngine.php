@@ -334,6 +334,8 @@ class StorageEngine implements StorageInterface, SingletonInterface
      * @param string|null $targetFilePath
      * @param array $config
      *
+     * @return string
+     *
      * @throws StorageException
      */
     public function move(
@@ -341,21 +343,20 @@ class StorageEngine implements StorageInterface, SingletonInterface
         string $destinationServer,
         ?string $targetFilePath = null,
         array $config = []
-    ): void {
+    ): string {
         /** @var FilesystemOperator $sourceFilesystem */
         [$sourceFilesystem, $sourcePath] = $this->determineFilesystemAndPath($sourceUri);
 
         $destinationFilesystem = $this->getFileSystem($destinationServer);
 
         try {
+            $targetFilePath = $targetFilePath ?: $sourcePath;
+
             $sourceFilesystem === $destinationFilesystem
-                ? $this->moveInTheSameFilesystem(
-                    $sourceFilesystem,
-                    $sourcePath,
-                    $targetFilePath ?: $sourcePath,
-                    $config
-                )
+                ? $this->moveInTheSameFilesystem($sourceFilesystem, $sourcePath, $targetFilePath, $config)
                 : $this->moveAcrossFilesystems($sourceUri, $destinationServer, $targetFilePath, $config);
+
+            return $this->uriResolver->buildUri($destinationServer, $targetFilePath);
         } catch (FilesystemException $e) {
             throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
@@ -367,6 +368,8 @@ class StorageEngine implements StorageInterface, SingletonInterface
      * @param string|null $targetFilePath
      * @param array $config
      *
+     * @return string
+     *
      * @throws StorageException
      */
     public function copy(
@@ -374,26 +377,27 @@ class StorageEngine implements StorageInterface, SingletonInterface
         string $destinationServer,
         ?string $targetFilePath = null,
         array $config = []
-    ): void {
+    ): string {
         /** @var FilesystemOperator $sourceFilesystem */
         [$sourceFilesystem, $sourcePath] = $this->determineFilesystemAndPath($sourceUri);
 
         $destinationFilesystem = $this->getFileSystem($destinationServer);
 
         try {
-            $sourceFilesystem === $destinationFilesystem ? $this->copyInSameFilesystem(
-                $sourceFilesystem,
-                $sourcePath,
-                $targetFilePath ?: $sourcePath,
-                $config
-            ) : $this->copyAcrossFilesystem(
-                $config['visibility'] ?? null,
-                $sourceFilesystem,
-                $sourcePath,
-                $destinationFilesystem,
-                $targetFilePath ?: $sourcePath,
-                $config
-            );
+            $targetFilePath = $targetFilePath ?: $sourcePath;
+
+            $sourceFilesystem === $destinationFilesystem
+                ? $this->copyInSameFilesystem($sourceFilesystem, $sourcePath, $targetFilePath, $config)
+                : $this->copyAcrossFilesystem(
+                    $config['visibility'] ?? null,
+                    $sourceFilesystem,
+                    $sourcePath,
+                    $destinationFilesystem,
+                    $targetFilePath,
+                    $config
+                );
+
+            return $this->uriResolver->buildUri($destinationServer, $targetFilePath);
         } catch (FilesystemException $e) {
             throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }

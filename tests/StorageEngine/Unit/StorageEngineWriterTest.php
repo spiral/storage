@@ -259,7 +259,10 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
 
         $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
 
-        $storage->move($sourceUri, $destinationServer, $targetFilePath, $config);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, $targetFilePath),
+            $storage->move($sourceUri, $destinationServer, $targetFilePath, $config)
+    );
     }
 
     /**
@@ -277,7 +280,10 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
 
         $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
 
-        $storage->move($sourceUri, $destinationServer);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, 'file.txt'),
+            $storage->move($sourceUri, $destinationServer)
+        );
     }
 
     /**
@@ -287,15 +293,16 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
     public function testMoveFileAcrossSystems(): void
     {
         $sourceUri = 'local://file.txt';
+        $filePath = 'file.txt';
         $destinationServer = 'local2';
 
         $localServer = $this->createMock(FilesystemOperator::class);
         $localServer->expects($this->once())
             ->method('readStream')
-            ->with('file.txt');
+            ->with($filePath);
         $localServer->expects($this->once())
             ->method('delete')
-            ->with('file.txt');
+            ->with($filePath);
 
 
         $localServer2 = $this->createMock(FilesystemOperator::class);
@@ -305,7 +312,10 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
         $this->mountStorageEngineFileSystem($storage, $destinationServer, $localServer2);
 
-        $storage->move($sourceUri, $destinationServer);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, $filePath),
+            $storage->move($sourceUri, $destinationServer)
+        );
     }
 
     /**
@@ -324,7 +334,10 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $this->expectException(MountException::class);
         $this->expectExceptionMessage('Server missed was not identified');
 
-        $storage->move($sourceUri, $destinationServer);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, 'file.txt'),
+            $storage->move($sourceUri, $destinationServer)
+        );
     }
 
     /**
@@ -350,7 +363,10 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to move file from file.txt to movedFile.txt');
 
-        $storage->move($sourceUri, $destinationServer, $targetFilePath);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, $targetFilePath),
+            $storage->move($sourceUri, $destinationServer, $targetFilePath)
+        );
     }
 
     /**
@@ -371,7 +387,10 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
 
         $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
 
-        $storage->copy($sourceUri, $destinationServer, $targetFilePath, $config);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, $targetFilePath),
+            $storage->copy($sourceUri, $destinationServer, $targetFilePath, $config)
+        );
     }
 
     /**
@@ -381,13 +400,14 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
     public function testCopyFileAcrossSystems(): void
     {
         $sourceUri = 'local://file.txt';
+        $filePath = 'file.txt';
         $destinationServer = 'local2';
         $config = ['visibility' => 'public'];
 
         $localServer = $this->createMock(FilesystemOperator::class);
         $localServer->expects($this->once())
             ->method('readStream')
-            ->with('file.txt');
+            ->with($filePath);
 
         $localServer2 = $this->createMock(FilesystemOperator::class);
         $localServer2->expects($this->once())
@@ -396,7 +416,10 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
         $this->mountStorageEngineFileSystem($storage, $destinationServer, $localServer2);
 
-        $storage->copy($sourceUri, $destinationServer, null, $config);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, $filePath),
+            $storage->copy($sourceUri, $destinationServer, null, $config)
+        );
     }
 
     /**
@@ -415,7 +438,10 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $this->expectException(MountException::class);
         $this->expectExceptionMessage('Server missed was not identified');
 
-        $storage->copy($sourceUri, $destinationServer);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, 'file.txt'),
+            $storage->copy($sourceUri, $destinationServer)
+        );
     }
 
     /**
@@ -441,6 +467,9 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to move file from file.txt to movedFile.txt');
 
-        $storage->copy($sourceUri, $destinationServer, $targetFilePath);
+        $this->assertEquals(
+            \sprintf('%s://%s', $destinationServer, $targetFilePath),
+            $storage->copy($sourceUri, $destinationServer, $targetFilePath)
+        );
     }
 }
