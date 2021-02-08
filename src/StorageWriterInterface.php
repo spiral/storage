@@ -19,14 +19,14 @@ interface StorageWriterInterface
         string $destinationServer,
         ?string $targetFilePath = null,
         array $config = []
-    );
+    ): string;
 
     public function move(
         string $sourceUri,
         string $destinationServer,
         ?string $targetFilePath = null,
         array $config = []
-    );
+    ): string;
 
     public function delete(string $uri): void;
 }
