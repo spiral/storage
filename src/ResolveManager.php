@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine;
 
 use Spiral\Core\Container\SingletonInterface;
-use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
-use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Config\DTO\Traits\ClassBasedTrait;
@@ -53,25 +53,6 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         }
     }
 
-    protected function prepareOptions(array $options): void
-    {
-        $this->validateRequiredOptions(
-            array_keys(static::REQUIRED_OPTIONS),
-            $options,
-            ' for server ' . $this->getName()
-        );
-
-        foreach ($options as $optionKey => $option) {
-            if (($type = $this->getOptionType($optionKey)) === null) {
-                continue;
-            }
-
-            $this->validateOptionByType($optionKey, $type, $option);
-
-            $this->options[$optionKey] = $this->processOptionByType($option, $type);
-        }
-    }
-
     public function getAdapterClass(): string
     {
         return $this->adapter;
@@ -96,6 +77,25 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         }
 
         return false;
+    }
+
+    protected function prepareOptions(array $options): void
+    {
+        $this->validateRequiredOptions(
+            array_keys(static::REQUIRED_OPTIONS),
+            $options,
+            ' for server ' . $this->getName()
+        );
+
+        foreach ($options as $optionKey => $option) {
+            if (($type = $this->getOptionType($optionKey)) === null) {
+                continue;
+            }
+
+            $this->validateOptionByType($optionKey, $type, $option);
+
+            $this->options[$optionKey] = $this->processOptionByType($option, $type);
+        }
     }
 
     protected function validateInfoSufficient(string $serverName, array $info): void

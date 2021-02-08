@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
 
 use League\Flysystem\Visibility;
-use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ClassBasedInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;

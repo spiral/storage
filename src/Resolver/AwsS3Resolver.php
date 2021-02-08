@@ -9,9 +9,9 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 
 class AwsS3Resolver extends AbstractResolver
 {
-    protected const SERVER_INFO_CLASS = AwsS3Info::class;
-
     public const EXPIRES_OPTION = 'expires';
+
+    protected const SERVER_INFO_CLASS = AwsS3Info::class;
 
     private const DEFAULT_URL_EXPIRES = '+24hours';
 

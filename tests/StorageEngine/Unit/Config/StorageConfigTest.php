@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Config;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
-use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
@@ -129,6 +129,9 @@ class StorageConfigTest extends AbstractUnitTest
         $config->buildServerInfo($serverName);
     }
 
+    /**
+     * @throws ConfigException
+     */
     public function testGetServersKeys(): void
     {
         $servers = [
@@ -141,6 +144,26 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertEquals(array_keys($servers), $config->getServersKeys());
     }
 
+    /**
+     * @throws ConfigException
+     */
+    public function testGetBucketsKeys(): void
+    {
+        $buckets = ['b1' => [], 'b2' => []];
+
+        $config = new StorageConfig(
+            [
+                'servers' => ['local' => []],
+                'buckets' => $buckets,
+            ]
+        );
+
+        $this->assertEquals(array_keys($buckets), $config->getBucketsKeys());
+    }
+
+    /**
+     * @throws ConfigException
+     */
     public function testHasServer(): void
     {
         $localServer = 'local';
@@ -157,6 +180,70 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertFalse($config->hasServer('missing'));
     }
 
+    /**
+     * @throws ConfigException
+     */
+    public function testGetTmpDir(): void
+    {
+        $configBasic = new StorageConfig(
+            [
+                'servers' => ['local' => $this->buildLocalInfoDescription()],
+            ]
+        );
+
+        $this->assertEquals(sys_get_temp_dir(), $configBasic->getTmpDir());
+
+        $tmpDir = __DIR__;
+
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    'local' => [],
+                ],
+                'tmp-dir' => $tmpDir,
+            ]
+        );
+
+        $this->assertEquals($tmpDir, $config->getTmpDir());
+    }
+
+    /**
+     * @throws ConfigException
+     */
+    public function testConstructorWrongTmpDirThrowsException(): void
+    {
+        $tmpDir = '/my+=Dir/some#3Dir/tmp';
+
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(
+            \sprintf('Defined tmp directory `%s` was not detected', $tmpDir)
+        );
+
+        new StorageConfig(
+            [
+                'servers' => [
+                    'local' => [],
+                ],
+                'tmp-dir' => $tmpDir,
+            ]
+        );
+    }
+
+    /**
+     * @throws ConfigException
+     */
+    public function testConstructorNoServersThrowsException(): void
+    {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage('Servers must be defined for storage work');
+
+        new StorageConfig([]);
+    }
+
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
     public function testBuildBucketInfo(): void
     {
         $localServer = 'local';
@@ -190,6 +277,10 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertSame($bucketInfo, $config->buildBucketInfo($localBucket1));
     }
 
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
     public function testBuildBucketInfoForMissedBucket(): void
     {
         $localServer = 'local';
@@ -219,6 +310,10 @@ class StorageConfigTest extends AbstractUnitTest
         $config->buildBucketInfo($missedBucket);
     }
 
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
     public function testGetServerBuckets(): void
     {
         $localServer = 'local';
@@ -250,6 +345,10 @@ class StorageConfigTest extends AbstractUnitTest
         $this->assertEquals([$localBucket1, $localBucket2], array_keys($config->getServerBuckets($localServer)));
     }
 
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
     public function testGetServerBucketsForMissedServer(): void
     {
         $localServer = 'local';

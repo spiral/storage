@@ -7,10 +7,18 @@ namespace Spiral\StorageEngine\Tests\Traits;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
 trait StorageConfigTrait
 {
+    /**
+     * @param array|null $servers
+     *
+     * @return StorageConfig
+     *
+     * @throws ConfigException
+     */
     protected function buildStorageConfig(?array $servers = null): StorageConfig
     {
         if (empty($servers)) {
@@ -23,8 +31,6 @@ trait StorageConfigTrait
             ];
         }
 
-        return new StorageConfig(
-            ['servers' => $servers]
-        );
+        return new StorageConfig(['servers' => $servers]);
     }
 }

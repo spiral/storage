@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine;
 
 use League\Flysystem\FilesystemOperator;
+use Spiral\StorageEngine\Exception\MountException;
 
 interface StorageInterface extends StorageReaderInterface, StorageWriterInterface
 {
     /**
-     * todo remove after refactoring
-     * @return FilesystemOperator|null
+     * @param string $key
+     *
+     * @return FilesystemOperator
+     *
+     * @throws MountException
      */
-    public function getMountManager(): ?FilesystemOperator;
+    public function getFileSystem(string $key): FilesystemOperator;
+
+    public function extractMountedFileSystemsKeys(): array;
 }

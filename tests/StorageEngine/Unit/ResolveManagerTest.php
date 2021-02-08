@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
-use Spiral\Core\Exception\ConfigException;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
@@ -31,6 +31,7 @@ class ResolveManagerTest extends AbstractUnitTest
     private const LOCAL_SERVER_HOST_2 = 'http://my.images.com/';
 
     /**
+     * @throws ConfigException
      * @throws \ReflectionException
      */
     public function testGetResolver(): void
@@ -49,6 +50,10 @@ class ResolveManagerTest extends AbstractUnitTest
         );
     }
 
+    /**
+     * @throws ConfigException
+     * @throws \ReflectionException
+     */
     public function testGetResolverFailed(): void
     {
         $resolveManager = $this->buildResolveManager(
@@ -70,6 +75,7 @@ class ResolveManagerTest extends AbstractUnitTest
      * @param string $expectedClass
      *
      * @throws \ReflectionException
+     * @throws ConfigException
      */
     public function testPrepareResolverForServer(ServerInfoInterface $serverInfo, string $expectedClass): void
     {
@@ -229,6 +235,13 @@ class ResolveManagerTest extends AbstractUnitTest
         ];
     }
 
+    /**
+     * @param array|null $servers
+     *
+     * @return ResolveManager
+     *
+     * @throws ConfigException
+     */
     private function buildResolveManager(?array $servers = null): ResolveManager
     {
         return new ResolveManager(
