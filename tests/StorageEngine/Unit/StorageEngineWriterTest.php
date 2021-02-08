@@ -32,7 +32,7 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
 
         $localServer = $this->createMock(FilesystemOperator::class);
         $localServer->expects($this->once())
-            ->method('read')
+            ->method('readStream')
             ->with('file.txt')
             ->willThrowException(
                 UnableToReadFile::fromLocation('file.txt')

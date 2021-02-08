@@ -18,5 +18,5 @@ interface StorageInterface extends StorageReaderInterface, StorageWriterInterfac
      */
     public function getFileSystem(string $key): FilesystemOperator;
 
-    public function extractMountedFileSystemsKeys(): array;
+    public function getFileSystemsNames(): array;
 }
