@@ -139,6 +139,15 @@ class StorageConfig extends InjectableConfig
 
         $serverInfo = $this->config[static::SERVERS_KEY][$serverKey];
 
+        if (!is_array($serverInfo)) {
+            throw new ConfigException(
+                \sprintf(
+                    'Server info for %s was provided in wrong format, array expected, %s received',
+                    $serverKey, gettype($serverInfo)
+                )
+            );
+        }
+
         switch ($this->extractServerAdapter($serverInfo)) {
             case \League\Flysystem\Local\LocalFilesystemAdapter::class:
                 $serverInfoDTO = new LocalInfo($serverKey, $serverInfo);

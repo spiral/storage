@@ -8,6 +8,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemOperator;
 use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\StorageConfig;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Exception\MountException;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
@@ -27,6 +28,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
     /**
      * @throws StorageException
+     * @throws \ReflectionException
      */
     protected function setUp(): void
     {
@@ -43,7 +45,11 @@ class StorageEngineTest extends StorageEngineAbstractTest
         );
 
         $this->storage = new StorageEngine($storageConfig, $this->getUriResolver());
-        $this->storage->mountFilesystem(ServerTestInterface::SERVER_NAME, $this->localFileSystem);
+        $this->mountStorageEngineFileSystem(
+            $this->storage,
+            ServerTestInterface::SERVER_NAME,
+            $this->localFileSystem
+        );
     }
 
     /**
@@ -78,59 +84,29 @@ class StorageEngineTest extends StorageEngineAbstractTest
     /**
      * @throws StorageException
      */
-    public function testMountSystems(): void
+    public function testMountSystemsByConfig(): void
     {
         $local1Name = 'local1';
         $local2Name = 'local2';
 
         $fsList = [
-            $local1Name => new Filesystem(AdapterFactory::build($this->buildLocalInfo($local1Name))),
-            $local2Name => new Filesystem(AdapterFactory::build($this->buildLocalInfo($local2Name))),
+            $local1Name => $this->buildLocalInfoDescription(),
+            $local2Name => $this->buildLocalInfoDescription(),
         ];
 
-        $storageConfig = $this->buildStorageConfig();
+        $storageConfig = $this->buildStorageConfig($fsList);
 
         $storage = new StorageEngine($storageConfig, $this->getUriResolver());
 
-        $storage->mountFileSystems($fsList);
-
-        foreach ($fsList as $key => $fs) {
+        foreach ($fsList as $key => $fsInfoDescription) {
             $this->assertTrue($storage->isFileSystemExists($key));
             $this->assertInstanceOf(FilesystemOperator::class, $storage->getFileSystem($key));
-            $this->assertSame($fs, $storage->getFileSystem($key));
         }
 
         $this->assertEquals(
-            [ServerTestInterface::SERVER_NAME, $local1Name, $local2Name],
+            [$local1Name, $local2Name],
             $storage->extractMountedFileSystemsKeys()
         );
-    }
-
-    /**
-     * @throws StorageException
-     */
-    public function testMountFileSystems(): void
-    {
-        $local1Name = 'local1';
-        $local2Name = 'local2';
-
-        $storageConfig = new StorageConfig(
-            [
-                'servers' => [
-                    $local1Name => $this->buildLocalInfoDescription(),
-                ],
-            ]
-        );
-
-        $storage = new StorageEngine($storageConfig, $this->getUriResolver());
-
-        $mountedFs = new Filesystem(AdapterFactory::build($this->buildLocalInfo()));
-        $storage->mountFilesystem($local2Name, $mountedFs);
-
-        $this->assertTrue($storage->isFileSystemExists($local2Name));
-        $this->assertSame($mountedFs, $storage->getFileSystem($local2Name));
-
-        $this->assertEquals([$local1Name, $local2Name], $storage->extractMountedFileSystemsKeys());
     }
 
     public function testIsFileSystemExists(): void
@@ -155,6 +131,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
     /**
      * @throws StorageException
+     * @throws \ReflectionException
      */
     public function testMountExistingFileSystemKeyThrowsException(): void
     {
@@ -164,7 +141,11 @@ class StorageEngineTest extends StorageEngineAbstractTest
             )
         );
 
-        $this->storage->mountFilesystem(ServerTestInterface::SERVER_NAME, $newFileSystem);
+        $this->mountStorageEngineFileSystem(
+            $this->storage,
+            ServerTestInterface::SERVER_NAME,
+            $newFileSystem
+        );
 
         $this->assertSame($this->storage->getFileSystem(ServerTestInterface::SERVER_NAME), $this->localFileSystem);
     }
@@ -172,17 +153,24 @@ class StorageEngineTest extends StorageEngineAbstractTest
     /**
      * @dataProvider getWrongFileSystemsList
      *
-     * @param array $filesystems
+     * @param array $servers
+     * @param string $expectedException
      * @param string $expectedMsg
      *
      * @throws StorageException
+     * @throws ConfigException
      */
-    public function testMountWrongFileSystemsThrowsException(array $filesystems, string $expectedMsg): void
-    {
-        $this->expectException(MountException::class);
+    public function testMountWrongFileSystemsThrowsException(
+        array $servers,
+        string $expectedException,
+        string $expectedMsg
+    ): void {
+        $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedMsg);
 
-        $this->storage->mountFileSystems($filesystems);
+        $storageConfig = $this->buildStorageConfig($servers);
+
+        new StorageEngine($storageConfig, $this->getUriResolver());
     }
 
     /**
@@ -270,25 +258,19 @@ class StorageEngineTest extends StorageEngineAbstractTest
         ];
     }
 
-    /**
-     * @return \array[][]
-     * @throws StorageException
-     */
     public function getWrongFileSystemsList(): array
     {
-        $localName = 'local';
-        $localFs = new Filesystem(AdapterFactory::build($this->buildLocalInfo($localName)));
-
         $local2Name = 'local2';
-        $local2Fs = new Filesystem(AdapterFactory::build($this->buildLocalInfo($local2Name)));
+        $localFsDesc = $this->buildLocalInfoDescription();
 
         $dateTime = new \DateTimeImmutable();
 
         return [
             [
                 [
-                    5 => $local2Fs,
+                    5 => $localFsDesc,
                 ],
+                MountException::class,
                 \sprintf(
                     'Server %s can\'t be mounted - string required, %s received',
                     5,
@@ -297,18 +279,20 @@ class StorageEngineTest extends StorageEngineAbstractTest
             ],
             [
                 [
-                    'local' => $localFs,
-                    null => $local2Fs,
+                    'local' => $localFsDesc,
+                    null => $localFsDesc,
                 ],
+                MountException::class,
                 'Server --non-displayable-- can\'t be mounted - string required, empty val received',
             ],
             [
                 [
-                    'local' => $localFs,
+                    'local' => $localFsDesc,
                     $local2Name => $dateTime,
                 ],
+                ConfigException::class,
                 \sprintf(
-                    'Server %s can\'t be mounted - filesystem has wrong type - %s received',
+                    'Server info for %s was provided in wrong format, array expected, %s received',
                     $local2Name,
                     gettype($dateTime)
                 ),

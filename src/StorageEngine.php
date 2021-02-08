@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine;
 
 use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Spiral\Core\Container\SingletonInterface;
@@ -39,47 +40,34 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
         if (!empty($config->getServersKeys())) {
             foreach ($config->getServersKeys() as $serverKey) {
-                $this->mountFilesystem(
-                    $serverKey,
-                    new Filesystem(AdapterFactory::build($this->config->buildServerInfo($serverKey)))
-                );
+                if (!is_string($serverKey) || empty($serverKey)) {
+                    throw new MountException(
+                        \sprintf(
+                            'Server %s can\'t be mounted - string required, %s received',
+                            is_scalar($serverKey) && !empty($serverKey) ? $serverKey : '--non-displayable--',
+                            empty($serverKey) ? 'empty val' : gettype($serverKey)
+                        )
+                    );
+                }
+
+                $serverInfo = AdapterFactory::build($this->config->buildServerInfo($serverKey));
+
+                if (!$serverInfo instanceof FilesystemAdapter) {
+                    throw new MountException(
+                        \sprintf(
+                            'Server %s can\'t be mounted - filesystem has wrong type - %s received',
+                            $serverKey,
+                            gettype($serverInfo)
+                        )
+                    );
+                }
+
+                $this->mountFilesystem($serverKey,new Filesystem($serverInfo));
             }
         }
     }
 
-    /**
-     * @param array $filesystems
-     *
-     * @throws StorageException
-     */
-    public function mountFileSystems(array $filesystems): void
-    {
-        foreach ($filesystems as $key => $fileSystem) {
-            if (!is_string($key) || empty($key)) {
-                throw new MountException(
-                    \sprintf(
-                        'Server %s can\'t be mounted - string required, %s received',
-                        is_scalar($key) && !empty($key) ? $key : '--non-displayable--',
-                        empty($key) ? 'empty val' : gettype($key)
-                    )
-                );
-            }
-
-            if (!$fileSystem instanceof FilesystemOperator) {
-                throw new MountException(
-                    \sprintf(
-                        'Server %s can\'t be mounted - filesystem has wrong type - %s received',
-                        $key,
-                        gettype($fileSystem)
-                    )
-                );
-            }
-
-            $this->mountFilesystem($key, $fileSystem);
-        }
-    }
-
-    public function mountFilesystem(string $key, FilesystemOperator $filesystem): void
+    protected function mountFilesystem(string $key, FilesystemOperator $filesystem): void
     {
         if ($this->isFileSystemExists($key)) {
             return;
