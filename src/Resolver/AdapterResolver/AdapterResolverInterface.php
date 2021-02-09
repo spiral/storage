@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\StorageEngine\Resolver\AdapterResolver;
 
-interface ResolverInterface
+interface AdapterResolverInterface
 {
     public function buildUrl(string $uri, array $options = []): ?string;
 }

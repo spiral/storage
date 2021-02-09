@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\StorageEngine\Resolver\AdapterResolver;
 
 use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Exception\ValidationException;
-use Spiral\StorageEngine\Resolver\DTO\UriStructure;
+use Spiral\StorageEngine\Resolver\AdapterResolver\DTO\UriStructure;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
-abstract class AbstractResolver implements ResolverInterface
+abstract class AbstractAdapterResolver implements AdapterResolverInterface
 {
     protected const SERVER_INFO_CLASS = '';
 

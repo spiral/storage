@@ -12,7 +12,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\AwsS3Resolver;
+use Spiral\StorageEngine\Resolver\AdapterResolver\AwsS3Resolver;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;

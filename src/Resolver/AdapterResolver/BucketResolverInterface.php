@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\StorageEngine\Resolver\AdapterResolver;
 
 use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 
