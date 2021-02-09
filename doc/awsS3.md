@@ -16,26 +16,25 @@ To work with local file server you should use one of specific adapters:
 ## Additional options
 - `path-prefix` - optional path prefix
 - `visibility` - `public` or `private`
-- `url-expires` - string or DateTimeInterface object with expires term for urls built by resolver
+- `resolver` - specific adapter resolver for handling url. Resolver must implements `\Spiral\StorageEngine\Resolver\AdapterResolver\AdapterResolverInterface`
 
 ## Example config file for basic usage
 ```php
 <?php
+
 return [
     'servers' => [
         'aws' => [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'options' => [
                 'bucket' => env('AWS_BUCKET'),
-                'client' => new \Aws\S3\S3Client(
-                    [
-                        'version' => 'latest',
-                        'region' => env('AWS_REGION'),
-                        'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
-                        'use_path_style_endpoint' => true,
-                        'endpoint' => env('AWS_PUBLIC_URL')
-                    ]
-                ), 
+                'client' => new \Aws\S3\S3Client([
+                    'version' => 'latest',
+                    'region' => env('AWS_REGION'),
+                    'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
+                    'use_path_style_endpoint' => true,
+                    'endpoint' => env('AWS_PUBLIC_URL')
+                ]),
             ]
         ],
     ],
@@ -45,22 +44,20 @@ return [
 ## Example config file for advanced usage
 ```php
 <?php
+
 return [
     'servers' => [
         'aws' => [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'options' => [
                 'bucket' => env('AWS_BUCKET'),
-                'client' => new \Aws\S3\S3Client(
-                    [
-                        'version' => 'latest',
-                        'region' => env('AWS_REGION'),
-                        'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
-                        'use_path_style_endpoint' => true,
-                        'endpoint' => env('AWS_PUBLIC_URL'),
-                        'url-expires' => '+48hours',
-                    ]
-                ),
+                'client' => new \Aws\S3\S3Client([
+                    'version' => 'latest',
+                    'region' => env('AWS_REGION'),
+                    'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
+                    'use_path_style_endpoint' => true,
+                    'endpoint' => env('AWS_PUBLIC_URL')
+                ]),
                 'path-prefix' => '/some/prefixDir/',
                 'visibility' => 'public',
             ]
