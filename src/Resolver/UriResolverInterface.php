@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
-use Spiral\StorageEngine\Resolver\DTO\UriStructure;
+use Spiral\StorageEngine\Resolver\AdapterResolver\DTO\UriStructure;
 
 interface UriResolverInterface
 {

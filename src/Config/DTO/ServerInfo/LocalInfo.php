@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
 
-use Spiral\StorageEngine\Resolver\LocalSystemResolver;
+use Spiral\StorageEngine\Resolver\AdapterResolver\LocalSystemResolver;
 
 class LocalInfo extends ServerInfo
 {

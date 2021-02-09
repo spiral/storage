@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\StorageEngine\Resolver\AdapterResolver;
 
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 
-class AwsS3Resolver extends AbstractResolver
+class AwsS3Resolver extends AbstractAdapterResolver
 {
     public const EXPIRES_OPTION = 'expires';
 

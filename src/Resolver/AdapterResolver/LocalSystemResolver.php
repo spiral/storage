@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\StorageEngine\Resolver\AdapterResolver;
 
 use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
@@ -10,7 +10,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 
-class LocalSystemResolver extends AbstractResolver implements BucketResolverInterface
+class LocalSystemResolver extends AbstractAdapterResolver implements BucketResolverInterface
 {
     protected const SERVER_INFO_CLASS = LocalInfo::class;
 

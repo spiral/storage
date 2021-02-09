@@ -10,7 +10,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver as Resolver;
+use Spiral\StorageEngine\Resolver\AdapterResolver;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
@@ -18,7 +18,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     protected StorageConfig $storageConfig;
 
     /**
-     * @var Resolver\ResolverInterface[]
+     * @var AdapterResolver\AdapterResolverInterface[]
      */
     protected array $resolvers = [];
 
@@ -54,7 +54,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         try {
             $fileInfo = $this->uriResolver->parseUriToStructure($uri);
 
-            if ($fileInfo instanceof Resolver\DTO\UriStructure && $fileInfo->isIdentified()) {
+            if ($fileInfo instanceof AdapterResolver\DTO\UriStructure && $fileInfo->isIdentified()) {
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
@@ -74,12 +74,12 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     /**
      * @param string $serverKey
      *
-     * @return Resolver\ResolverInterface
+     * @return AdapterResolver\ResolverInterface
      *
      * @throws ResolveException
      * @throws StorageException
      */
-    protected function getResolver(string $serverKey): Resolver\ResolverInterface
+    protected function getResolver(string $serverKey): AdapterResolver\AdapterResolverInterface
     {
         if (!array_key_exists($serverKey, $this->resolvers)) {
             $this->resolvers[$serverKey] = $this->prepareResolverForServer(
@@ -90,8 +90,9 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         return $this->resolvers[$serverKey];
     }
 
-    protected function prepareResolverForServer(ServerInfoInterface $serverInfo): Resolver\ResolverInterface
-    {
+    protected function prepareResolverForServer(
+        ServerInfoInterface $serverInfo
+    ): AdapterResolver\AdapterResolverInterface {
         $resolverClass = $serverInfo->getResolverClass();
 
         return new $resolverClass(

@@ -7,7 +7,7 @@ namespace Spiral\StorageEngine\Resolver;
 use Spiral\Core\Container\SingletonInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\ValidationException;
-use Spiral\StorageEngine\Resolver\DTO\UriStructure;
+use Spiral\StorageEngine\Resolver\AdapterResolver\DTO\UriStructure;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class UriResolver implements UriResolverInterface, SingletonInterface

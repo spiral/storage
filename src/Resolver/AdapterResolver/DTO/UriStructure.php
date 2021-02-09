@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver\DTO;
+namespace Spiral\StorageEngine\Resolver\AdapterResolver\DTO;
 
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
