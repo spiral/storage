@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine;
 
 use Spiral\Core\Container\SingletonInterface;
-use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
@@ -58,9 +57,13 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
-        } catch (ConfigException | StorageException $e) {
+        } catch (StorageException $e) {
             if ($throwException) {
                 throw $e;
+            }
+        } catch (\Throwable $e) {
+            if ($throwException) {
+                throw new ResolveException($e->getMessage(), $e->getCode(), $e);
             }
         }
 

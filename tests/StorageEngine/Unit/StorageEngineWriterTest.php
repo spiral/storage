@@ -262,7 +262,7 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $this->assertEquals(
             \sprintf('%s://%s', $destinationServer, $targetFilePath),
             $storage->move($sourceUri, $destinationServer, $targetFilePath, $config)
-    );
+        );
     }
 
     /**
