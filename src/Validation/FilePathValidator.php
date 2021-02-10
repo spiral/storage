@@ -9,7 +9,7 @@ use Spiral\StorageEngine\Exception\ValidationException;
 
 class FilePathValidator implements SingletonInterface, FilePathValidatorInterface
 {
-    public const SERVER_PATH_SEPARATOR = '://';
+    protected const SERVER_PATH_SEPARATOR = '://';
 
     protected const SERVER_PATTERN = '(?\'' . self::FILE_PATH_SERVER_PART . '\'[\w\-]*)';
     protected const FILE_PATH_PATTERN = '(?\'' . self::FILE_PATH_PART . '\'[\w\-+_\(\)\/\.,=\*\s]*)';
