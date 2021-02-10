@@ -68,12 +68,21 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         return null;
     }
 
+    public function buildBucketUri(string $bucket, string $filePath): string
+    {
+        $bucketInfo = $this->storageConfig->buildBucketInfo($bucket);
+
+        return $this->uriResolver->buildUri(
+            $bucketInfo->getServerKey(),
+            \sprintf('%s%s', $bucketInfo->getDirectory(), $filePath)
+        );
+    }
+
     /**
      * @param string $serverKey
      *
      * @return AdapterResolver\AdapterResolverInterface
      *
-     * @throws ResolveException
      * @throws StorageException
      */
     protected function getResolver(string $serverKey): AdapterResolver\AdapterResolverInterface

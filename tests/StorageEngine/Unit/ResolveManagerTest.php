@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
@@ -206,6 +207,86 @@ class ResolveManagerTest extends AbstractUnitTest
         $this->expectExceptionMessage('Server unknownServer was not found');
 
         $resolveManager->buildUrl('unknownServer://someFile.txt');
+    }
+
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
+    public function testBuildBucketUri(): void
+    {
+        $serverName = 'local';
+        $bucketName = 'bucket1';
+        $bucketName2 = 'bucket2';
+
+        $config = new StorageConfig([
+            'servers' => [
+                $serverName => $this->buildLocalInfoDescription(),
+            ],
+            'buckets' => [
+                $bucketName => [
+                    'server' => $serverName,
+                    'options' => [
+                        'directory' => 'b1/',
+                    ],
+                ],
+                $bucketName2 => [
+                    'server' => $serverName,
+                    'options' => [
+                        'directory' => 'some/bucket/dir/',
+                    ],
+                ]
+            ],
+        ]);
+
+        $resolveManager = new ResolveManager($config, $this->getUriResolver(), $this->getFilePathValidator());
+
+        $this->assertEquals(
+            'local://b1/file.txt',
+            $resolveManager->buildBucketUri($bucketName, 'file.txt')
+        );
+
+        $this->assertEquals(
+            'local://b1/',
+            $resolveManager->buildBucketUri($bucketName, '')
+        );
+
+        $this->assertEquals(
+            'local://some/bucket/dir/dirFile.txt',
+            $resolveManager->buildBucketUri($bucketName2, 'dirFile.txt')
+        );
+    }
+
+    /**
+     * @throws ConfigException
+     * @throws StorageException
+     */
+    public function testBuildBucketUriUnknownBucket(): void
+    {
+        $serverName = 'local';
+        $bucketName = 'bucket1';
+        $bucketName2 = 'bucket2';
+
+        $config = new StorageConfig([
+            'servers' => [
+                $serverName => $this->buildLocalInfoDescription(),
+            ],
+            'buckets' => [
+                $bucketName => [
+                    'server' => $serverName,
+                    'options' => [
+                        'directory' => 'b1/',
+                    ],
+                ],
+            ],
+        ]);
+
+        $resolveManager = new ResolveManager($config, $this->getUriResolver(), $this->getFilePathValidator());
+
+        $this->expectException(StorageException::class);
+        $this->expectExceptionMessage('Bucket bucket2 was not found');
+
+        $resolveManager->buildBucketUri($bucketName2, 'file.txt');
     }
 
     public function getFileLists(): array

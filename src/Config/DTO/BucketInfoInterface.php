@@ -7,7 +7,7 @@ namespace Spiral\StorageEngine\Config\DTO;
 interface BucketInfoInterface
 {
     public const DIRECTORY_KEY = 'directory';
-    public const SERVER_KEY = 'key';
+    public const SERVER_KEY = 'server';
 
     public function getDirectory(): ?string;
 

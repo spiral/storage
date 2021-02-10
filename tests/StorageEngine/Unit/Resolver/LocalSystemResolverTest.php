@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
-use Spiral\StorageEngine\Config\DTO\BucketInfo;
-use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
@@ -111,98 +109,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $this->expectExceptionMessage('Url can\'t be built for server someServer - host was not defined');
 
         $resolver->buildUrl('file1.txt');
-    }
-
-    /**
-     * @throws StorageException
-     * @throws \ReflectionException
-     */
-    public function testBuildBucketPath(): void
-    {
-        $directoryKey = $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY');
-
-        $serverName = ServerTestInterface::SERVER_NAME . 1232;
-        $bucketName = 'debugBucket';
-        $bucketDirectory = 'debug/dir1/';
-
-        $options = [
-            LocalInfo::ROOT_DIR_KEY => '/some/root/',
-            LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
-        ];
-
-        $resolver = new LocalSystemResolver(
-            new StorageConfig(
-                [
-                    'servers' => [
-                        $serverName => [
-                            LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                            LocalInfo::OPTIONS_KEY => $options,
-                        ],
-                    ],
-                    'buckets' => [
-                        $bucketName => [
-                            BucketInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory],
-                            BucketInfoInterface::SERVER_KEY => $serverName,
-                        ],
-                    ],
-                ]
-            ),
-            $this->getFilePathValidator(),
-            $serverName
-        );
-
-        $this->assertEquals(
-            $options[LocalInfo::ROOT_DIR_KEY] . $bucketDirectory,
-            $resolver->buildBucketPath($bucketName)
-        );
-    }
-
-    /**
-     * @throws StorageException
-     * @throws \ReflectionException
-     */
-    public function testBuildBucketPathFailed(): void
-    {
-        $directoryKey = $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY');
-
-        $serverName = ServerTestInterface::SERVER_NAME;
-        $bucketName = 'debugBucket';
-        $bucketDirectory = 'debug/dir1/';
-
-        $missedBucket = 'missedBucket';
-
-        $options = [
-            LocalInfo::ROOT_DIR_KEY => '/some/root/',
-            LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
-        ];
-
-        $resolver = new LocalSystemResolver(
-            new StorageConfig(
-                [
-                    'servers' => [
-                        $serverName => [
-                            LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                            LocalInfo::OPTIONS_KEY => $options,
-                        ],
-                    ],
-                    'buckets' => [
-                        $bucketName => [
-                            BucketInfo::OPTIONS_KEY => [$directoryKey => $bucketDirectory],
-                            BucketInfo::SERVER_KEY => $serverName,
-                        ],
-                    ],
-                ]
-            ),
-            $this->getFilePathValidator(),
-            $serverName
-        );
-
-        $this->expectException(StorageException::class);
-        $this->expectExceptionMessage(
-            \sprintf('Bucket `%s` is not defined for server `%s`', $missedBucket, $serverName)
-        );
-
-        $resolver->buildBucketPath($missedBucket);
     }
 
     /**

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver\AdapterResolver;
 
-use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
-use Spiral\StorageEngine\Exception\StorageException;
 
-class LocalSystemResolver extends AbstractAdapterResolver implements BucketResolverInterface
+class LocalSystemResolver extends AbstractAdapterResolver
 {
     protected const SERVER_INFO_CLASS = LocalInfo::class;
 
@@ -40,32 +38,5 @@ class LocalSystemResolver extends AbstractAdapterResolver implements BucketResol
             $this->serverInfo->getOption(LocalInfo::HOST_KEY),
             $this->normalizeFilePathToUri($uri)
         );
-    }
-
-    /**
-     * @param string $bucketName
-     *
-     * @return string
-     *
-     * @throws StorageException
-     */
-    public function buildBucketPath(string $bucketName): string
-    {
-        if (!($bucket = $this->getBucketInfo($bucketName)) instanceof BucketInfoInterface) {
-            throw new StorageException(
-                \sprintf('Bucket `%s` is not defined for server `%s`', $bucketName, $this->serverInfo->getName())
-            );
-        }
-
-        return \sprintf(
-            '%s%s',
-            $this->serverInfo->getOption(LocalInfo::ROOT_DIR_KEY),
-            $bucket->getDirectory()
-        );
-    }
-
-    public function getBucketInfo(string $key): ?BucketInfoInterface
-    {
-        return array_key_exists($key, $this->buckets) ? $this->buckets[$key] : null;
     }
 }
