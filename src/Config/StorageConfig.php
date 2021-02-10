@@ -90,7 +90,7 @@ class StorageConfig extends InjectableConfig
     /**
      * @param string $serverKey
      *
-     * @return array
+     * @return BucketInfoInterface[]
      *
      * @throws StorageException
      */
@@ -181,10 +181,7 @@ class StorageConfig extends InjectableConfig
     {
         if (!$this->hasBucket($bucketLabel)) {
             throw new StorageException(
-                \sprintf(
-                    'Bucket %s was not found',
-                    $bucketLabel
-                )
+                \sprintf('Bucket %s was not found', $bucketLabel)
             );
         }
 
