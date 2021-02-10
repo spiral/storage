@@ -1,24 +1,22 @@
-Storage Engine. 
-========
+# Storage Engine
 
-AwsS3 file server
--------
+## AwsS3 file server
 To work with local file server you should use one of specific adapters:
 - `\League\Flysystem\AwsS3V3\AwsS3V3Adapter`
   * `composer require league/flysystem-aws-s3-v3` for adapter installation
 - `\League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter`
   * `composer require league/flysystem-async-aws-s3` for adapter installation
 
-## Required options
+### Required options
 - `bucket` - used bucket name
 - `client` - S3Client 
 
-## Additional options
+### Additional options
 - `path-prefix` - optional path prefix
 - `visibility` - `public` or `private`
 - `resolver` - specific adapter resolver for handling url. Resolver must implements `\Spiral\StorageEngine\Resolver\AdapterResolver\AdapterResolverInterface`
 
-## Example config file for basic usage
+### Example config file for basic usage
 ```php
 <?php
 
@@ -41,7 +39,7 @@ return [
 ];
 ```
 
-## Example config file for advanced usage
+### Example config file for advanced usage
 ```php
 <?php
 

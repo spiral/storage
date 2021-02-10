@@ -5,17 +5,13 @@ based on provided configuration.
 Storage engine is based on [FlySystem](https://github.com/thephpleague/flysystem) and for correct work with file servers 
 (except local one) you will need to provide required FlySystem adapter (take a look at concrete filesystem doc).
 
-StorageEngine based on 2 classes:
-1. StorageEngine
+StorageEngine based on 2 basic interfaces:
+1. [StorageInterface](doc/StorageInterface.md)
     * works with all file servers that handle files
     * works with file paths in a specific format (`{serverName}://{filePath}` by default)
-      * to change it you can prepare your own `\Spiral\StorageEngine\Validation\FilePathValidatorInterface` class and make required binding  
-    * implements `\Spiral\StorageEngine\StorageInterface`
-2. ResolveManager
-    * build server path for filepaths storage
-    * parse file path from db format to identify used server
-    * build url for file download
-    * can be replaced with your specific class by implementing `\Spiral\StorageEngine\ResolveManagerInterface` and binding it
+      * to change it you can prepare your own `\Spiral\StorageEngine\Validation\FilePathValidatorInterface` class and make required binding
+2. [ResolveManagerInterface](doc/ResolveManagerInterface.md)
+    * build url (and urls list) for file download
 
 # Supported file servers
 Current release provides ability to work with:
@@ -47,7 +43,7 @@ $mimeType = $storageEngine->mimeType($copiedUri); // = 'text/plain'
 ```
 2. To build url to your file you can use ResolveManagerInterface object:
 ``` php
-$resolveManager->buildUrl('local://someDir/myFile.txt'); // for example it can return
+$resolveManager->buildUrl('local://someDir/myFile.txt'); // for example it can return smth like 'http://myhost.com/files/somedir/myfile.txt'
 ```
 * P.S. For local server info you should define host in server description to build url. In other case it will throw exception.
 # License:

@@ -1,15 +1,13 @@
-Storage Engine. 
-========
+# Storage Engine
 
-Local file server
--------
+## Local file server
 To work with local file server you don't need any additional adapters. 
 You can use built-in local adapter `\League\Flysystem\Local\LocalFilesystemAdapter`
 
-## Required options
+### Required options
 - `rootDir` - directory of local server for file storage
 
-## Additional options
+### Additional options
 Any of the additional options can be used to configure specific params
 - `host` - host for urls building via resolvers by filepath
 - `visibility` - customize how visibility is converted to unix permissions
@@ -19,7 +17,7 @@ Any of the additional options can be used to configure specific params
   * Disallowing them causes exceptions when encountered
 - `resolver` - specific adapter resolver for handling url. Resolver must implements `\Spiral\StorageEngine\Resolver\AdapterResolver\AdapterResolverInterface`
 
-## Example config file for basic usage
+### Example config file for basic usage
 ```php
 <?php
 return [
@@ -34,7 +32,7 @@ return [
 ];
 ```
 
-## Example config file for advanced usage
+### Example config file for advanced usage
 ```php
 <?php
 return [
