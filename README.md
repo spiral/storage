@@ -12,24 +12,82 @@ StorageEngine based on 2 basic interfaces:
       * to change it you can prepare your own `\Spiral\StorageEngine\Validation\FilePathValidatorInterface` class and make required binding
 2. [ResolveManagerInterface](doc/ResolveManagerInterface.md)
     * build url (and urls list) for file download
+    * build bucket uri 
+      * for local file server
 
-# Supported file servers
+## Supported file servers
 Current release provides ability to work with:
 - [Local filesystem](doc/local.md)
 - [Aws S3 (+async)](doc/awsS3.md)
 
-# Configuration
+## Configuration
 You can configure file servers usage in Spiral with configuration file `storage.php` located in configuration directory.
 
 You can receive more details about spiral configuration from [here](https://spiral.dev/docs/start-configuration).
 
 More details about specific file servers configuration you can find [here](#supported-file-servers)
 
-# Basic usage
-## If you are use Spiral Framework
+Configuration can contains:
+- servers*
+  - file servers description
+- buckets
+  - server buckets description
+  - actual for local file server only  
+  - bucket info refers to server and has only one option - directory
+    - directory is relative to root directory for local file server
+- tmp-dir
+  - temp directory for creating some temp files for process
+  - system temp directory by default 
+
+### Configuration example
+```php
+<?php
+
+declare(strict_types=1);
+
+$s3Client = new \Aws\S3\S3Client([
+    'version' => 'latest',
+    'region' => env('AWS_REGION'),
+    'credentials' => new \Aws\Credentials\Credentials(env('AWS_KEY'), env('AWS_SECRET')),
+    'use_path_style_endpoint' => true,
+    'endpoint' => env('AWS_PUBLIC_URL')
+]);
+
+return [
+    'servers' => [
+        'aws' => [
+            'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
+            'options' => [
+                'bucket' => env('AWS_BUCKET'),
+                'client' => $s3Client,
+            ]
+        ],
+        'local' => [
+            'adapter' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
+            'options' => [
+                'rootDir' => '/var/www/tmpLocal',
+                'host' => 'http://localhost:8115/public/',
+            ],
+        ],
+    ],
+    'buckets' => [
+        'bucket1' => [
+            'server' => 'local',
+            'options' => [
+                'directory' => 'b1/',
+            ],
+        ],
+    ],
+    'tmp-dir' => '/var/www/tmp/',
+];
+
+```
+
+## Basic usage
+### If you are use Spiral Framework
 When you finish your configuration file you should add `Spiral\StorageEngine\Bootloader\StorageEngineBootloader` in your app.
 
-## Usage
+### Usage
 When you need to make some file operation you should use your StorageEngine object for it:
 1. To perform different operations on your files you can use FilesystemOperator implemented object:
 ``` php
@@ -46,5 +104,6 @@ $mimeType = $storageEngine->mimeType($copiedUri); // = 'text/plain'
 $resolveManager->buildUrl('local://someDir/myFile.txt'); // for example it can return smth like 'http://myhost.com/files/somedir/myfile.txt'
 ```
 * P.S. For local server info you should define host in server description to build url. In other case it will throw exception.
-# License:
+
+## License:
 MIT License (MIT). Please see [`LICENSE`](./LICENSE) for more information. Maintained by [Spiral Scout](https://spiralscout.com).
