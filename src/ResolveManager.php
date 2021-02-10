@@ -10,7 +10,6 @@ use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AdapterResolver;
-use Spiral\StorageEngine\Resolver\DTO\UriStructure;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
@@ -54,10 +53,8 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         try {
             $fileInfo = $this->uriResolver->parseUriToStructure($uri);
 
-            if ($fileInfo instanceof UriStructure && $fileInfo->isIdentified()) {
-                return $this->getResolver($fileInfo->serverName)
-                    ->buildUrl($fileInfo->filePath);
-            }
+            return $this->getResolver($fileInfo->serverName)
+                ->buildUrl($fileInfo->filePath);
         } catch (StorageException $e) {
             if ($throwException) {
                 throw $e;
@@ -66,10 +63,6 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
             if ($throwException) {
                 throw new ResolveException($e->getMessage(), $e->getCode(), $e);
             }
-        }
-
-        if ($throwException) {
-            throw new ResolveException('Url can\'t be built by uri ' . $uri);
         }
 
         return null;

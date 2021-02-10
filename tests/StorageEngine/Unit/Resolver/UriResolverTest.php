@@ -68,6 +68,11 @@ class UriResolverTest extends AbstractUnitTest
         $resolver->buildUri('local', $uri);
     }
 
+    /**
+     * @return array[]
+     *
+     * @throws ValidationException
+     */
     public function getUriList(): array
     {
         $filePathValidator = $this->getFilePathValidator();
@@ -75,13 +80,15 @@ class UriResolverTest extends AbstractUnitTest
         $fileTxt = 'file.txt';
         $dirFile = 'some/debug/dir/file1.csv';
 
-        $uriStruct1 = new UriStructure('', $filePathValidator->getUriPattern());
-        $uriStruct1->serverName = ServerTestInterface::SERVER_NAME;
-        $uriStruct1->filePath = $fileTxt;
+        $uriStruct1 = new UriStructure(
+            \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $fileTxt),
+            $filePathValidator->getUriPattern()
+        );
 
-        $uriStruct2 = new UriStructure('', $filePathValidator->getUriPattern());
-        $uriStruct2->serverName = ServerTestInterface::SERVER_NAME;
-        $uriStruct2->filePath = $dirFile;
+        $uriStruct2 = new UriStructure(
+            \sprintf('%s://%s', ServerTestInterface::SERVER_NAME, $dirFile),
+            $filePathValidator->getUriPattern()
+        );
 
         return [
             [

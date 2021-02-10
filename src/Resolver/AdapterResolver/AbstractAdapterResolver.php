@@ -68,7 +68,7 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
                 $this->filePathValidator->getUriPattern()
             );
 
-            return $uriStructure->isIdentified() ? $uriStructure->filePath : $filePath;
+            return $uriStructure->filePath;
         } catch (ValidationException $e) {
             // if filePath is not uri we suppose it is short form of filepath - without server name
         }

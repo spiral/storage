@@ -4,32 +4,59 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Tests\Unit\Resolver\DTO;
 
+use Spiral\StorageEngine\Exception\ValidationException;
 use Spiral\StorageEngine\Resolver\DTO\UriStructure;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class UriStructureTest extends AbstractUnitTest
 {
     /**
-     * @dataProvider getUriListForCheck
+     * @dataProvider getUriListForConstructor
      *
      * @param string $uri
-     * @param bool $expectedResult
+     * @param string $expectedServer
+     * @param string $expectedPath
+     *
+     * @throws ValidationException
      */
-    public function testIsIdentified(string $uri, bool $expectedResult): void
+    public function testConstructor(string $uri, string $expectedServer, string $expectedPath): void
     {
-        $filePathValidator = $this->getFilePathValidator();
+        $structure = new UriStructure($uri, $this->getFilePathValidator()->getUriPattern());
 
-        $structure = new UriStructure($uri, $filePathValidator->getUriPattern());
-
-        $this->assertEquals($structure->isIdentified(), $expectedResult);
+        $this->assertEquals($structure->serverName, $expectedServer);
+        $this->assertEquals($structure->filePath, $expectedPath);
     }
 
-    public function getUriListForCheck(): array
+    /**
+     * @dataProvider getFailedUriListForConstructor
+     *
+     * @param string $uri
+     * @param string $expectedExceptionMsg
+     *
+     * @throws ValidationException
+     */
+    public function testConstructorThrowsException(string $uri, string $expectedExceptionMsg): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage($expectedExceptionMsg);
+
+        new UriStructure($uri, $this->getFilePathValidator()->getUriPattern());
+    }
+
+    public function getUriListForConstructor(): array
     {
         return [
-            ['file.txt', false],
-            ['local://file.txt', true],
-            ['local://dir/file.txt', true],
+            ['local://file.txt', 'local', 'file.txt'],
+            ['aws://dir/file.txt', 'aws', 'dir/file.txt'],
+        ];
+    }
+
+    public function getFailedUriListForConstructor(): array
+    {
+        return [
+            ['://file.txt', 'No server was detected in uri ://file.txt'],
+            ['aws://', 'No path was detected in uri'],
+            ['aws+-/someFile.txt', 'No uri structure was detected in uri aws+-/someFile.txt']
         ];
     }
 }
