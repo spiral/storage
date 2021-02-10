@@ -11,7 +11,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AdapterResolver\AwsS3Resolver;
-use Spiral\StorageEngine\Resolver\AdapterResolver\DTO\UriStructure;
+use Spiral\StorageEngine\Resolver\DTO\UriStructure;
 use Spiral\StorageEngine\Resolver\AdapterResolver\LocalSystemResolver;
 use Spiral\StorageEngine\Resolver\UriResolverInterface;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;

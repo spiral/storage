@@ -11,6 +11,8 @@ interface FilePathValidatorInterface
     public const FILE_PATH_PART = 'path';
     public const FILE_PATH_SERVER_PART = 'server';
 
+    public function getServerPathSeparator(): string;
+
     public function getFilePathPattern(): string;
 
     public function getUriPattern(): string;

@@ -6,7 +6,7 @@ namespace Spiral\StorageEngine\Tests\Unit\Resolver;
 
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\ValidationException;
-use Spiral\StorageEngine\Resolver\AdapterResolver\DTO\UriStructure;
+use Spiral\StorageEngine\Resolver\DTO\UriStructure;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 

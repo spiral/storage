@@ -10,6 +10,7 @@ use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AdapterResolver;
+use Spiral\StorageEngine\Resolver\DTO\UriStructure;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
@@ -53,7 +54,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         try {
             $fileInfo = $this->uriResolver->parseUriToStructure($uri);
 
-            if ($fileInfo instanceof AdapterResolver\DTO\UriStructure && $fileInfo->isIdentified()) {
+            if ($fileInfo instanceof UriStructure && $fileInfo->isIdentified()) {
                 return $this->getResolver($fileInfo->serverName)
                     ->buildUrl($fileInfo->filePath);
             }
@@ -77,7 +78,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     /**
      * @param string $serverKey
      *
-     * @return AdapterResolver\ResolverInterface
+     * @return AdapterResolver\AdapterResolverInterface
      *
      * @throws ResolveException
      * @throws StorageException
