@@ -11,7 +11,6 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AdapterResolver\AwsS3Resolver;
-use Spiral\StorageEngine\Resolver\AdapterResolver\DTO\UriStructure;
 use Spiral\StorageEngine\Resolver\AdapterResolver\LocalSystemResolver;
 use Spiral\StorageEngine\Resolver\UriResolverInterface;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
@@ -152,30 +151,6 @@ class ResolveManagerTest extends AbstractUnitTest
         $this->expectExceptionMessage(
             \sprintf('File %s can\'t be identified', $uri)
         );
-
-        $resolveManager->buildUrl($uri);
-    }
-
-    /**
-     * @throws StorageException
-     */
-    public function testBuildUrlUriNotIdentifiedException(): void
-    {
-        $uri = 'local://someFile.txt';
-
-        $uriResolver = $this->createMock(UriResolverInterface::class);
-        $uriResolver->expects($this->once())
-            ->method('parseUriToStructure')
-            ->willReturn(new UriStructure($uri, '/^[\s]:\/\/[\s]$/'));
-
-        $resolveManager = new ResolveManager(
-            $this->buildStorageConfig([static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]),
-            $uriResolver,
-            $this->getFilePathValidator()
-        );
-
-        $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage('Url can\'t be built by uri ' . $uri);
 
         $resolveManager->buildUrl($uri);
     }

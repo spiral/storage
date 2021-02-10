@@ -9,10 +9,12 @@ use Spiral\StorageEngine\Exception\ValidationException;
 
 class FilePathValidator implements SingletonInterface, FilePathValidatorInterface
 {
-    public const SERVER_PATTERN = '(?\'' . self::FILE_PATH_SERVER_PART . '\'[\w\-]*)';
-    public const FILE_PATH_PATTERN = '(?\'' . self::FILE_PATH_PART . '\'[\w\-+_\(\)\/\.,=\*\s]*)';
+    public const SERVER_PATH_SEPARATOR = '://';
 
-    public const URI_PATTERN = '/^' . self::SERVER_PATTERN . ':\/\/' . self::FILE_PATH_PATTERN . '$/';
+    protected const SERVER_PATTERN = '(?\'' . self::FILE_PATH_SERVER_PART . '\'[\w\-]*)';
+    protected const FILE_PATH_PATTERN = '(?\'' . self::FILE_PATH_PART . '\'[\w\-+_\(\)\/\.,=\*\s]*)';
+
+    protected const URI_PATTERN = '/^' . self::SERVER_PATTERN . ':\/\/' . self::FILE_PATH_PATTERN . '$/';
 
     /**
      * @param string $filePath
@@ -46,5 +48,10 @@ class FilePathValidator implements SingletonInterface, FilePathValidatorInterfac
     public function getUriPattern(): string
     {
         return static::URI_PATTERN;
+    }
+
+    public function getServerPathSeparator(): string
+    {
+        return static::SERVER_PATH_SEPARATOR;
     }
 }

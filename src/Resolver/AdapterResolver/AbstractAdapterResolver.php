@@ -9,7 +9,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Exception\ValidationException;
-use Spiral\StorageEngine\Resolver\AdapterResolver\DTO\UriStructure;
+use Spiral\StorageEngine\Resolver\DTO\UriStructure;
 use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 abstract class AbstractAdapterResolver implements AdapterResolverInterface
@@ -68,7 +68,7 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
                 $this->filePathValidator->getUriPattern()
             );
 
-            return $uriStructure->isIdentified() ? $uriStructure->filePath : $filePath;
+            return $uriStructure->filePath;
         } catch (ValidationException $e) {
             // if filePath is not uri we suppose it is short form of filepath - without server name
         }

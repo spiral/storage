@@ -53,10 +53,8 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         try {
             $fileInfo = $this->uriResolver->parseUriToStructure($uri);
 
-            if ($fileInfo instanceof AdapterResolver\DTO\UriStructure && $fileInfo->isIdentified()) {
-                return $this->getResolver($fileInfo->serverName)
-                    ->buildUrl($fileInfo->filePath);
-            }
+            return $this->getResolver($fileInfo->serverName)
+                ->buildUrl($fileInfo->filePath);
         } catch (StorageException $e) {
             if ($throwException) {
                 throw $e;
@@ -67,17 +65,13 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
             }
         }
 
-        if ($throwException) {
-            throw new ResolveException('Url can\'t be built by uri ' . $uri);
-        }
-
         return null;
     }
 
     /**
      * @param string $serverKey
      *
-     * @return AdapterResolver\ResolverInterface
+     * @return AdapterResolver\AdapterResolverInterface
      *
      * @throws ResolveException
      * @throws StorageException
