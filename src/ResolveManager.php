@@ -9,30 +9,24 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Parser\UriParserInterface;
 use Spiral\StorageEngine\Resolver\AdapterResolver;
-use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
 {
     protected StorageConfig $storageConfig;
 
+    protected UriParserInterface $uriParser;
+
     /**
-     * @var AdapterResolver\AdapterResolverInterface[]
+     * @var \Spiral\StorageEngine\Resolver\AdapterResolverInterface[]
      */
     protected array $resolvers = [];
 
-    private Resolver\UriResolverInterface $uriResolver;
-
-    private FilePathValidatorInterface $filePathValidator;
-
-    public function __construct(
-        StorageConfig $storageConfig,
-        Resolver\UriResolverInterface $uriResolver,
-        FilePathValidatorInterface $filePathValidator
-    ) {
+    public function __construct(StorageConfig $storageConfig, UriParserInterface $uriParser)
+    {
         $this->storageConfig = $storageConfig;
-        $this->uriResolver = $uriResolver;
-        $this->filePathValidator = $filePathValidator;
+        $this->uriParser = $uriParser;
     }
 
     /**
@@ -51,10 +45,10 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     public function buildUrl(string $uri, bool $throwException = true): ?string
     {
         try {
-            $fileInfo = $this->uriResolver->parseUriToStructure($uri);
+            $uriStructure = $this->uriParser->parseUri($uri);
 
-            return $this->getResolver($fileInfo->serverName)
-                ->buildUrl($fileInfo->filePath);
+            return $this->getResolver($uriStructure->server)
+                ->buildUrl($uriStructure->path);
         } catch (StorageException $e) {
             if ($throwException) {
                 throw $e;
@@ -72,7 +66,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     {
         $bucketInfo = $this->storageConfig->buildBucketInfo($bucket);
 
-        return $this->uriResolver->buildUri(
+        return (string)$this->uriParser->prepareUri(
             $bucketInfo->getServerKey(),
             \sprintf('%s%s', $bucketInfo->getDirectory(), $filePath)
         );
@@ -81,11 +75,11 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     /**
      * @param string $serverKey
      *
-     * @return AdapterResolver\AdapterResolverInterface
+     * @return \Spiral\StorageEngine\Resolver\AdapterResolverInterface
      *
      * @throws StorageException
      */
-    protected function getResolver(string $serverKey): AdapterResolver\AdapterResolverInterface
+    protected function getResolver(string $serverKey): Resolver\AdapterResolverInterface
     {
         if (!array_key_exists($serverKey, $this->resolvers)) {
             $this->resolvers[$serverKey] = $this->prepareResolverForServer(
@@ -98,13 +92,9 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
 
     protected function prepareResolverForServer(
         ServerInfoInterface $serverInfo
-    ): AdapterResolver\AdapterResolverInterface {
+    ): Resolver\AdapterResolverInterface {
         $resolverClass = $serverInfo->getResolverClass();
 
-        return new $resolverClass(
-            $this->storageConfig,
-            $this->filePathValidator,
-            $serverInfo->getName()
-        );
+        return new $resolverClass($this->uriParser, $this->storageConfig, $serverInfo->getName());
     }
 }

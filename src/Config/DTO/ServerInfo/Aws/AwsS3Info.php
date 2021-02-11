@@ -7,7 +7,7 @@ namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\SpecificConfigurableServerInfo;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\AdapterResolver\AwsS3Resolver;
+use Spiral\StorageEngine\Resolver\AwsS3Resolver;
 
 class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
 {

@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Exception;
 
-class ValidationException extends StorageException
+class UriException extends StorageException
 {
 }
