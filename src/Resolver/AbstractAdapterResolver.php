@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Resolver;
 
 use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Exception\UriException;
@@ -13,9 +13,9 @@ use Spiral\StorageEngine\Parser\UriParserInterface;
 
 abstract class AbstractAdapterResolver implements AdapterResolverInterface
 {
-    protected const SERVER_INFO_CLASS = '';
+    protected const FILE_SYSTEM_INFO_CLASS = '';
 
-    protected ServerInfoInterface $serverInfo;
+    protected FileSystemInfoInterface $fsInfo;
 
     protected UriParserInterface $uriParser;
 
@@ -27,21 +27,21 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
     /**
      * @param UriParserInterface $uriParser
      * @param StorageConfig $storageConfig
-     * @param string $serverKey
+     * @param string $fs
      *
      * @throws StorageException
      */
-    public function __construct(UriParserInterface $uriParser, StorageConfig $storageConfig, string $serverKey)
+    public function __construct(UriParserInterface $uriParser, StorageConfig $storageConfig, string $fs)
     {
-        $requiredClass = static::SERVER_INFO_CLASS;
+        $requiredClass = static::FILE_SYSTEM_INFO_CLASS;
 
-        $serverInfo = $storageConfig->buildServerInfo($serverKey);
+        $fsInfo = $storageConfig->buildFileSystemInfo($fs);
 
-        if (empty($requiredClass) || !$serverInfo instanceof $requiredClass) {
+        if (empty($requiredClass) || !$fsInfo instanceof $requiredClass) {
             throw new StorageException(
                 \sprintf(
-                    'Wrong server info (%s) for resolver %s',
-                    get_class($serverInfo),
+                    'Wrong file system info (%s) for resolver %s',
+                    get_class($fsInfo),
                     static::class
                 )
             );
@@ -49,8 +49,7 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
 
         $this->uriParser = $uriParser;
 
-        $this->serverInfo = $serverInfo;
-        $this->buckets = $storageConfig->getServerBuckets($serverKey);
+        $this->fsInfo = $fsInfo;
     }
 
     public function normalizeFilePathToUri(string $filePath): string
@@ -58,7 +57,7 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
         try {
             return $this->uriParser->parseUri($filePath)->path;
         } catch (UriException $e) {
-            // if filePath is not uri we suppose it is short form of filepath - without server name
+            // if filePath is not uri we suppose it is short form of filepath - without fs part
         }
 
         return $filePath;

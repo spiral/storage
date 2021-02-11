@@ -9,11 +9,11 @@ use Aws\S3\S3Client;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
 
-trait AwsS3ServerBuilderTrait
+trait AwsS3FsBuilderTrait
 {
     /**
      * @param string|null $name
@@ -22,7 +22,7 @@ trait AwsS3ServerBuilderTrait
      *
      * @throws StorageException
      */
-    protected function buildAwsS3Info(?string $name = ServerTestInterface::SERVER_NAME): AwsS3Info
+    protected function buildAwsS3Info(?string $name = FsTestInterface::SERVER_NAME): AwsS3Info
     {
         return new AwsS3Info($name, $this->buildAwsS3ServerDescription());
     }

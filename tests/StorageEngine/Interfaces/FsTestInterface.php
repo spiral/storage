@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Tests\Interfaces;
 
-interface ServerTestInterface
+interface FsTestInterface
 {
     public const SERVER_NAME = 'debugServer';
     public const VFS_PREFIX = 'vfs://';

@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo;
+namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\FileSystemInfo;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
-class ServerInfoTest extends AbstractUnitTest
+class FileSystemInfoTest extends AbstractUnitTest
 {
     /**
      * @throws StorageException
      */
     public function testValidateNoOptionsFailed(): void
     {
-        $serverName = 'someServer';
+        $fsName = 'some';
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server %s needs options defined', $serverName));
+        $this->expectExceptionMessage(\sprintf('File system %s needs options defined', $fsName));
 
         new LocalInfo(
-            $serverName,
+            $fsName,
             [LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class]
         );
     }
@@ -34,17 +34,17 @@ class ServerInfoTest extends AbstractUnitTest
      */
     public function testValidateNoAdapterClassFailed(): void
     {
-        $serverName = 'someServer';
+        $fsName = 'some';
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server %s needs adapter class defined', $serverName));
+        $this->expectExceptionMessage(\sprintf('File system %s needs adapter class defined', $fsName));
 
         new LocalInfo(
-            $serverName,
+            $fsName,
             [
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                 ],
             ]
         );

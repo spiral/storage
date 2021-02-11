@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo\Aws;
+namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\FileSystemInfo\Aws;
 
 use Aws\S3\S3Client;
 use League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
-use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
+use Spiral\StorageEngine\Tests\Traits\AwsS3FsBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class AwsS3InfoTest extends AbstractUnitTest
 {
-    use AwsS3ServerBuilderTrait;
+    use AwsS3FsBuilderTrait;
 
     /**
      * @throws StorageException
@@ -29,21 +29,21 @@ class AwsS3InfoTest extends AbstractUnitTest
             AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
         ];
 
-        $serverInfo = new AwsS3Info(
-            'someServer',
+        $fsInfo = new AwsS3Info(
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
 
-        $this->assertEquals(AwsS3V3Adapter::class, $serverInfo->getAdapterClass());
+        $this->assertEquals(AwsS3V3Adapter::class, $fsInfo->getAdapterClass());
 
         foreach ($options as $optionKey => $optionVal) {
-            $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
+            $this->assertEquals($optionVal, $fsInfo->getOption($optionKey));
         }
 
-        $this->assertNull($serverInfo->getVisibilityConverter());
+        $this->assertNull($fsInfo->getVisibilityConverter());
     }
 
     /**
@@ -56,18 +56,18 @@ class AwsS3InfoTest extends AbstractUnitTest
             AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
         ];
 
-        $serverInfo = new AwsS3Info(
-            'someServer',
+        $fsInfo = new AwsS3Info(
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AsyncAwsS3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
 
-        $this->assertEquals(AsyncAwsS3Adapter::class, $serverInfo->getAdapterClass());
+        $this->assertEquals(AsyncAwsS3Adapter::class, $fsInfo->getAdapterClass());
 
         foreach ($options as $optionKey => $optionVal) {
-            $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
+            $this->assertEquals($optionVal, $fsInfo->getOption($optionKey));
         }
     }
 
@@ -83,22 +83,22 @@ class AwsS3InfoTest extends AbstractUnitTest
             AwsS3Info::VISIBILITY_KEY => $this->getAwsS3VisibilityOption(),
         ];
 
-        $serverInfo = new AwsS3Info(
-            'someServer',
+        $fsInfo = new AwsS3Info(
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
 
-        $this->assertTrue($serverInfo->isAdvancedUsage());
+        $this->assertTrue($fsInfo->isAdvancedUsage());
         foreach ($options as $optionKey => $optionVal) {
-            $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
+            $this->assertEquals($optionVal, $fsInfo->getOption($optionKey));
         }
 
-        $visibilityConvertor = $serverInfo->getVisibilityConverter();
+        $visibilityConvertor = $fsInfo->getVisibilityConverter();
         $this->assertInstanceOf(PortableVisibilityConverter::class, $visibilityConvertor);
-        $this->assertSame($visibilityConvertor, $serverInfo->getVisibilityConverter());
+        $this->assertSame($visibilityConvertor, $fsInfo->getVisibilityConverter());
     }
 
     /**
@@ -114,7 +114,7 @@ class AwsS3InfoTest extends AbstractUnitTest
         ];
 
         $advancedAwsS3Info = new AwsS3Info(
-            'someServer',
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AsyncAwsS3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => $options,
@@ -141,35 +141,35 @@ class AwsS3InfoTest extends AbstractUnitTest
             AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
         ];
 
-        $serverInfo = new AwsS3Info(
-            'someServer',
+        $fsInfo = new AwsS3Info(
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => $options,
             ]
         );
 
-        $client = $serverInfo->getClient();
+        $client = $fsInfo->getClient();
         $this->assertInstanceOf(S3Client::class, $client);
-        $this->assertSame($client, $serverInfo->getClient());
+        $this->assertSame($client, $fsInfo->getClient());
     }
 
     /**
      * @dataProvider getMissedRequiredOptions
      *
-     * @param string $serverName
+     * @param string $fsName
      * @param array $options
      * @param string $exceptionMsg
      *
      * @throws StorageException
      */
-    public function testValidateRequiredOptionsFailed(string $serverName, array $options, string $exceptionMsg): void
+    public function testValidateRequiredOptionsFailed(string $fsName, array $options, string $exceptionMsg): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage($exceptionMsg);
 
         new AwsS3Info(
-            $serverName,
+            $fsName,
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => $options,
@@ -184,11 +184,11 @@ class AwsS3InfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            'Option visibility defined in wrong format for server someServer, array expected'
+            'Option visibility defined in wrong format for file system some, array expected'
         );
 
         new AwsS3Info(
-            'someServer',
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => [
@@ -209,7 +209,7 @@ class AwsS3InfoTest extends AbstractUnitTest
         $this->expectExceptionMessage('visibility should be defined with one of values: public,private');
 
         new AwsS3Info(
-            'someServer',
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => [
@@ -233,11 +233,11 @@ class AwsS3InfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            'Option path-prefix defined in wrong format for server someServer, string expected'
+            'Option path-prefix defined in wrong format for file system some, string expected'
         );
 
         new AwsS3Info(
-            'someServer',
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => [
@@ -255,7 +255,7 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testIsAdvancedUsage(): void
     {
         $simpleAwsS3 = new AwsS3Info(
-            'someServer',
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => [
@@ -268,7 +268,7 @@ class AwsS3InfoTest extends AbstractUnitTest
         $this->assertFalse($simpleAwsS3->isAdvancedUsage());
 
         $advancedAwsS3Info = new AwsS3Info(
-            'someServer',
+            'some',
             [
                 AwsS3Info::ADAPTER_KEY => AwsS3V3Adapter::class,
                 AwsS3Info::OPTIONS_KEY => [
@@ -284,47 +284,47 @@ class AwsS3InfoTest extends AbstractUnitTest
 
     public function getWrongUrlExpiresList(): array
     {
-        $serverName = ServerTestInterface::SERVER_NAME;
-        $errorMsgPrefix = 'Url expires should be string or DateTimeInterface implemented object for server ';
+        $fsName = FsTestInterface::SERVER_NAME;
+        $errorMsgPrefix = 'Url expires should be string or DateTimeInterface implemented object for file system ';
 
         return [
             [
-                $serverName,
+                $fsName,
                 [new \DateTime('+1 hour')],
-                $errorMsgPrefix . ServerTestInterface::SERVER_NAME,
+                $errorMsgPrefix . FsTestInterface::SERVER_NAME,
             ],
             [
-                $serverName,
+                $fsName,
                 null,
-                $errorMsgPrefix . ServerTestInterface::SERVER_NAME,
+                $errorMsgPrefix . FsTestInterface::SERVER_NAME,
             ],
             [
-                'someServer',
+                'some',
                 true,
-                $errorMsgPrefix . 'someServer',
+                $errorMsgPrefix . 'some',
             ],
         ];
     }
 
     public function getMissedRequiredOptions(): array
     {
-        $serverName = ServerTestInterface::SERVER_NAME;
+        $fsName = FsTestInterface::SERVER_NAME;
 
         return [
             [
-                $serverName,
+                $fsName,
                 [],
-                'Option bucket not detected for server ' . $serverName,
+                'Option bucket not detected for file system ' . $fsName,
             ],
             [
-                $serverName,
+                $fsName,
                 [AwsS3Info::CLIENT_KEY => 'client'],
-                'Option bucket not detected for server ' . $serverName,
+                'Option bucket not detected for file system ' . $fsName,
             ],
             [
-                'someServer',
+                'some',
                 [AwsS3Info::BUCKET_KEY => 'someBucket'],
-                'Option client not detected for server someServer',
+                'Option client not detected for file system some',
             ],
         ];
     }

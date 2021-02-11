@@ -6,12 +6,12 @@ namespace Spiral\StorageEngine\Tests\Unit\Config\DTO;
 
 use Spiral\StorageEngine\Config\DTO\BucketInfo;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalFsBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class BucketInfoTest extends AbstractUnitTest
 {
-    use LocalServerBuilderTrait;
+    use LocalFsBuilderTrait;
 
     /**
      * @throws StorageException
@@ -22,13 +22,13 @@ class BucketInfoTest extends AbstractUnitTest
 
         $localInfo = $this->buildLocalInfo();
 
-        $dtoNull = new BucketInfo('dBucket', $localInfo);
+        $dtoNull = new BucketInfo('dBucket', $localInfo->getName());
 
         $this->assertNull($dtoNull->getDirectory());
 
         $dto = new BucketInfo(
             'dBucket2',
-            $localInfo,
+            $localInfo->getName(),
             [
                 'directory' => $directory,
                 'server' => $localInfo->getName(),

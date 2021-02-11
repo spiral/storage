@@ -11,5 +11,5 @@ interface BucketInfoInterface
 
     public function getDirectory(): ?string;
 
-    public function getServerKey(): string;
+    public function getServer(): string;
 }

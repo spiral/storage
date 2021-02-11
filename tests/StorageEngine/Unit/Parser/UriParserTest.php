@@ -10,15 +10,15 @@ class UriParserTest extends AbstractUnitTest
     /**
      * @dataProvider getUriList
      *
-     * @param string $server
+     * @param string $fs
      * @param string $path
      * @param string $uri
      */
-    public function testPrepareUri(string $server, string $path, string $uri): void
+    public function testPrepareUri(string $fs, string $path, string $uri): void
     {
-        $uriStructure = $this->getUriParser()->prepareUri($server, $path);
+        $uriStructure = $this->getUriParser()->prepareUri($fs, $path);
 
-        $this->assertEquals($server, $uriStructure->getServer());
+        $this->assertEquals($fs, $uriStructure->getFileSystem());
         $this->assertEquals($path, $uriStructure->getPath());
         $this->assertEquals($uri, (string)$uriStructure);
     }
@@ -26,17 +26,17 @@ class UriParserTest extends AbstractUnitTest
     /**
      * @dataProvider getUriList
      *
-     * @param string $server
+     * @param string $fs
      * @param string $path
      * @param string $uri
      *
      * @throws UriException
      */
-    public function testParseUri(string $server, string $path, string $uri): void
+    public function testParseUri(string $fs, string $path, string $uri): void
     {
         $uriStructure = $this->getUriParser()->parseUri($uri);
 
-        $this->assertEquals($server, $uriStructure->getServer());
+        $this->assertEquals($fs, $uriStructure->getFileSystem());
         $this->assertEquals($path, $uriStructure->getPath());
         $this->assertEquals($uri, (string)$uriStructure);
     }
@@ -60,22 +60,22 @@ class UriParserTest extends AbstractUnitTest
     /**
      * @dataProvider getUriListWithSeparators
      *
-     * @param string $server
+     * @param string $fs
      * @param string $path
      * @param string $uri
      * @param string|null $separator
      *
      * @throws \ReflectionException
      */
-    public function testBuildUriStructure(string $server, string $path, string $uri, ?string $separator = null): void
+    public function testBuildUriStructure(string $fs, string $path, string $uri, ?string $separator = null): void
     {
         $uriStructure = $this->callNotPublicMethod(
             $this->getUriParser(),
             'buildUriStructure',
-            [$server, $path, $separator]
+            [$fs, $path, $separator]
         );
 
-        $this->assertEquals($server, $uriStructure->getServer());
+        $this->assertEquals($fs, $uriStructure->getFileSystem());
         $this->assertEquals($path, $uriStructure->getPath());
         $this->assertEquals($uri, (string)$uriStructure);
     }
@@ -122,13 +122,13 @@ class UriParserTest extends AbstractUnitTest
 
     public function getBadUriList(): array
     {
-        $noServerUri = '://file.txt';
+        $noFsUri = '://file.txt';
         $noPathUri = 'aws://';
 
         return [
             [
-                $noServerUri,
-                'No server was detected in uri ' . $noServerUri,
+                $noFsUri,
+                'No file system was detected in uri ' . $noFsUri,
             ],
             [
                 $noPathUri,

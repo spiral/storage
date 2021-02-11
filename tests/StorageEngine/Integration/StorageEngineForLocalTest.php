@@ -11,13 +11,13 @@ use Spiral\StorageEngine\Exception\FileOperationException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\AbstractTest;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
-use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
+use Spiral\StorageEngine\Tests\Traits\LocalFsBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 
 class StorageEngineForLocalTest extends AbstractTest
 {
-    use LocalServerBuilderTrait;
+    use LocalFsBuilderTrait;
     use StorageConfigTrait;
 
     private const ROOT_FILE_NAME = 'file.txt';
@@ -31,7 +31,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         parent::setUp();
 
-        $this->rootDir = vfsStream::setup(ServerTestInterface::ROOT_DIR_NAME, 777);
+        $this->rootDir = vfsStream::setup(FsTestInterface::ROOT_DIR_NAME, 777);
     }
 
     /**
@@ -88,7 +88,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->assertTrue(
             $storageEngine->fileExists('local://' . self::ROOT_FILE_NAME)
@@ -102,20 +102,20 @@ class StorageEngineForLocalTest extends AbstractTest
     /**
      * @throws StorageException
      */
-    public function testWrongServerFileExistsThrowsException(): void
+    public function testFileExistsWrongFsThrowsException(): void
     {
         $this->buildSimpleVfsStructure();
 
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('Server other was not identified');
+        $this->expectExceptionMessage('File system other was not identified');
 
-        $this->buildStorageForServer('local')->fileExists('other://' . static::ROOT_FILE_NAME);
+        $this->buildStorageForFs('local')->fileExists('other://' . static::ROOT_FILE_NAME);
     }
 
     /**
      * @throws StorageException
      */
-    public function testWrongFormatServerFileExistsThrowsException(): void
+    public function testFileExistsWrongFormatThrowsException(): void
     {
         $this->buildSimpleVfsStructure();
 
@@ -124,7 +124,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage('No uri structure was detected in uri ' . $uri);
 
-        $this->buildStorageForServer('local')->fileExists($uri);
+        $this->buildStorageForFs('local')->fileExists($uri);
     }
 
     /**
@@ -134,7 +134,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->assertEquals(
             static::ROOT_FILE_CONTENT,
@@ -149,7 +149,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessageMatches('/^Unable to read file from location: file_missed.txt./');
@@ -164,7 +164,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->assertIsResource($storageEngine->readStream('local://' . static::ROOT_FILE_NAME));
     }
@@ -176,7 +176,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessageMatches('/^Unable to read file from location: file_missed.txt./');
@@ -193,7 +193,7 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $fileLastModified = $storageEngine->lastModified('local://' . static::ROOT_FILE_NAME);
         $dateLastModified = $today->setTimestamp($fileLastModified);
@@ -211,7 +211,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessageMatches(
@@ -228,7 +228,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $fileSize = $storageEngine->fileSize('local://' . static::ROOT_FILE_NAME);
 
@@ -243,7 +243,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessageMatches(
@@ -260,7 +260,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->assertEquals('text/plain', $storageEngine->mimeType('local://' . static::ROOT_FILE_NAME));
     }
@@ -272,7 +272,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessageMatches(
@@ -289,7 +289,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->assertEquals('public', $storageEngine->visibility('local://' . static::ROOT_FILE_NAME));
     }
@@ -301,7 +301,7 @@ class StorageEngineForLocalTest extends AbstractTest
     {
         $this->buildSimpleVfsStructure();
 
-        $storageEngine = $this->buildStorageForServer('local');
+        $storageEngine = $this->buildStorageForFs('local');
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessageMatches(
@@ -331,7 +331,7 @@ class StorageEngineForLocalTest extends AbstractTest
      *
      * @throws StorageException
      */
-    private function buildStorageForServer(string $name): StorageEngine
+    private function buildStorageForFs(string $name): StorageEngine
     {
         return new StorageEngine(
             new StorageConfig(

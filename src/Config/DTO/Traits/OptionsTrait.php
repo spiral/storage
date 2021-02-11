@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\Traits;
 
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\OptionsBasedInterface;
 
 trait OptionsTrait
 {

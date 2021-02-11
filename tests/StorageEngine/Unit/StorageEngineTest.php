@@ -13,14 +13,14 @@ use Spiral\StorageEngine\Exception\MountException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Exception\UriException;
 use Spiral\StorageEngine\StorageEngine;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
 
 /**
  * tests for basic StorageEngine methods
  */
 class StorageEngineTest extends StorageEngineAbstractTest
 {
-    private const DEFAULT_SERVER_NAME = 'default';
+    private const DEFAULT_FS = 'default';
 
     private StorageEngine $storage;
 
@@ -36,18 +36,18 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
         $this->localFileSystem = new Filesystem(
             AdapterFactory::build(
-                $this->buildLocalInfo(ServerTestInterface::SERVER_NAME, false)
+                $this->buildLocalInfo(FsTestInterface::SERVER_NAME, false)
             )
         );
 
         $storageConfig = $this->buildStorageConfig(
-            [static::DEFAULT_SERVER_NAME => $this->buildLocalInfoDescription()]
+            [static::DEFAULT_FS => $this->buildLocalInfoDescription()]
         );
 
         $this->storage = new StorageEngine($storageConfig, $this->getUriParser());
         $this->mountStorageEngineFileSystem(
             $this->storage,
-            ServerTestInterface::SERVER_NAME,
+            FsTestInterface::SERVER_NAME,
             $this->localFileSystem
         );
     }
@@ -115,7 +115,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
             $this->callNotPublicMethod(
                 $this->storage,
                 'isFileSystemExists',
-                [ServerTestInterface::SERVER_NAME]
+                [FsTestInterface::SERVER_NAME]
             )
         );
         $this->assertFalse(
@@ -132,7 +132,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
      */
     public function testGetFileSystem(): void
     {
-        $this->assertSame($this->localFileSystem, $this->storage->getFileSystem(ServerTestInterface::SERVER_NAME));
+        $this->assertSame($this->localFileSystem, $this->storage->getFileSystem(FsTestInterface::SERVER_NAME));
     }
 
     /**
@@ -141,7 +141,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
     public function testGetMissedFileSystem(): void
     {
         $this->expectException(MountException::class);
-        $this->expectExceptionMessage('Server missed was not identified');
+        $this->expectExceptionMessage('File system missed was not identified');
 
         $this->storage->getFileSystem('missed');
     }
@@ -149,7 +149,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
     public function testExtractMountedFileSystemsKeys(): void
     {
         $this->assertEquals(
-            [static::DEFAULT_SERVER_NAME, ServerTestInterface::SERVER_NAME],
+            [static::DEFAULT_FS, FsTestInterface::SERVER_NAME],
             $this->storage->getFileSystemsNames()
         );
     }
@@ -162,17 +162,17 @@ class StorageEngineTest extends StorageEngineAbstractTest
     {
         $newFileSystem = new Filesystem(
             AdapterFactory::build(
-                $this->buildLocalInfo(ServerTestInterface::SERVER_NAME, false)
+                $this->buildLocalInfo(FsTestInterface::SERVER_NAME, false)
             )
         );
 
         $this->mountStorageEngineFileSystem(
             $this->storage,
-            ServerTestInterface::SERVER_NAME,
+            FsTestInterface::SERVER_NAME,
             $newFileSystem
         );
 
-        $this->assertSame($this->storage->getFileSystem(ServerTestInterface::SERVER_NAME), $this->localFileSystem);
+        $this->assertSame($this->storage->getFileSystem(FsTestInterface::SERVER_NAME), $this->localFileSystem);
     }
 
     /**
@@ -235,10 +235,10 @@ class StorageEngineTest extends StorageEngineAbstractTest
     /**
      * @throws \ReflectionException
      */
-    public function testDetermineFilesystemAndPathUnknownServer(): void
+    public function testDetermineFilesystemAndPathUnknownFs(): void
     {
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('Server missed was not identified');
+        $this->expectExceptionMessage('File system missed was not identified');
 
         $this->callNotPublicMethod($this->storage, 'determineFilesystemAndPath', ['missed://file.txt']);
     }
@@ -313,7 +313,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
                 ],
                 MountException::class,
                 \sprintf(
-                    'Server %s can\'t be mounted - string required, %s received',
+                    'File system %s can\'t be mounted - string required, %s received',
                     5,
                     gettype(5)
                 )
@@ -324,7 +324,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
                     null => $localFsDesc,
                 ],
                 MountException::class,
-                'Server --non-displayable-- can\'t be mounted - string required, empty val received',
+                'File system --non-displayable-- can\'t be mounted - string required, empty val received',
             ],
             [
                 [
@@ -333,7 +333,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
                 ],
                 ConfigException::class,
                 \sprintf(
-                    'Server info for %s was provided in wrong format, array expected, %s received',
+                    'File system info for %s was provided in wrong format, array expected, %s received',
                     $local2Name,
                     gettype($dateTime)
                 ),

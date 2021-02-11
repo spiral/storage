@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo\Aws;
+namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\FileSystemInfo\Aws;
 
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsVisibilityConverter;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws\AwsVisibilityConverter;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 

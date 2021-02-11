@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
+namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo;
 
 use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Config\DTO\Traits\ClassBasedTrait;
 
-abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, OptionsBasedInterface
+abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInterface, OptionsBasedInterface
 {
     use ClassBasedTrait;
     use OptionsTrait;
@@ -18,7 +18,7 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
     protected const ADDITIONAL_OPTIONS = [];
 
-    protected const SERVER_INFO_TYPE = '';
+    protected const FILE_SYSTEM_INFO_TYPE = '';
 
     protected string $name;
 
@@ -38,17 +38,17 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
 
         $this->name = $name;
 
-        $this->checkClass($info[static::ADAPTER_KEY], \sprintf('Server %s adapter', $this->name));
+        $this->checkClass($info[static::ADAPTER_KEY], \sprintf('File system %s adapter', $this->name));
         $this->adapter = $info[static::ADAPTER_KEY];
 
         if (array_key_exists(static::RESOLVER_KEY, $info)) {
-            $this->checkClass($info[static::RESOLVER_KEY], \sprintf('Server %s resolver', $this->name));
+            $this->checkClass($info[static::RESOLVER_KEY], \sprintf('File system %s resolver', $this->name));
             $this->resolver = $info[static::RESOLVER_KEY];
         }
 
         $this->prepareOptions($info[OptionsBasedInterface::OPTIONS_KEY]);
 
-        if ($this instanceof SpecificConfigurableServerInfo) {
+        if ($this instanceof SpecificConfigurableFileSystemInfo) {
             $this->constructSpecific($info);
         }
     }
@@ -89,7 +89,7 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         $this->validateRequiredOptions(
             array_keys(static::REQUIRED_OPTIONS),
             $options,
-            ' for server ' . $this->getName()
+            ' for file system ' . $this->getName()
         );
 
         foreach ($options as $optionKey => $option) {
@@ -104,22 +104,22 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
     }
 
     /**
-     * @param string $serverName
+     * @param string $fs
      * @param array $info
      *
      * @throws ConfigException
      */
-    protected function validateInfoSufficient(string $serverName, array $info): void
+    protected function validateInfoSufficient(string $fs, array $info): void
     {
         if (!array_key_exists(static::ADAPTER_KEY, $info)) {
             throw new ConfigException(
-                \sprintf('Server %s needs adapter class defined', $serverName)
+                \sprintf('File system %s needs adapter class defined', $fs)
             );
         }
 
         if (!array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
             throw new ConfigException(
-                \sprintf('Server %s needs options defined', $serverName)
+                \sprintf('File system %s needs options defined', $fs)
             );
         }
     }
@@ -136,7 +136,7 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         if (!$this->isOptionHasRequiredType($optionLabel, $optionVal, $optionType)) {
             throw new ConfigException(
                 \sprintf(
-                    'Option %s defined in wrong format for server %s, %s expected',
+                    'Option %s defined in wrong format for file system %s, %s expected',
                     $optionLabel,
                     $this->getName(),
                     $optionType

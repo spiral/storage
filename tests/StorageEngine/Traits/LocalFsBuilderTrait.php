@@ -8,11 +8,11 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Builder\AdapterFactory;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
 
-trait LocalServerBuilderTrait
+trait LocalFsBuilderTrait
 {
     /**
      * @param bool|null $useVcsPrefix
@@ -21,7 +21,7 @@ trait LocalServerBuilderTrait
      *
      * @throws StorageException
      */
-    protected function buildLocalServer(?bool $useVcsPrefix = false): Filesystem
+    protected function buildLocalFs(?bool $useVcsPrefix = false): Filesystem
     {
         return new Filesystem(
             $this->buildLocalAdapter($useVcsPrefix)
@@ -37,7 +37,7 @@ trait LocalServerBuilderTrait
      */
     protected function buildLocalAdapter(?bool $useVcsPrefix = false): FilesystemAdapter
     {
-        return AdapterFactory::build($this->buildLocalInfo(ServerTestInterface::SERVER_NAME, $useVcsPrefix));
+        return AdapterFactory::build($this->buildLocalInfo(FsTestInterface::SERVER_NAME, $useVcsPrefix));
     }
 
     /**
@@ -49,7 +49,7 @@ trait LocalServerBuilderTrait
      * @throws StorageException
      */
     protected function buildLocalInfo(
-        ?string $name = ServerTestInterface::SERVER_NAME,
+        ?string $name = FsTestInterface::SERVER_NAME,
         ?bool $useVcsPrefix = false
     ): LocalInfo {
         return new LocalInfo($name, $this->buildLocalInfoDescription($useVcsPrefix));
@@ -60,9 +60,9 @@ trait LocalServerBuilderTrait
         return [
             LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
             LocalInfo::OPTIONS_KEY => [
-                LocalInfo::ROOT_DIR_KEY => ($useVcsPrefix ? ServerTestInterface::VFS_PREFIX : '')
-                    . ServerTestInterface::ROOT_DIR_NAME,
-                LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                LocalInfo::ROOT_DIR_KEY => ($useVcsPrefix ? FsTestInterface::VFS_PREFIX : '')
+                    . FsTestInterface::ROOT_DIR_NAME,
+                LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
             ],
         ];
     }

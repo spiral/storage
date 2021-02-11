@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
+namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo;
 
-interface ServerInfoInterface
+interface FileSystemInfoInterface
 {
     public const ADAPTER_KEY = 'adapter';
 
@@ -25,7 +25,7 @@ interface ServerInfoInterface
     public function getName(): string;
 
     /**
-     * Check if adapter for server should be configured with additional params
+     * Check if adapter for fs should be configured with additional params
      *
      * @return bool
      */

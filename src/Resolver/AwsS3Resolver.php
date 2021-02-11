@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 
 class AwsS3Resolver extends AbstractAdapterResolver
 {
     public const EXPIRES_OPTION = 'expires';
 
-    protected const SERVER_INFO_CLASS = AwsS3Info::class;
+    protected const FILE_SYSTEM_INFO_CLASS = AwsS3Info::class;
 
     private const DEFAULT_URL_EXPIRES = '+24hours';
 
     /**
-     * @var ServerInfoInterface|AwsS3Info
+     * @var FileSystemInfoInterface|AwsS3Info
      */
-    protected ServerInfoInterface $serverInfo;
+    protected FileSystemInfoInterface $fsInfo;
 
     public function buildUrl(string $uri, array $options = []): ?string
     {
-        $s3Client = $this->serverInfo->getClient();
+        $s3Client = $this->fsInfo->getClient();
 
         return (string)$s3Client
             ->createPresignedRequest(
                 $s3Client->getCommand(
                     'GetObject',
                     [
-                        'Bucket' => $this->serverInfo->getOption(AwsS3Info::BUCKET_KEY),
+                        'Bucket' => $this->fsInfo->getOption(AwsS3Info::BUCKET_KEY),
                         'Key' => $this->normalizeFilePathToUri($uri),
                     ]
                 ),

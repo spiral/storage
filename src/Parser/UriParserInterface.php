@@ -10,12 +10,12 @@ use Spiral\StorageEngine\Parser\DTO\UriStructureInterface;
 interface UriParserInterface
 {
     /**
-     * @param string $server
+     * @param string $fs
      * @param string $path
      *
      * @return UriStructureInterface
      */
-    public function prepareUri(string $server, string $path): UriStructureInterface;
+    public function prepareUri(string $fs, string $path): UriStructureInterface;
 
     /**
      * @param string $uri

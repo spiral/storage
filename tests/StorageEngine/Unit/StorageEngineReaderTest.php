@@ -16,7 +16,7 @@ use Spiral\StorageEngine\Exception\StorageException;
  */
 class StorageEngineReaderTest extends StorageEngineAbstractTest
 {
-    private const LOCAL_SERVER_NAME = 'local';
+    private const LOCAL_FS = 'local';
 
     /**
      * @throws StorageException
@@ -24,12 +24,12 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testFileExists(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('fileExists')
             ->with('file.txt');
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $storage->fileExists('local://file.txt');
     }
@@ -39,14 +39,14 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testFileExistsThrowsException(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('fileExists')
             ->willThrowException(
                 UnableToCheckFileExistence::forLocation('file.txt')
             );
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to check file existence for: file.txt');
@@ -60,12 +60,12 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testRead(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('read')
             ->with('file.txt');
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $storage->read('local://file.txt');
     }
@@ -76,14 +76,14 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testReadThrowsException(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('read')
             ->willThrowException(
                 UnableToReadFile::fromLocation('file.txt')
             );
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to read file from location: file.txt.');
@@ -97,12 +97,12 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testReadStream(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('readStream')
             ->with('file.txt');
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $storage->readStream('local://file.txt');
     }
@@ -113,14 +113,14 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testReadStreamThrowsException(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('readStream')
             ->willThrowException(
                 UnableToReadFile::fromLocation('file.txt')
             );
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to read file from location: file.txt.');
@@ -134,12 +134,12 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testLastModified(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('lastModified')
             ->with('file.txt');
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $storage->lastModified('local://file.txt');
     }
@@ -150,14 +150,14 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testLastModifiedThrowsException(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('lastModified')
             ->willThrowException(
                 UnableToRetrieveMetadata::lastModified('file.txt')
             );
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to retrieve the last_modified for file at location: file.txt.');
@@ -171,12 +171,12 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testFileSize(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('fileSize')
             ->with('file.txt');
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $storage->fileSize('local://file.txt');
     }
@@ -187,14 +187,14 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testFileSizeThrowsException(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('fileSize')
             ->willThrowException(
                 UnableToRetrieveMetadata::fileSize('file.txt')
             );
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to retrieve the file_size for file at location: file.txt.');
@@ -208,12 +208,12 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testMimeType(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('mimeType')
             ->with('file.txt');
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $storage->mimeType('local://file.txt');
     }
@@ -224,14 +224,14 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testMimeTypeThrowsException(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('mimeType')
             ->willThrowException(
                 UnableToRetrieveMetadata::mimeType('file.txt')
             );
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to retrieve the mime_type for file at location: file.txt.');
@@ -245,12 +245,12 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testVisibility(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('visibility')
             ->with('file.txt');
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $storage->visibility('local://file.txt');
     }
@@ -261,14 +261,14 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
      */
     public function testVisibilityThrowsException(): void
     {
-        $localServer = $this->createMock(FilesystemOperator::class);
-        $localServer->expects($this->once())
+        $localFs = $this->createMock(FilesystemOperator::class);
+        $localFs->expects($this->once())
             ->method('visibility')
             ->willThrowException(
                 UnableToRetrieveMetadata::visibility('file.txt')
             );
 
-        $storage = $this->buildSimpleStorageEngine(static::LOCAL_SERVER_NAME, $localServer);
+        $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('Unable to retrieve the visibility for file at location: file.txt.');

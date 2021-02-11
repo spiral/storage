@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
+namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws;
 
 use League\Flysystem\Visibility;
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ClassBasedInterface;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\ClassBasedInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\OptionsBasedInterface;
 use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Config\DTO\Traits\ClassBasedTrait;

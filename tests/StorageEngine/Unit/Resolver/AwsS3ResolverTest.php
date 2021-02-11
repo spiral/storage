@@ -8,29 +8,29 @@ use Aws\CommandInterface;
 use Aws\S3\S3Client;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use Psr\Http\Message\RequestInterface;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
-use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\AwsS3FsBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalFsBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class AwsS3ResolverTest extends AbstractUnitTest
 {
-    use LocalServerBuilderTrait;
-    use AwsS3ServerBuilderTrait;
+    use LocalFsBuilderTrait;
+    use AwsS3FsBuilderTrait;
 
     /**
      * @throws StorageException
      */
-    public function testWrongServerInfo(): void
+    public function testWrongFsInfo(): void
     {
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage(
             \sprintf(
-                'Wrong server info (%s) for resolver %s',
+                'Wrong file system info (%s) for resolver %s',
                 LocalInfo::class,
                 AwsS3Resolver::class
             )

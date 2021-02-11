@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\ServerInfo\Aws;
+namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws;
 
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\SpecificConfigurableServerInfo;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfo;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\SpecificConfigurableFileSystemInfo;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
 
-class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
+class AwsS3Info extends FileSystemInfo implements SpecificConfigurableFileSystemInfo
 {
     public const BUCKET_KEY = 'bucket';
     public const CLIENT_KEY = 'client';
     public const PATH_PREFIX_KEY = 'path-prefix';
 
-    protected const SERVER_INFO_TYPE = 'awsS3';
+    protected const FILE_SYSTEM_INFO_TYPE = 'awsS3';
 
     protected const REQUIRED_OPTIONS = [
         self::BUCKET_KEY => self::STRING_TYPE,
