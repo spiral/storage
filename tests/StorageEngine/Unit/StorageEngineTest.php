@@ -10,8 +10,8 @@ use Spiral\StorageEngine\Builder\AdapterFactory;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Exception\MountException;
-use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\StorageEngine\Exception\UriException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 
@@ -44,7 +44,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
             [static::DEFAULT_SERVER_NAME => $this->buildLocalInfoDescription()]
         );
 
-        $this->storage = new StorageEngine($storageConfig, $this->getUriResolver());
+        $this->storage = new StorageEngine($storageConfig, $this->getUriParser());
         $this->mountStorageEngineFileSystem(
             $this->storage,
             ServerTestInterface::SERVER_NAME,
@@ -69,7 +69,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
             ]
         );
 
-        $storage = new StorageEngine($storageConfig, $this->getUriResolver());
+        $storage = new StorageEngine($storageConfig, $this->getUriParser());
 
         foreach ([$local1Name, $local2Name] as $key) {
             $this->assertInstanceOf(FilesystemOperator::class, $storage->getFileSystem($key));
@@ -93,7 +93,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
         $storageConfig = $this->buildStorageConfig($fsList);
 
-        $storage = new StorageEngine($storageConfig, $this->getUriResolver());
+        $storage = new StorageEngine($storageConfig, $this->getUriParser());
 
         foreach ($fsList as $key => $fsInfoDescription) {
             $this->assertInstanceOf(FilesystemOperator::class, $storage->getFileSystem($key));
@@ -191,7 +191,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
         $storageConfig = $this->buildStorageConfig($servers);
 
-        new StorageEngine($storageConfig, $this->getUriResolver());
+        new StorageEngine($storageConfig, $this->getUriParser());
     }
 
     /**
@@ -233,8 +233,8 @@ class StorageEngineTest extends StorageEngineAbstractTest
     public function testDetermineFilesystemAndPathWrongFormat(): void
     {
         $file = 'missed:/-/file.txt';
-        $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage(\sprintf('File %s can\'t be identified', $file));
+        $this->expectException(UriException::class);
+        $this->expectExceptionMessage('No uri structure was detected in uri ' . $file);
 
         $this->callNotPublicMethod($this->storage, 'determineFilesystemAndPath', [$file]);
     }
@@ -261,7 +261,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
             ]
         );
 
-        $storage = new StorageEngine($storageConfig, $this->getUriResolver());
+        $storage = new StorageEngine($storageConfig, $this->getUriParser());
 
         return [
             [

@@ -2,23 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver\AdapterResolver;
+namespace Spiral\StorageEngine\Resolver;
 
 use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Exception\ValidationException;
-use Spiral\StorageEngine\Resolver\DTO\UriStructure;
-use Spiral\StorageEngine\Validation\FilePathValidatorInterface;
+use Spiral\StorageEngine\Exception\UriException;
+use Spiral\StorageEngine\Parser\UriParserInterface;
 
 abstract class AbstractAdapterResolver implements AdapterResolverInterface
 {
     protected const SERVER_INFO_CLASS = '';
 
-    protected FilePathValidatorInterface $filePathValidator;
-
     protected ServerInfoInterface $serverInfo;
+
+    protected UriParserInterface $uriParser;
 
     /**
      * @var BucketInfoInterface[]
@@ -26,17 +25,14 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
     protected array $buckets = [];
 
     /**
+     * @param UriParserInterface $uriParser
      * @param StorageConfig $storageConfig
-     * @param FilePathValidatorInterface $filePathValidator
      * @param string $serverKey
      *
      * @throws StorageException
      */
-    public function __construct(
-        StorageConfig $storageConfig,
-        FilePathValidatorInterface $filePathValidator,
-        string $serverKey
-    ) {
+    public function __construct(UriParserInterface $uriParser, StorageConfig $storageConfig, string $serverKey)
+    {
         $requiredClass = static::SERVER_INFO_CLASS;
 
         $serverInfo = $storageConfig->buildServerInfo($serverKey);
@@ -51,25 +47,17 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
             );
         }
 
-        $this->filePathValidator = $filePathValidator;
+        $this->uriParser = $uriParser;
 
         $this->serverInfo = $serverInfo;
-
         $this->buckets = $storageConfig->getServerBuckets($serverKey);
     }
 
     public function normalizeFilePathToUri(string $filePath): string
     {
         try {
-            $this->filePathValidator->validateUri($filePath);
-
-            $uriStructure = new UriStructure(
-                $filePath,
-                $this->filePathValidator->getUriPattern()
-            );
-
-            return $uriStructure->filePath;
-        } catch (ValidationException $e) {
+            return $this->uriParser->parseUri($filePath)->path;
+        } catch (UriException $e) {
             // if filePath is not uri we suppose it is short form of filepath - without server name
         }
 

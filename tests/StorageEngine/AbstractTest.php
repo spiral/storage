@@ -5,29 +5,19 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Spiral\StorageEngine\Resolver\UriResolver;
-use Spiral\StorageEngine\Validation\FilePathValidator;
+use Spiral\StorageEngine\Parser\UriParser;
+use Spiral\StorageEngine\Parser\UriParserInterface;
 
 class AbstractTest extends TestCase
 {
-    protected ?UriResolver $uriResolver = null;
-    protected ?FilePathValidator $filePathValidator = null;
+    protected ?UriParserInterface $uriParser = null;
 
-    protected function getUriResolver(): UriResolver
+    protected function getUriParser(): UriParserInterface
     {
-        if ($this->uriResolver instanceof UriResolver) {
-            return $this->uriResolver;
+        if (!$this->uriParser instanceof UriParserInterface) {
+            $this->uriParser = new UriParser();
         }
 
-        return new UriResolver($this->getFilePathValidator());
-    }
-
-    protected function getFilePathValidator(): FilePathValidator
-    {
-        if ($this->filePathValidator instanceof FilePathValidator) {
-            return $this->filePathValidator;
-        }
-
-        return new FilePathValidator();
+        return $this->uriParser;
     }
 }

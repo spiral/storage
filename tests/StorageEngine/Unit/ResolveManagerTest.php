@@ -7,13 +7,12 @@ namespace Spiral\StorageEngine\Tests\Unit;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Config\DTO\ServerInfo;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\AdapterResolver\AwsS3Resolver;
-use Spiral\StorageEngine\Resolver\AdapterResolver\LocalSystemResolver;
-use Spiral\StorageEngine\Resolver\UriResolverInterface;
+use Spiral\StorageEngine\Exception\UriException;
+use Spiral\StorageEngine\Parser\UriParserInterface;
+use Spiral\StorageEngine\Resolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
@@ -45,7 +44,7 @@ class ResolveManagerTest extends AbstractUnitTest
         );
 
         $resolver = $this->callNotPublicMethod($resolveManager, 'getResolver', [$serverName]);
-        $this->assertInstanceOf(LocalSystemResolver::class, $resolver);
+        $this->assertInstanceOf(Resolver\LocalSystemResolver::class, $resolver);
         $this->assertSame(
             $resolver,
             $this->callNotPublicMethod($resolveManager, 'getResolver', [$serverName])
@@ -73,14 +72,16 @@ class ResolveManagerTest extends AbstractUnitTest
     /**
      * @dataProvider getServerInfoListForResolversPrepare
      *
-     * @param ServerInfoInterface $serverInfo
+     * @param ServerInfo\ServerInfoInterface $serverInfo
      * @param string $expectedClass
      *
      * @throws \ReflectionException
      * @throws ConfigException
      */
-    public function testPrepareResolverForServer(ServerInfoInterface $serverInfo, string $expectedClass): void
-    {
+    public function testPrepareResolverForServer(
+        ServerInfo\ServerInfoInterface $serverInfo,
+        string $expectedClass
+    ): void {
         $resolveManager = $this->buildResolveManager(
             [
                 'local' => $this->buildLocalInfoDescription(),
@@ -107,10 +108,10 @@ class ResolveManagerTest extends AbstractUnitTest
             [
                 static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription(),
                 static::LOCAL_SERVER_2 => [
-                    LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    LocalInfo::OPTIONS_KEY => [
-                        LocalInfo::ROOT_DIR_KEY => static::LOCAL_SERVER_ROOT_2,
-                        LocalInfo::HOST_KEY => static::LOCAL_SERVER_HOST_2,
+                    ServerInfo\LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                    ServerInfo\LocalInfo::OPTIONS_KEY => [
+                        ServerInfo\LocalInfo::ROOT_DIR_KEY => static::LOCAL_SERVER_ROOT_2,
+                        ServerInfo\LocalInfo::HOST_KEY => static::LOCAL_SERVER_HOST_2,
                     ],
                 ],
             ]
@@ -148,10 +149,8 @@ class ResolveManagerTest extends AbstractUnitTest
             [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
         );
 
-        $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage(
-            \sprintf('File %s can\'t be identified', $uri)
-        );
+        $this->expectException(UriException::class);
+        $this->expectExceptionMessage('No uri structure was detected in uri ' . $uri);
 
         $resolveManager->buildUrl($uri);
     }
@@ -165,15 +164,14 @@ class ResolveManagerTest extends AbstractUnitTest
 
         $exceptionMsg = 'Some unhandled exception';
 
-        $uriResolver = $this->createMock(UriResolverInterface::class);
-        $uriResolver->expects($this->once())
-            ->method('parseUriToStructure')
+        $uriParser = $this->createMock(UriParserInterface::class);
+        $uriParser->expects($this->once())
+            ->method('parseUri')
             ->willThrowException(new \Exception($exceptionMsg));
 
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig([static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]),
-            $uriResolver,
-            $this->getFilePathValidator()
+            $uriParser
         );
 
         $this->expectException(ResolveException::class);
@@ -239,7 +237,7 @@ class ResolveManagerTest extends AbstractUnitTest
             ],
         ]);
 
-        $resolveManager = new ResolveManager($config, $this->getUriResolver(), $this->getFilePathValidator());
+        $resolveManager = new ResolveManager($config, $this->getUriParser());
 
         $this->assertEquals(
             'local://b1/file.txt',
@@ -281,7 +279,7 @@ class ResolveManagerTest extends AbstractUnitTest
             ],
         ]);
 
-        $resolveManager = new ResolveManager($config, $this->getUriResolver(), $this->getFilePathValidator());
+        $resolveManager = new ResolveManager($config, $this->getUriParser());
 
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage('Bucket bucket2 was not found');
@@ -338,8 +336,8 @@ class ResolveManagerTest extends AbstractUnitTest
     public function getServerInfoListForResolversPrepare(): array
     {
         return [
-            [$this->buildLocalInfo('local'), LocalSystemResolver::class],
-            [$this->buildAwsS3Info('aws'), AwsS3Resolver::class]
+            [$this->buildLocalInfo('local'), Resolver\LocalSystemResolver::class],
+            [$this->buildAwsS3Info('aws'), Resolver\AwsS3Resolver::class]
         ];
     }
 
@@ -352,10 +350,6 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     private function buildResolveManager(?array $servers = null): ResolveManager
     {
-        return new ResolveManager(
-            $this->buildStorageConfig($servers),
-            $this->getUriResolver(),
-            $this->getFilePathValidator()
-        );
+        return new ResolveManager($this->buildStorageConfig($servers), $this->getUriParser());
     }
 }

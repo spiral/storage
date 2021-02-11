@@ -14,7 +14,7 @@ To work with local file server you should use one of specific adapters:
 ### Additional options
 - `path-prefix` - optional path prefix
 - `visibility` - `public` or `private`
-- `resolver` - specific adapter resolver for handling url. Resolver must implements `\Spiral\StorageEngine\Resolver\AdapterResolver\AdapterResolverInterface`
+- `resolver` - specific adapter resolver for handling url. Resolver must implements `\Spiral\StorageEngine\Resolver\AdapterResolverInterface`
 
 ### Example config file for basic usage
 ```php

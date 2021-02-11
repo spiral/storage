@@ -43,7 +43,7 @@ class StorageEngineForLocalTest extends AbstractTest
             new StorageConfig(
                 ['servers' => ['local' => $this->buildLocalInfoDescription(true)]]
             ),
-            $this->getUriResolver()
+            $this->getUriParser()
         );
 
         $this->assertRegExp('/^\/tmp\/tmpStorageFile_[\w]*$/', $engine->tempFilename());
@@ -60,7 +60,7 @@ class StorageEngineForLocalTest extends AbstractTest
             new StorageConfig(
                 ['servers' => ['local' => $this->buildLocalInfoDescription(true)]]
             ),
-            $this->getUriResolver()
+            $this->getUriParser()
         );
 
         $tmpFilePath = $engine->tempFilename('local://' . static::ROOT_FILE_NAME);
@@ -114,9 +114,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $uri = 'other-//file.txt';
 
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage(
-            \sprintf('File %s can\'t be identified', $uri)
-        );
+        $this->expectExceptionMessage('No uri structure was detected in uri ' . $uri);
 
         $this->buildStorageForServer('local')->fileExists($uri);
     }
@@ -333,7 +331,7 @@ class StorageEngineForLocalTest extends AbstractTest
                     'servers' => [$name => $this->buildLocalInfoDescription(true)]
                 ]
             ),
-            $this->getUriResolver()
+            $this->getUriParser()
         );
     }
 }

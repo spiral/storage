@@ -10,7 +10,7 @@ use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Resolver\AdapterResolver\LocalSystemResolver;
+use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
@@ -36,10 +36,10 @@ class LocalSystemResolverTest extends AbstractUnitTest
         );
 
         new LocalSystemResolver(
+            $this->getUriParser(),
             new StorageConfig(
                 ['servers' => ['aws' => $this->buildAwsS3ServerDescription()]]
             ),
-            $this->getFilePathValidator(),
             'aws'
         );
     }
@@ -63,6 +63,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         string $expectedUrl
     ): void {
         $resolver = new LocalSystemResolver(
+            $this->getUriParser(),
             new StorageConfig(
                 [
                     'servers' => [
@@ -76,7 +77,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
                     ],
                 ]
             ),
-            $this->getFilePathValidator(),
             $serverName
         );
 
@@ -89,6 +89,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
     public function testBuildUrlNoHost(): void
     {
         $resolver = new LocalSystemResolver(
+            $this->getUriParser(),
             new StorageConfig(
                 [
                     'servers' => [
@@ -101,7 +102,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
                     ]
                 ]
             ),
-            $this->getFilePathValidator(),
             'someServer'
         );
 
@@ -122,6 +122,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
     public function testNormalizePathForServer(string $filePath, string $uri): void
     {
         $resolver = new LocalSystemResolver(
+            $this->getUriParser(),
             new StorageConfig(
                 [
                     'servers' => [
@@ -129,7 +130,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
                     ],
                 ]
             ),
-            $this->getFilePathValidator(),
             'local'
         );
 

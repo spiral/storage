@@ -29,7 +29,7 @@ abstract class StorageEngineAbstractTest extends AbstractUnitTest
         ?string $mountServerKey = null,
         ?FilesystemOperator $fileSystem = null
     ): StorageEngine {
-        $engine = new StorageEngine($this->buildStorageConfig(), $this->getUriResolver());
+        $engine = new StorageEngine($this->buildStorageConfig(), $this->getUriParser());
 
         if (!empty($mountServerKey) && $fileSystem !== null) {
             $this->mountStorageEngineFileSystem($engine, $mountServerKey, $fileSystem);

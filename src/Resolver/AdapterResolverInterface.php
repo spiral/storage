@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver\AdapterResolver;
+namespace Spiral\StorageEngine\Resolver;
 
 interface AdapterResolverInterface
 {
