@@ -35,7 +35,7 @@ class AwsS3Builder extends AbstractBuilder
             $this->serverInfo->hasOption(AwsS3Info::PATH_PREFIX_KEY)
                 ? $this->serverInfo->getOption(AwsS3Info::PATH_PREFIX_KEY)
                 : '',
-            $this->serverInfo->getVisibiltyConverter()
+            $this->serverInfo->getVisibilityConverter()
         );
     }
 }

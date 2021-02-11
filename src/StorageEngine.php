@@ -38,26 +38,33 @@ class StorageEngine implements StorageInterface, SingletonInterface
         $this->config = $config;
         $this->uriParser = $uriParser;
 
-        if (!empty($config->getServersKeys())) {
-            foreach ($config->getServersKeys() as $serverKey) {
-                if (!is_string($serverKey) || empty($serverKey)) {
-                    throw new MountException(
-                        \sprintf(
-                            'Server %s can\'t be mounted - string required, %s received',
-                            is_scalar($serverKey) && !empty($serverKey) ? $serverKey : '--non-displayable--',
-                            empty($serverKey) ? 'empty val' : gettype($serverKey)
-                        )
-                    );
-                }
+        if (empty($config->getServersKeys())) {
+            throw new MountException('No file servers description was defined');
+        }
 
-                $this->mountFilesystem(
-                    $serverKey,
-                    new Filesystem(
-                        AdapterFactory::build($this->config->buildServerInfo($serverKey))
+        if (empty($config->getBucketsKeys())) {
+            throw new MountException('No buckets description was defined');
+        }
+
+        foreach ($config->getServersKeys() as $serverKey) {
+            if (!is_string($serverKey) || empty($serverKey)) {
+                throw new MountException(
+                    \sprintf(
+                        'Server %s can\'t be mounted - string required, %s received',
+                        is_scalar($serverKey) && !empty($serverKey) ? $serverKey : '--non-displayable--',
+                        empty($serverKey) ? 'empty val' : gettype($serverKey)
                     )
                 );
             }
+
+            $this->mountFilesystem(
+                $serverKey,
+                new Filesystem(
+                    AdapterFactory::build($this->config->buildServerInfo($serverKey))
+                )
+            );
         }
+
     }
 
     /**

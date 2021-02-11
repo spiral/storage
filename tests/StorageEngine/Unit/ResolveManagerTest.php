@@ -39,8 +39,11 @@ class ResolveManagerTest extends AbstractUnitTest
     {
         $serverName = 'local';
 
-        $resolveManager = $this->buildResolveManager(
-            [$serverName => $this->buildLocalInfoDescription()]
+        $resolveManager = new ResolveManager(
+            $this->buildStorageConfig(
+                [$serverName => $this->buildLocalInfoDescription()],
+            ),
+            $this->getUriParser()
         );
 
         $resolver = $this->callNotPublicMethod($resolveManager, 'getResolver', [$serverName]);
@@ -57,8 +60,13 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testGetResolverFailed(): void
     {
-        $resolveManager = $this->buildResolveManager(
-            ['local' => $this->buildLocalInfoDescription()]
+        $serverName = 'local';
+
+        $resolveManager = new ResolveManager(
+            $this->buildStorageConfig(
+                [$serverName => $this->buildLocalInfoDescription()],
+            ),
+            $this->getUriParser()
         );
 
         $missedServer = 'missedServer';
@@ -82,11 +90,14 @@ class ResolveManagerTest extends AbstractUnitTest
         ServerInfo\ServerInfoInterface $serverInfo,
         string $expectedClass
     ): void {
-        $resolveManager = $this->buildResolveManager(
-            [
-                'local' => $this->buildLocalInfoDescription(),
-                'aws' => $this->buildAwsS3ServerDescription(),
-            ]
+        $resolveManager = new ResolveManager(
+            $this->buildStorageConfig(
+                [
+                    'local' => $this->buildLocalInfoDescription(),
+                    'aws' => $this->buildAwsS3ServerDescription(),
+                ]
+            ),
+            $this->getUriParser()
         );
 
         $resolver = $this->callNotPublicMethod($resolveManager, 'prepareResolverForServer', [$serverInfo]);
@@ -104,17 +115,20 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testBuildUrlsListNoException(array $filesList, array $expectedUrlsList): void
     {
-        $resolveManager = $this->buildResolveManager(
-            [
-                static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription(),
-                static::LOCAL_SERVER_2 => [
-                    ServerInfo\LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    ServerInfo\LocalInfo::OPTIONS_KEY => [
-                        ServerInfo\LocalInfo::ROOT_DIR_KEY => static::LOCAL_SERVER_ROOT_2,
-                        ServerInfo\LocalInfo::HOST_KEY => static::LOCAL_SERVER_HOST_2,
+        $resolveManager = new ResolveManager(
+            $this->buildStorageConfig(
+                [
+                    static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription(),
+                    static::LOCAL_SERVER_2 => [
+                        ServerInfo\LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                        ServerInfo\LocalInfo::OPTIONS_KEY => [
+                            ServerInfo\LocalInfo::ROOT_DIR_KEY => static::LOCAL_SERVER_ROOT_2,
+                            ServerInfo\LocalInfo::HOST_KEY => static::LOCAL_SERVER_HOST_2,
+                        ],
                     ],
-                ],
-            ]
+                ]
+            ),
+            $this->getUriParser()
         );
 
         $urlsList = $resolveManager->buildUrlsList($filesList, false);
@@ -129,8 +143,11 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testBuildUrlUnknownServerNoException(): void
     {
-        $resolveManager = $this->buildResolveManager(
-            [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+        $resolveManager = new ResolveManager(
+            $this->buildStorageConfig(
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()],
+            ),
+            $this->getUriParser()
         );
 
         $this->assertNull(
@@ -145,8 +162,11 @@ class ResolveManagerTest extends AbstractUnitTest
     {
         $uri = 'someServer:/+/someFile.txt';
 
-        $resolveManager = $this->buildResolveManager(
-            [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+        $resolveManager = new ResolveManager(
+            $this->buildStorageConfig(
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()],
+            ),
+            $this->getUriParser()
         );
 
         $this->expectException(UriException::class);
@@ -170,7 +190,9 @@ class ResolveManagerTest extends AbstractUnitTest
             ->willThrowException(new \Exception($exceptionMsg));
 
         $resolveManager = new ResolveManager(
-            $this->buildStorageConfig([static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]),
+            $this->buildStorageConfig(
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+            ),
             $uriParser
         );
 
@@ -185,8 +207,11 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testBuildUrlWrongFormatServerNoException(): void
     {
-        $resolveManager = $this->buildResolveManager(
-            [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+        $resolveManager = new ResolveManager(
+            $this->buildStorageConfig(
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()],
+            ),
+            $this->getUriParser()
         );
 
         $this->assertNull($resolveManager->buildUrl('unknownServer:\\/someFile.txt', false));
@@ -197,8 +222,11 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testBuildUrlWrongFormatServerThrowsException(): void
     {
-        $resolveManager = $this->buildResolveManager(
-            [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
+        $resolveManager = new ResolveManager(
+            $this->buildStorageConfig(
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()],
+            ),
+            $this->getUriParser()
         );
 
         $this->expectException(ConfigException::class);
@@ -224,15 +252,11 @@ class ResolveManagerTest extends AbstractUnitTest
             'buckets' => [
                 $bucketName => [
                     'server' => $serverName,
-                    'options' => [
-                        'directory' => 'b1/',
-                    ],
+                    'directory' => 'b1/',
                 ],
                 $bucketName2 => [
                     'server' => $serverName,
-                    'options' => [
-                        'directory' => 'some/bucket/dir/',
-                    ],
+                    'directory' => 'some/bucket/dir/',
                 ]
             ],
         ]);
@@ -272,9 +296,7 @@ class ResolveManagerTest extends AbstractUnitTest
             'buckets' => [
                 $bucketName => [
                     'server' => $serverName,
-                    'options' => [
-                        'directory' => 'b1/',
-                    ],
+                    'directory' => 'b1/',
                 ],
             ],
         ]);
@@ -339,17 +361,5 @@ class ResolveManagerTest extends AbstractUnitTest
             [$this->buildLocalInfo('local'), Resolver\LocalSystemResolver::class],
             [$this->buildAwsS3Info('aws'), Resolver\AwsS3Resolver::class]
         ];
-    }
-
-    /**
-     * @param array|null $servers
-     *
-     * @return ResolveManager
-     *
-     * @throws ConfigException
-     */
-    private function buildResolveManager(?array $servers = null): ResolveManager
-    {
-        return new ResolveManager($this->buildStorageConfig($servers), $this->getUriParser());
     }
 }

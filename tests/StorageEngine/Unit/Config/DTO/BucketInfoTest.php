@@ -14,7 +14,6 @@ class BucketInfoTest extends AbstractUnitTest
     use LocalServerBuilderTrait;
 
     /**
-     * @throws \ReflectionException
      * @throws StorageException
      */
     public function testGetDirectory(): void
@@ -31,9 +30,8 @@ class BucketInfoTest extends AbstractUnitTest
             'dBucket2',
             $localInfo,
             [
-                BucketInfo::OPTIONS_KEY => [
-                    $this->getProtectedConst(BucketInfo::class, 'DIRECTORY_KEY') => $directory,
-                ],
+                'directory' => $directory,
+                'server' => $localInfo->getName(),
             ]
         );
 

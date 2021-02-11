@@ -13,10 +13,12 @@ use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\AbstractTest;
 use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 
 class StorageEngineForLocalTest extends AbstractTest
 {
     use LocalServerBuilderTrait;
+    use StorageConfigTrait;
 
     private const ROOT_FILE_NAME = 'file.txt';
     private const ROOT_FILE_CONTENT = 'file text';
@@ -41,7 +43,10 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $engine = new StorageEngine(
             new StorageConfig(
-                ['servers' => ['local' => $this->buildLocalInfoDescription(true)]]
+                [
+                    'servers' => ['local' => $this->buildLocalInfoDescription(true)],
+                    'buckets' => ['localB' => $this->buildServerBucketInfoDesc('local')],
+                ]
             ),
             $this->getUriParser()
         );
@@ -58,7 +63,10 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $engine = new StorageEngine(
             new StorageConfig(
-                ['servers' => ['local' => $this->buildLocalInfoDescription(true)]]
+                [
+                    'servers' => ['local' => $this->buildLocalInfoDescription(true)],
+                    'buckets' => ['localB' => $this->buildServerBucketInfoDesc('local')],
+                ]
             ),
             $this->getUriParser()
         );
@@ -328,7 +336,8 @@ class StorageEngineForLocalTest extends AbstractTest
         return new StorageEngine(
             new StorageConfig(
                 [
-                    'servers' => [$name => $this->buildLocalInfoDescription(true)]
+                    'servers' => [$name => $this->buildLocalInfoDescription(true)],
+                    'buckets' => [$name . 'B' => $this->buildServerBucketInfoDesc($name)],
                 ]
             ),
             $this->getUriParser()

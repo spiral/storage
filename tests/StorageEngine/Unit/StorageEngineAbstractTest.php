@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit;
 
 use League\Flysystem\FilesystemOperator;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
@@ -22,7 +23,7 @@ abstract class StorageEngineAbstractTest extends AbstractUnitTest
      * @return StorageEngine
      *
      * @throws StorageException
-     * @throws \Spiral\StorageEngine\Exception\ConfigException
+     * @throws ConfigException
      * @throws \ReflectionException
      */
     protected function buildSimpleStorageEngine(

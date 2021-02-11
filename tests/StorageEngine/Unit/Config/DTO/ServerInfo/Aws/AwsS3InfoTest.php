@@ -43,7 +43,7 @@ class AwsS3InfoTest extends AbstractUnitTest
             $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
         }
 
-        $this->assertNull($serverInfo->getVisibiltyConverter());
+        $this->assertNull($serverInfo->getVisibilityConverter());
     }
 
     /**
@@ -96,9 +96,9 @@ class AwsS3InfoTest extends AbstractUnitTest
             $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
         }
 
-        $visibilityConvertor = $serverInfo->getVisibiltyConverter();
+        $visibilityConvertor = $serverInfo->getVisibilityConverter();
         $this->assertInstanceOf(PortableVisibilityConverter::class, $visibilityConvertor);
-        $this->assertSame($visibilityConvertor, $serverInfo->getVisibiltyConverter());
+        $this->assertSame($visibilityConvertor, $serverInfo->getVisibilityConverter());
     }
 
     /**
@@ -126,9 +126,9 @@ class AwsS3InfoTest extends AbstractUnitTest
             $this->assertEquals($optionVal, $advancedAwsS3Info->getOption($optionKey));
         }
 
-        $visibilityConvertor = $advancedAwsS3Info->getVisibiltyConverter();
+        $visibilityConvertor = $advancedAwsS3Info->getVisibilityConverter();
         $this->assertInstanceOf(PortableVisibilityConverter::class, $visibilityConvertor);
-        $this->assertSame($visibilityConvertor, $advancedAwsS3Info->getVisibiltyConverter());
+        $this->assertSame($visibilityConvertor, $advancedAwsS3Info->getVisibilityConverter());
     }
 
     /**

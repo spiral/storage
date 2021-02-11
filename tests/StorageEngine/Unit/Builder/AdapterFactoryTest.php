@@ -140,7 +140,7 @@ class AdapterFactoryTest extends AbstractUnitTest
             $this->getProtectedProperty($adapter, 'prefixer')
         );
         $this->assertEquals(
-            $info->getVisibiltyConverter(),
+            $info->getVisibilityConverter(),
             $this->getProtectedProperty($adapter, 'visibility')
         );
     }

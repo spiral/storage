@@ -66,6 +66,10 @@ class StorageEngineTest extends StorageEngineAbstractTest
                     $local1Name => $this->buildLocalInfoDescription(),
                     $local2Name => $this->buildLocalInfoDescription(),
                 ],
+                'buckets' => [
+                    'local1B' => $this->buildServerBucketInfoDesc($local1Name),
+                    'local2B' => $this->buildServerBucketInfoDesc($local2Name),
+                ],
             ]
         );
 
@@ -189,7 +193,19 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedMsg);
 
-        $storageConfig = $this->buildStorageConfig($servers);
+        $buckets = [];
+
+        foreach ($servers as $serverKey => $serverInfo) {
+            $buckets[$serverKey . 'B'] = [
+                'server' => $serverKey,
+                'directory' => '',
+            ];
+        }
+
+        $storageConfig = new StorageConfig([
+            'servers' => $servers,
+            'buckets' => $buckets,
+        ]);
 
         new StorageEngine($storageConfig, $this->getUriParser());
     }
@@ -257,6 +273,10 @@ class StorageEngineTest extends StorageEngineAbstractTest
                 'servers' => [
                     $localName => $this->buildLocalInfoDescription(),
                     $local2Name => $this->buildLocalInfoDescription(),
+                ],
+                'buckets' => [
+                    $localName . 'B' => $this->buildServerBucketInfoDesc($localName),
+                    $local2Name . 'B' => $this->buildServerBucketInfoDesc($local2Name),
                 ],
             ]
         );

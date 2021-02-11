@@ -79,6 +79,11 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         return false;
     }
 
+    /**
+     * @param array $options
+     *
+     * @throws ConfigException
+     */
     protected function prepareOptions(array $options): void
     {
         $this->validateRequiredOptions(
@@ -98,6 +103,12 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
         }
     }
 
+    /**
+     * @param string $serverName
+     * @param array $info
+     *
+     * @throws ConfigException
+     */
     protected function validateInfoSufficient(string $serverName, array $info): void
     {
         if (!array_key_exists(static::ADAPTER_KEY, $info)) {
@@ -116,7 +127,9 @@ abstract class ServerInfo implements ServerInfoInterface, ClassBasedInterface, O
     /**
      * @param string $optionLabel
      * @param string $optionType
-     * @param mixed $optionVal
+     * @param $optionVal
+     *
+     * @throws ConfigException
      */
     protected function validateOptionByType(string $optionLabel, string $optionType, $optionVal): void
     {

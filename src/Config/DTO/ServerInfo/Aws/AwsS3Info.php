@@ -43,7 +43,7 @@ class AwsS3Info extends ServerInfo implements SpecificConfigurableServerInfo
         }
     }
 
-    public function getVisibiltyConverter()
+    public function getVisibilityConverter()
     {
         return $this->visibilityConverter instanceof AwsVisibilityConverter
             ? $this->visibilityConverter->getConverter()
