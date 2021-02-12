@@ -29,7 +29,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage(
             \sprintf(
-                'Wrong file system info (%s) for resolver %s',
+                'Wrong file system info (`%s`) for resolver `%s`',
                 AwsS3Info::class,
                 LocalSystemResolver::class
             )
@@ -37,10 +37,11 @@ class LocalSystemResolverTest extends AbstractUnitTest
 
         new LocalSystemResolver(
             $this->getUriParser(),
-            new StorageConfig(
-                ['servers' => ['aws' => $this->buildAwsS3ServerDescription()]]
+            $this->buildStorageConfig(
+                ['aws' => $this->buildAwsS3ServerDescription()],
+                ['awsBucket' => $this->buildServerBucketInfoDesc('aws')]
             ),
-            'aws'
+            'awsBucket'
         );
     }
 
@@ -64,20 +65,19 @@ class LocalSystemResolverTest extends AbstractUnitTest
     ): void {
         $resolver = new LocalSystemResolver(
             $this->getUriParser(),
-            new StorageConfig(
+            $this->buildStorageConfig(
                 [
-                    'servers' => [
-                        $serverName => [
-                            LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                            LocalInfo::OPTIONS_KEY => [
-                                LocalInfo::ROOT_DIR_KEY => $rootDir,
-                                LocalInfo::HOST_KEY => $host,
-                            ],
+                    $serverName => [
+                        LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                        LocalInfo::OPTIONS_KEY => [
+                            LocalInfo::ROOT_DIR_KEY => $rootDir,
+                            LocalInfo::HOST_KEY => $host,
                         ],
                     ],
-                ]
+                ],
+                [$this->buildBucketNameByServer($serverName) => $this->buildServerBucketInfoDesc($serverName)]
             ),
-            $serverName
+            $this->buildBucketNameByServer($serverName)
         );
 
         $this->assertEquals($expectedUrl, $resolver->buildUrl($uri));
@@ -88,25 +88,28 @@ class LocalSystemResolverTest extends AbstractUnitTest
      */
     public function testBuildUrlNoHost(): void
     {
+        $server = 'some';
+
         $resolver = new LocalSystemResolver(
             $this->getUriParser(),
-            new StorageConfig(
+            $this->buildStorageConfig(
                 [
-                    'servers' => [
-                        'some' => [
-                            LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                            LocalInfo::OPTIONS_KEY => [
-                                LocalInfo::ROOT_DIR_KEY => 'rootDir',
-                            ],
-                        ]
+                    $server => [
+                        LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                        LocalInfo::OPTIONS_KEY => [
+                            LocalInfo::ROOT_DIR_KEY => 'rootDir',
+                        ],
                     ]
+                ],
+                [
+                    $this->buildBucketNameByServer($server) => $this->buildServerBucketInfoDesc($server)
                 ]
             ),
-            'some'
+            $this->buildBucketNameByServer($server)
         );
 
         $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage('Url can\'t be built for file system some - host was not defined');
+        $this->expectExceptionMessage('Url can\'t be built for file system `someBucket` - host was not defined');
 
         $resolver->buildUrl('file1.txt');
     }
@@ -123,14 +126,13 @@ class LocalSystemResolverTest extends AbstractUnitTest
     {
         $resolver = new LocalSystemResolver(
             $this->getUriParser(),
-            new StorageConfig(
+            $this->buildStorageConfig(
                 [
-                    'servers' => [
-                        'local' => $this->buildLocalInfoDescription(),
-                    ],
-                ]
+                    'local' => $this->buildLocalInfoDescription(),
+                ],
+                ['localBucket' => $this->buildServerBucketInfoDesc('local')]
             ),
-            'local'
+            'localBucket'
         );
 
         $this->assertEquals($uri, $resolver->normalizeFilePathToUri($filePath));
@@ -161,16 +163,16 @@ class LocalSystemResolverTest extends AbstractUnitTest
 
     public function getUriListForNormalize(): array
     {
-        $fsName = FsTestInterface::SERVER_NAME;
+        $bucketName = $this->buildBucketNameByServer(FsTestInterface::SERVER_NAME);
 
         $result = [
             [
-                \sprintf('%s://some/dir/%s', $fsName, 'file.txt'),
+                \sprintf('%s://some/dir/%s', $bucketName, 'file.txt'),
                 'some/dir/file.txt',
             ],
             [
-                \sprintf('%s//%s', $fsName, 'file.txt'),
-                \sprintf('%s//%s', $fsName, 'file.txt'),
+                \sprintf('%s//%s', $bucketName, 'file.txt'),
+                \sprintf('%s//%s', $bucketName, 'file.txt'),
             ],
         ];
 
@@ -187,7 +189,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
 
         foreach ($filesList as $fileName) {
             $result[] = [
-                \sprintf('%s://%s', $fsName, $fileName),
+                \sprintf('%s://%s', $bucketName, $fileName),
                 $fileName,
             ];
 

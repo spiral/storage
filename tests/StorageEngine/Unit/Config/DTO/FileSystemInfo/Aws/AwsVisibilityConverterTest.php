@@ -87,7 +87,7 @@ class AwsVisibilityConverterTest extends AbstractUnitTest
     public function testConstructorNoVisibilityOptionFailed(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('visibility option should be defined for Aws visibility converter');
+        $this->expectExceptionMessage('`visibility` option should be defined for Aws visibility converter');
 
         new AwsVisibilityConverter(
             [

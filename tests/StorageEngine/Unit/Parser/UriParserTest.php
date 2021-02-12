@@ -128,11 +128,11 @@ class UriParserTest extends AbstractUnitTest
         return [
             [
                 $noFsUri,
-                'No file system was detected in uri ' . $noFsUri,
+                \sprintf('No file system was detected in uri `%s`', $noFsUri),
             ],
             [
                 $noPathUri,
-                'No path was detected in uri ' . $noPathUri,
+                \sprintf('No path was detected in uri `%s`', $noPathUri),
             ],
         ];
     }

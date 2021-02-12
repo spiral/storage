@@ -49,7 +49,7 @@ class AwsVisibilityConverter implements ClassBasedInterface, OptionsBasedInterfa
 
         if (!$this->hasOption(static::VISIBILITY_KEY)) {
             throw new ConfigException(
-                \sprintf('%s option should be defined for Aws visibility converter', static::VISIBILITY_KEY)
+                \sprintf('`%s` option should be defined for Aws visibility converter', static::VISIBILITY_KEY)
             );
         }
 
@@ -57,7 +57,7 @@ class AwsVisibilityConverter implements ClassBasedInterface, OptionsBasedInterfa
         if (!in_array($this->getOption(static::VISIBILITY_KEY), $allowedVisibilityOptionValues, true)) {
             throw new ConfigException(
                 \sprintf(
-                    '%s should be defined with one of values: %s',
+                    '`%s` should be defined with one of values: %s',
                     static::VISIBILITY_KEY,
                     implode(',', $allowedVisibilityOptionValues)
                 )

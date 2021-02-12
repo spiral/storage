@@ -36,6 +36,8 @@ class StorageEngineReaderTest extends StorageEngineAbstractTest
 
     /**
      * @throws StorageException
+     * @throws \ReflectionException
+     * @throws \Spiral\StorageEngine\Exception\ConfigException
      */
     public function testFileExistsThrowsException(): void
     {

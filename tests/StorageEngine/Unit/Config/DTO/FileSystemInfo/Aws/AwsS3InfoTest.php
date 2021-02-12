@@ -184,7 +184,7 @@ class AwsS3InfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            'Option visibility defined in wrong format for file system some, array expected'
+            'Option `visibility` defined in wrong format for file system `some`, array expected'
         );
 
         new AwsS3Info(
@@ -206,7 +206,7 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function testValidateVisibilityOptionWrongValueFailed(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('visibility should be defined with one of values: public,private');
+        $this->expectExceptionMessage('`visibility` should be defined with one of values: public,private');
 
         new AwsS3Info(
             'some',
@@ -233,7 +233,7 @@ class AwsS3InfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            'Option path-prefix defined in wrong format for file system some, string expected'
+            'Option `path-prefix` defined in wrong format for file system `some`, string expected'
         );
 
         new AwsS3Info(
@@ -314,17 +314,17 @@ class AwsS3InfoTest extends AbstractUnitTest
             [
                 $fsName,
                 [],
-                'Option bucket not detected for file system ' . $fsName,
+                \sprintf('Option `bucket` not detected for file system `%s`', $fsName),
             ],
             [
                 $fsName,
                 [AwsS3Info::CLIENT_KEY => 'client'],
-                'Option bucket not detected for file system ' . $fsName,
+                \sprintf('Option `bucket` not detected for file system `%s`', $fsName),
             ],
             [
                 'some',
                 [AwsS3Info::BUCKET_KEY => 'someBucket'],
-                'Option client not detected for file system some',
+                'Option `client` not detected for file system `some`',
             ],
         ];
     }

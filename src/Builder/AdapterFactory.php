@@ -46,7 +46,7 @@ class AdapterFactory
                 return new AdapterBuilder\AwsS3Builder($info);
             default:
                 throw new StorageException(
-                    'Adapter can\'t be built by file system info'
+                    \sprintf('Adapter can\'t be built by file system info `%s`', $info->getName())
                 );
         }
     }

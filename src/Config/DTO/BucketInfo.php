@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO;
 
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+
 class BucketInfo implements BucketInfoInterface
 {
     public string $name;
 
     public string $server;
+
+    protected ?FileSystemInfoInterface $fileSystemInfo = null;
 
     protected ?string $directory = null;
 
@@ -30,5 +34,17 @@ class BucketInfo implements BucketInfoInterface
     public function getDirectory(): ?string
     {
         return $this->directory;
+    }
+
+    public function setFileSystemInfo(FileSystemInfoInterface $fileSystemInfo): BucketInfoInterface
+    {
+        $this->fileSystemInfo = $fileSystemInfo;
+
+        return $this;
+    }
+
+    public function getFileSystemInfo(): ?FileSystemInfoInterface
+    {
+        return $this->fileSystemInfo;
     }
 }

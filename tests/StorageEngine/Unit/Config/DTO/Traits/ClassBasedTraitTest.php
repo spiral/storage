@@ -36,7 +36,7 @@ class ClassBasedTraitTest extends AbstractUnitTest
 
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage(
-            \sprintf('Class %s not exists. %s', $wrongClass, '')
+            \sprintf('Class `%s` not exists. %s', $wrongClass, '')
         );
 
         $this->trait->setClass($wrongClass);

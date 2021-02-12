@@ -16,14 +16,12 @@ use Spiral\StorageEngine\Resolver;
 use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
 use Spiral\StorageEngine\Tests\Traits\AwsS3FsBuilderTrait;
 use Spiral\StorageEngine\Tests\Traits\LocalFsBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 use Spiral\StorageEngine\ResolveManager;
 
 class ResolveManagerTest extends AbstractUnitTest
 {
     use LocalFsBuilderTrait;
     use AwsS3FsBuilderTrait;
-    use StorageConfigTrait;
 
     private const LOCAL_SERVER_1 = 'local';
     private const LOCAL_SERVER_2 = 'local2';
@@ -37,20 +35,22 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testGetResolver(): void
     {
-        $fsName = 'local';
+        $server = 'local';
+        $bucket = 'localBucket';
 
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig(
-                [$fsName => $this->buildLocalInfoDescription()],
+                [$server => $this->buildLocalInfoDescription()],
+                [$bucket => $this->buildServerBucketInfoDesc($server)]
             ),
             $this->getUriParser()
         );
 
-        $resolver = $this->callNotPublicMethod($resolveManager, 'getResolver', [$fsName]);
+        $resolver = $this->callNotPublicMethod($resolveManager, 'getResolver', [$bucket]);
         $this->assertInstanceOf(Resolver\LocalSystemResolver::class, $resolver);
         $this->assertSame(
             $resolver,
-            $this->callNotPublicMethod($resolveManager, 'getResolver', [$fsName])
+            $this->callNotPublicMethod($resolveManager, 'getResolver', [$bucket])
         );
     }
 
@@ -60,11 +60,11 @@ class ResolveManagerTest extends AbstractUnitTest
      */
     public function testGetResolverFailed(): void
     {
-        $fsName = 'local';
+        $server = 'local';
 
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig(
-                [$fsName => $this->buildLocalInfoDescription()],
+                [$server => $this->buildLocalInfoDescription()],
             ),
             $this->getUriParser()
         );
@@ -72,7 +72,7 @@ class ResolveManagerTest extends AbstractUnitTest
         $missedFs = 'missedFs';
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Server %s was not found', $missedFs));
+        $this->expectExceptionMessage(\sprintf('Bucket `%s` was not found', $missedFs));
 
         $this->callNotPublicMethod($resolveManager, 'getResolver', [$missedFs]);
     }
@@ -90,12 +90,19 @@ class ResolveManagerTest extends AbstractUnitTest
         FileSystemInfo\FileSystemInfoInterface $fsInfo,
         string $expectedClass
     ): void {
+        $localServer = 'local';
+        $awsServer = 'aws';
+
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig(
                 [
-                    'local' => $this->buildLocalInfoDescription(),
-                    'aws' => $this->buildAwsS3ServerDescription(),
-                ]
+                    $localServer => $this->buildLocalInfoDescription(),
+                    $awsServer => $this->buildAwsS3ServerDescription(),
+                ],
+                [
+                    'localBucket' => $this->buildServerBucketInfoDesc($localServer),
+                    'awsBucket' => $this->buildServerBucketInfoDesc($awsServer),
+                ],
             ),
             $this->getUriParser()
         );
@@ -126,6 +133,14 @@ class ResolveManagerTest extends AbstractUnitTest
                             FileSystemInfo\LocalInfo::HOST_KEY => static::LOCAL_SERVER_HOST_2,
                         ],
                     ],
+                ],
+                [
+                    $this->buildBucketNameByServer(static::LOCAL_SERVER_1) => $this->buildServerBucketInfoDesc(
+                        static::LOCAL_SERVER_1
+                    ),
+                    $this->buildBucketNameByServer(static::LOCAL_SERVER_2) => $this->buildServerBucketInfoDesc(
+                        static::LOCAL_SERVER_2
+                    ),
                 ]
             ),
             $this->getUriParser()
@@ -170,7 +185,7 @@ class ResolveManagerTest extends AbstractUnitTest
         );
 
         $this->expectException(UriException::class);
-        $this->expectExceptionMessage('No uri structure was detected in uri ' . $uri);
+        $this->expectExceptionMessage(\sprintf('No uri structure was detected in uri `%s`', $uri));
 
         $resolveManager->buildUrl($uri);
     }
@@ -230,7 +245,7 @@ class ResolveManagerTest extends AbstractUnitTest
         );
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Server unknown was not found');
+        $this->expectExceptionMessage('Bucket `unknown` was not found');
 
         $resolveManager->buildUrl('unknown://someFile.txt');
     }
@@ -304,7 +319,7 @@ class ResolveManagerTest extends AbstractUnitTest
         $resolveManager = new ResolveManager($config, $this->getUriParser());
 
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('Bucket bucket2 was not found');
+        $this->expectExceptionMessage('Bucket `bucket2` was not found');
 
         $resolveManager->buildBucketUri($bucketName2, 'file.txt');
     }
@@ -314,10 +329,13 @@ class ResolveManagerTest extends AbstractUnitTest
         $fileTxt = 'file.txt';
         $specificCsvFile = 'some/specific/dir/file1.csv';
 
+        $fs1 = $this->buildBucketNameByServer(static::LOCAL_SERVER_1);
+        $fs2 = $this->buildBucketNameByServer(static::LOCAL_SERVER_2);
+
         return [
             [
                 [
-                    \sprintf('%s://%s', static::LOCAL_SERVER_1, $fileTxt),
+                    \sprintf('%s://%s', $fs1, $fileTxt),
                 ],
                 [
                     \sprintf('%s%s', FsTestInterface::CONFIG_HOST, $fileTxt),
@@ -325,9 +343,9 @@ class ResolveManagerTest extends AbstractUnitTest
             ],
             [
                 [
-                    \sprintf('%s://%s', static::LOCAL_SERVER_1, $fileTxt),
-                    \sprintf('%s://%s', static::LOCAL_SERVER_1, $specificCsvFile),
-                    \sprintf('%s://%s', static::LOCAL_SERVER_2, $specificCsvFile),
+                    \sprintf('%s://%s', $fs1, $fileTxt),
+                    \sprintf('%s://%s', $fs1, $specificCsvFile),
+                    \sprintf('%s://%s', $fs2, $specificCsvFile),
                 ],
                 [
                     \sprintf('%s%s', FsTestInterface::CONFIG_HOST, $fileTxt),
@@ -337,9 +355,9 @@ class ResolveManagerTest extends AbstractUnitTest
             ],
             [
                 [
-                    \sprintf('%s://%s', static::LOCAL_SERVER_1, $fileTxt),
-                    \sprintf('%s://%s', static::LOCAL_SERVER_1, $specificCsvFile),
-                    \sprintf('%s:-/+/%s', static::LOCAL_SERVER_2, $specificCsvFile),
+                    \sprintf('%s://%s', $fs1, $fileTxt),
+                    \sprintf('%s://%s', $fs1, $specificCsvFile),
+                    \sprintf('%s:-/+/%s', $fs2, $specificCsvFile),
                 ],
                 [
                     \sprintf('%s%s', FsTestInterface::CONFIG_HOST, $fileTxt),
@@ -358,8 +376,8 @@ class ResolveManagerTest extends AbstractUnitTest
     public function getFsInfoListForResolversPrepare(): array
     {
         return [
-            [$this->buildLocalInfo('local'), Resolver\LocalSystemResolver::class],
-            [$this->buildAwsS3Info('aws'), Resolver\AwsS3Resolver::class]
+            [$this->buildLocalInfo('localBucket'), Resolver\LocalSystemResolver::class],
+            [$this->buildAwsS3Info('awsBucket'), Resolver\AwsS3Resolver::class]
         ];
     }
 }

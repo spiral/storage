@@ -35,6 +35,12 @@ class BucketInfoTest extends AbstractUnitTest
             ]
         );
 
+        $this->assertNull($dto->getFileSystemInfo());
+
         $this->assertEquals($directory, $dto->getDirectory());
+
+        $dto->setFileSystemInfo($localInfo);
+
+        $this->assertSame($localInfo, $dto->getFileSystemInfo());
     }
 }

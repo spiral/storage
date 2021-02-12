@@ -42,7 +42,7 @@ trait ClassBasedTrait
     {
         if (!class_exists($class)) {
             throw new StorageException(
-                \sprintf('Class %s not exists. %s', $class, $errorPostfix)
+                \sprintf('Class `%s` not exists. %s', $class, $errorPostfix)
             );
         }
     }

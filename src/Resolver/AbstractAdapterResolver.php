@@ -40,7 +40,7 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
         if (empty($requiredClass) || !$fsInfo instanceof $requiredClass) {
             throw new StorageException(
                 \sprintf(
-                    'Wrong file system info (%s) for resolver %s',
+                    'Wrong file system info (`%s`) for resolver `%s`',
                     get_class($fsInfo),
                     static::class
                 )

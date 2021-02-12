@@ -65,13 +65,13 @@ class StorageEngineForLocalTest extends AbstractTest
             new StorageConfig(
                 [
                     'servers' => ['local' => $this->buildLocalInfoDescription(true)],
-                    'buckets' => ['localB' => $this->buildServerBucketInfoDesc('local')],
+                    'buckets' => ['localBucket' => $this->buildServerBucketInfoDesc('local')],
                 ]
             ),
             $this->getUriParser()
         );
 
-        $tmpFilePath = $engine->tempFilename('local://' . static::ROOT_FILE_NAME);
+        $tmpFilePath = $engine->tempFilename('localBucket://' . static::ROOT_FILE_NAME);
 
         $this->assertRegExp(
             \sprintf('/^\/tmp\/%s_[\w]*$/', static::ROOT_FILE_NAME),
@@ -91,11 +91,11 @@ class StorageEngineForLocalTest extends AbstractTest
         $storageEngine = $this->buildStorageForFs('local');
 
         $this->assertTrue(
-            $storageEngine->fileExists('local://' . self::ROOT_FILE_NAME)
+            $storageEngine->fileExists('localBucket://' . self::ROOT_FILE_NAME)
         );
 
         $this->assertFalse(
-            $storageEngine->fileExists('local://file_missed.txt')
+            $storageEngine->fileExists('localBucket://file_missed.txt')
         );
     }
 
@@ -107,7 +107,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $this->buildSimpleVfsStructure();
 
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('File system other was not identified');
+        $this->expectExceptionMessage('File system `other` was not identified');
 
         $this->buildStorageForFs('local')->fileExists('other://' . static::ROOT_FILE_NAME);
     }
@@ -122,7 +122,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $uri = 'other-//file.txt';
 
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('No uri structure was detected in uri ' . $uri);
+        $this->expectExceptionMessage(\sprintf('No uri structure was detected in uri `%s`', $uri));
 
         $this->buildStorageForFs('local')->fileExists($uri);
     }
@@ -138,7 +138,7 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $this->assertEquals(
             static::ROOT_FILE_CONTENT,
-            $storageEngine->read('local://' . static::ROOT_FILE_NAME)
+            $storageEngine->read('localBucket://' . static::ROOT_FILE_NAME)
         );
     }
 
@@ -154,7 +154,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessageMatches('/^Unable to read file from location: file_missed.txt./');
 
-        $storageEngine->read('local://file_missed.txt');
+        $storageEngine->read('localBucket://file_missed.txt');
     }
 
     /**
@@ -166,7 +166,7 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $storageEngine = $this->buildStorageForFs('local');
 
-        $this->assertIsResource($storageEngine->readStream('local://' . static::ROOT_FILE_NAME));
+        $this->assertIsResource($storageEngine->readStream('localBucket://' . static::ROOT_FILE_NAME));
     }
 
     /**
@@ -181,7 +181,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessageMatches('/^Unable to read file from location: file_missed.txt./');
 
-        $storageEngine->readStream('local://file_missed.txt');
+        $storageEngine->readStream('localBucket://file_missed.txt');
     }
 
     /**
@@ -195,7 +195,7 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $storageEngine = $this->buildStorageForFs('local');
 
-        $fileLastModified = $storageEngine->lastModified('local://' . static::ROOT_FILE_NAME);
+        $fileLastModified = $storageEngine->lastModified('localBucket://' . static::ROOT_FILE_NAME);
         $dateLastModified = $today->setTimestamp($fileLastModified);
 
         $this->assertIsInt($fileLastModified);
@@ -218,7 +218,7 @@ class StorageEngineForLocalTest extends AbstractTest
             '/^Unable to retrieve the last_modified for file at location: file_missed.txt./'
         );
 
-        $storageEngine->lastModified('local://file_missed.txt');
+        $storageEngine->lastModified('localBucket://file_missed.txt');
     }
 
     /**
@@ -230,7 +230,7 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $storageEngine = $this->buildStorageForFs('local');
 
-        $fileSize = $storageEngine->fileSize('local://' . static::ROOT_FILE_NAME);
+        $fileSize = $storageEngine->fileSize('localBucket://' . static::ROOT_FILE_NAME);
 
         $this->assertIsInt($fileSize);
         $this->assertNotEmpty($fileSize);
@@ -250,7 +250,7 @@ class StorageEngineForLocalTest extends AbstractTest
             '/^Unable to retrieve the file_size for file at location: file_missed.txt./'
         );
 
-        $storageEngine->fileSize('local://file_missed.txt');
+        $storageEngine->fileSize('localBucket://file_missed.txt');
     }
 
     /**
@@ -262,7 +262,7 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $storageEngine = $this->buildStorageForFs('local');
 
-        $this->assertEquals('text/plain', $storageEngine->mimeType('local://' . static::ROOT_FILE_NAME));
+        $this->assertEquals('text/plain', $storageEngine->mimeType('localBucket://' . static::ROOT_FILE_NAME));
     }
 
     /**
@@ -279,7 +279,7 @@ class StorageEngineForLocalTest extends AbstractTest
             '/^Unable to retrieve the mime_type for file at location: file_missed.txt./'
         );
 
-        $storageEngine->mimeType('local://file_missed.txt');
+        $storageEngine->mimeType('localBucket://file_missed.txt');
     }
 
     /**
@@ -291,7 +291,7 @@ class StorageEngineForLocalTest extends AbstractTest
 
         $storageEngine = $this->buildStorageForFs('local');
 
-        $this->assertEquals('public', $storageEngine->visibility('local://' . static::ROOT_FILE_NAME));
+        $this->assertEquals('public', $storageEngine->visibility('localBucket://' . static::ROOT_FILE_NAME));
     }
 
     /**
@@ -308,7 +308,7 @@ class StorageEngineForLocalTest extends AbstractTest
             '/^Unable to retrieve the visibility for file at location: file_missed.txt./'
         );
 
-        $storageEngine->visibility('local://file_missed.txt');
+        $storageEngine->visibility('localBucket://file_missed.txt');
     }
 
     private function buildSimpleVfsStructure(): void
@@ -337,7 +337,9 @@ class StorageEngineForLocalTest extends AbstractTest
             new StorageConfig(
                 [
                     'servers' => [$name => $this->buildLocalInfoDescription(true)],
-                    'buckets' => [$name . 'B' => $this->buildServerBucketInfoDesc($name)],
+                    'buckets' => [
+                        $this->buildBucketNameByServer($name) => $this->buildServerBucketInfoDesc($name)
+                    ],
                 ]
             ),
             $this->getUriParser()

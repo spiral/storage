@@ -89,7 +89,7 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
         $this->validateRequiredOptions(
             array_keys(static::REQUIRED_OPTIONS),
             $options,
-            ' for file system ' . $this->getName()
+            \sprintf(' for file system `%s`', $this->getName())
         );
 
         foreach ($options as $optionKey => $option) {
@@ -113,13 +113,13 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
     {
         if (!array_key_exists(static::ADAPTER_KEY, $info)) {
             throw new ConfigException(
-                \sprintf('File system %s needs adapter class defined', $fs)
+                \sprintf('File system `%s` needs adapter class defined', $fs)
             );
         }
 
         if (!array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
             throw new ConfigException(
-                \sprintf('File system %s needs options defined', $fs)
+                \sprintf('File system `%s` needs options defined', $fs)
             );
         }
     }
@@ -136,7 +136,7 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
         if (!$this->isOptionHasRequiredType($optionLabel, $optionVal, $optionType)) {
             throw new ConfigException(
                 \sprintf(
-                    'Option %s defined in wrong format for file system %s, %s expected',
+                    'Option `%s` defined in wrong format for file system `%s`, %s expected',
                     $optionLabel,
                     $this->getName(),
                     $optionType

@@ -9,12 +9,10 @@ use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
 use Spiral\StorageEngine\Tests\Traits\LocalFsBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
 
 abstract class StorageEngineAbstractTest extends AbstractUnitTest
 {
     use LocalFsBuilderTrait;
-    use StorageConfigTrait;
 
     /**
      * @param string|null $fs

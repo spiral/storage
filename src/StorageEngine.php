@@ -38,29 +38,21 @@ class StorageEngine implements StorageInterface, SingletonInterface
         $this->config = $config;
         $this->uriParser = $uriParser;
 
-        if (empty($config->getServersKeys())) {
-            throw new MountException('No file servers description was defined');
-        }
-
-        if (empty($config->getBucketsKeys())) {
-            throw new MountException('No buckets description was defined');
-        }
-
-        foreach ($config->getServersKeys() as $serverKey) {
-            if (!is_string($serverKey) || empty($serverKey)) {
+        foreach ($config->getBucketsKeys() as $fs) {
+            if (!is_string($fs) || empty($fs)) {
                 throw new MountException(
                     \sprintf(
-                        'File system %s can\'t be mounted - string required, %s received',
-                        is_scalar($serverKey) && !empty($serverKey) ? $serverKey : '--non-displayable--',
-                        empty($serverKey) ? 'empty val' : gettype($serverKey)
+                        'File system `%s` can\'t be mounted - string required, %s received',
+                        is_scalar($fs) && !empty($fs) ? $fs : '--non-displayable--',
+                        empty($fs) ? 'empty val' : gettype($fs)
                     )
                 );
             }
 
             $this->mountFilesystem(
-                $serverKey,
+                $fs,
                 new Filesystem(
-                    AdapterFactory::build($this->config->buildFileSystemInfo($serverKey))
+                    AdapterFactory::build($this->config->buildFileSystemInfo($fs))
                 )
             );
         }
@@ -73,7 +65,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     {
         if (!$this->isFileSystemExists($key)) {
             throw new MountException(
-                \sprintf('File system %s was not identified', $key)
+                \sprintf('File system `%s` was not identified', $key)
             );
         }
 

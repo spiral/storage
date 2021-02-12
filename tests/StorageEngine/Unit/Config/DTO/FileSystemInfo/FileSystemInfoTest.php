@@ -21,7 +21,7 @@ class FileSystemInfoTest extends AbstractUnitTest
         $fsName = 'some';
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('File system %s needs options defined', $fsName));
+        $this->expectExceptionMessage(\sprintf('File system `%s` needs options defined', $fsName));
 
         new LocalInfo(
             $fsName,
@@ -37,7 +37,7 @@ class FileSystemInfoTest extends AbstractUnitTest
         $fsName = 'some';
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('File system %s needs adapter class defined', $fsName));
+        $this->expectExceptionMessage(\sprintf('File system `%s` needs adapter class defined', $fsName));
 
         new LocalInfo(
             $fsName,

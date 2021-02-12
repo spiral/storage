@@ -82,7 +82,7 @@ class OptionsTraitTest extends AbstractUnitTest
 
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            \sprintf('Unknown option type detected for option %s: %s', $optionLabel, $optionType)
+            \sprintf('Unknown option type detected for option `%s`: %s', $optionLabel, $optionType)
         );
 
         $this->callNotPublicMethod($trait, 'isOptionHasRequiredType', [$optionLabel, 'someVal', $optionType]);
@@ -139,7 +139,7 @@ class OptionsTraitTest extends AbstractUnitTest
         $trait = $this->buildBasicOptions();
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Option %s not detected%s', $reqOption, $msgPostfix));
+        $this->expectExceptionMessage(\sprintf('Option `%s` not detected%s', $reqOption, $msgPostfix));
 
         $this->callNotPublicMethod(
             $trait,

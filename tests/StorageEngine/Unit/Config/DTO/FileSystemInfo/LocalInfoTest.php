@@ -105,7 +105,7 @@ class LocalInfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            'Option visibility defined in wrong format for file system some, array expected'
+            'Option `visibility` defined in wrong format for file system `some`, array expected'
         );
 
         new LocalInfo(
@@ -132,7 +132,7 @@ class LocalInfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            \sprintf('Option %s defined in wrong format for file system some, int expected', $label)
+            \sprintf('Option `%s` defined in wrong format for file system `some`, int expected', $label)
         );
 
         new LocalInfo(
@@ -234,14 +234,14 @@ class LocalInfoTest extends AbstractUnitTest
             [
                 $fsName,
                 [],
-                'Option rootDir not detected for file system ' . $fsName,
+                \sprintf('Option `rootDir` not detected for file system `%s`', $fsName),
             ],
             [
                 'some',
                 [
                     LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                 ],
-                'Option rootDir not detected for file system some'
+                'Option `rootDir` not detected for file system `some`'
             ]
         ];
     }

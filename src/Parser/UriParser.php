@@ -37,21 +37,21 @@ class UriParser implements UriParserInterface, SingletonInterface
         preg_match(static::URI_PATTERN, $uri, $match);
 
         if (empty($match)) {
-            throw new UriException('No uri structure was detected in uri ' . $uri);
+            throw new UriException(\sprintf('No uri structure was detected in uri `%s`', $uri));
         }
 
         if (
             !array_key_exists(static::FILE_PATH_FS_PART, $match)
             || empty($match[static::FILE_PATH_FS_PART])
         ) {
-            throw new UriException('No file system was detected in uri ' . $uri);
+            throw new UriException(\sprintf('No file system was detected in uri `%s`', $uri));
         }
 
         if (
             !array_key_exists(static::FILE_PATH_PART, $match)
             || empty($match[static::FILE_PATH_PART])
         ) {
-            throw new UriException('No path was detected in uri ' . $uri);
+            throw new UriException(\sprintf('No path was detected in uri `%s`', $uri));
         }
 
         return $this->buildUriStructure(

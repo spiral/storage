@@ -29,7 +29,7 @@ class LocalSystemResolver extends AbstractAdapterResolver
     {
         if (!$this->fsInfo->hasOption(LocalInfo::HOST_KEY)) {
             throw new ResolveException(
-                \sprintf('Url can\'t be built for file system %s - host was not defined', $this->fsInfo->getName())
+                \sprintf('Url can\'t be built for file system `%s` - host was not defined', $this->fsInfo->getName())
             );
         }
 

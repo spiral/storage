@@ -46,8 +46,36 @@ class StorageConfig extends InjectableConfig
      */
     public function __construct(array $config = [])
     {
-        if (!array_key_exists(static::SERVERS_KEY, $config)) {
+        if (!array_key_exists(static::SERVERS_KEY, $config) || empty($config[static::SERVERS_KEY])) {
             throw new ConfigException('Servers must be defined for storage work');
+        }
+
+        foreach (array_keys($config[static::SERVERS_KEY]) as $key => $server) {
+            if (!is_string($server) || empty($server)) {
+                throw new ConfigException(
+                    \sprintf(
+                        'Server `%s` has incorrect key - string expected %s received',
+                        is_scalar($server) && !empty($server) ? $server : '--non-displayable--' . "[$key]",
+                        empty($server) ? 'empty val' : gettype($server)
+                    )
+                );
+            }
+        }
+
+        if (!array_key_exists(static::BUCKETS_KEY, $config) || empty($config[static::BUCKETS_KEY])) {
+            throw new ConfigException('Buckets must be defined for storage work');
+        }
+
+        foreach (array_keys($config[static::BUCKETS_KEY]) as $key => $bucket) {
+            if (!is_string($bucket) || empty($bucket)) {
+                throw new ConfigException(
+                    \sprintf(
+                        'Bucket `%s` has incorrect key - string expected %s received',
+                        is_scalar($bucket) && !empty($bucket) ? $bucket : '--non-displayable--' . "[$key]",
+                        empty($bucket) ? 'empty val' : gettype($bucket)
+                    )
+                );
+            }
         }
 
         if (array_key_exists(static::TMP_DIR_KEY, $config) && !is_dir($config[static::TMP_DIR_KEY])) {
@@ -68,7 +96,8 @@ class StorageConfig extends InjectableConfig
 
     public function hasServer(string $key): bool
     {
-        return array_key_exists($key, $this->config[static::SERVERS_KEY]);
+        return array_key_exists($key, $this->config[static::SERVERS_KEY])
+            && is_array($this->config[static::SERVERS_KEY][$key]);
     }
 
     public function getBucketsKeys(): array
@@ -80,7 +109,8 @@ class StorageConfig extends InjectableConfig
 
     public function hasBucket(string $key): bool
     {
-        return array_key_exists($key, $this->config[static::BUCKETS_KEY]);
+        return array_key_exists($key, $this->config[static::BUCKETS_KEY])
+            && is_array($this->config[static::BUCKETS_KEY][$key]);
     }
 
     public function getTmpDir(): string
@@ -94,54 +124,60 @@ class StorageConfig extends InjectableConfig
      * Build file system info by provided fs (bucket) label
      * Force mode allows to rebuild fs info for internal file systems info list
      *
-     * @param string $fileSystem
+     * @param string $fs
      * @param bool|null $force
      *
      * @return FileSystemInfo\FileSystemInfoInterface
      *
      * @throws StorageException
      */
-    public function buildFileSystemInfo(
-        string $fileSystem,
-        ?bool $force = false
-    ): FileSystemInfo\FileSystemInfoInterface {
-        if (!$this->hasServer($fileSystem)) {
+    public function buildFileSystemInfo(string $fs, ?bool $force = false): FileSystemInfo\FileSystemInfoInterface
+    {
+        if (!$this->hasBucket($fs)) {
             throw new ConfigException(
-                \sprintf('Server %s was not found', $fileSystem)
+                \sprintf('Bucket `%s` was not found', $fs)
             );
         }
 
-        if (!$force && array_key_exists($fileSystem, $this->fileSystemsInfoList)) {
-            return $this->fileSystemsInfoList[$fileSystem];
+        if (!$force && array_key_exists($fs, $this->fileSystemsInfoList)) {
+            return $this->fileSystemsInfoList[$fs];
         }
 
-        $serverInfo = $this->config[static::SERVERS_KEY][$fileSystem];
+        $bucketInfo = $this->buildBucketInfo($fs);
 
-        if (!is_array($serverInfo)) {
+        if (!$this->hasServer($bucketInfo->getServer())) {
             throw new ConfigException(
                 \sprintf(
-                    'File system info for %s was provided in wrong format, array expected, %s received',
-                    $fileSystem,
-                    gettype($serverInfo)
+                    'Server `%s` info for file system `%s` was not detected',
+                    $bucketInfo->getServer(),
+                    $fs
                 )
             );
         }
 
+        $serverInfo = $this->config[static::SERVERS_KEY][$bucketInfo->getServer()];
+
         switch ($this->extractServerAdapter($serverInfo)) {
             case \League\Flysystem\Local\LocalFilesystemAdapter::class:
-                $fsInfoDTO = new FileSystemInfo\LocalInfo($fileSystem, $serverInfo);
+                $fsInfoDTO = new FileSystemInfo\LocalInfo($fs, $serverInfo);
                 break;
             case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
             case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
-                $fsInfoDTO = new FileSystemInfo\Aws\AwsS3Info($fileSystem, $serverInfo);
+                $fsInfoDTO = new FileSystemInfo\Aws\AwsS3Info(
+                    $fs,
+                    array_merge([FileSystemInfo\Aws\AwsS3Info::BUCKET_KEY => $fs], $serverInfo)
+                );
                 break;
             default:
-                throw new ConfigException('Adapter can\'t be identified for file system ' . $fileSystem);
+                throw new ConfigException(
+                    \sprintf('Adapter can\'t be identified for file system `%s`', $fs)
+                );
         }
 
-        $this->fileSystemsInfoList[$fileSystem] = $fsInfoDTO;
+        $this->fileSystemsInfoList[$fs] = $fsInfoDTO;
+        $bucketInfo->setFileSystemInfo($fsInfoDTO);
 
-        return $this->fileSystemsInfoList[$fileSystem];
+        return $this->fileSystemsInfoList[$fs];
     }
 
     /**
@@ -159,7 +195,7 @@ class StorageConfig extends InjectableConfig
     {
         if (!$this->hasBucket($bucketLabel)) {
             throw new StorageException(
-                \sprintf('Bucket %s was not found', $bucketLabel)
+                \sprintf('Bucket `%s` was not found', $bucketLabel)
             );
         }
 

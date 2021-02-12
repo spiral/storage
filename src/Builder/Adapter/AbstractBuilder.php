@@ -23,7 +23,7 @@ abstract class AbstractBuilder implements AdapterBuilderInterface
 
         if (empty($requiredClass) || !$fsInfo instanceof $requiredClass) {
             throw new StorageException(
-                \sprintf('Wrong file system info %s provided for %s', get_class($fsInfo), static::class)
+                \sprintf('Wrong file system info `%s` provided for `%s`', get_class($fsInfo), static::class)
             );
         }
 

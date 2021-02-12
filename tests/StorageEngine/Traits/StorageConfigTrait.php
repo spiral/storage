@@ -34,8 +34,8 @@ trait StorageConfigTrait
 
         if (!empty($servers) && empty($buckets)) {
             $buckets = [];
-            foreach ($servers as $serverKey => $serverInfo) {
-                $buckets[$serverKey . 'B'] = $this->buildServerBucketInfoDesc($serverKey);
+            foreach ($servers as $server => $serverInfo) {
+                $buckets[$this->buildBucketNameByServer($server)] = $this->buildServerBucketInfoDesc($server);
             }
         }
 
@@ -50,5 +50,10 @@ trait StorageConfigTrait
             'server' => $serverName,
             'directory' => 'tmp/',
         ];
+    }
+
+    protected function buildBucketNameByServer(string $server): string
+    {
+        return $server . 'Bucket';
     }
 }
