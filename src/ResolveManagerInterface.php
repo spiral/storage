@@ -34,14 +34,4 @@ interface ResolveManagerInterface
      * @throws StorageException
      */
     public function buildUrl(string $uri, bool $throwException = true): ?string;
-
-    /**
-     * @param string $bucket
-     * @param string $filePath
-     *
-     * @return string
-     *
-     * @throws StorageException
-     */
-    public function buildBucketUri(string $bucket, string $filePath): string;
 }

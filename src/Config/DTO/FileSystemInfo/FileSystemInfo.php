@@ -151,8 +151,6 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
             return static::REQUIRED_OPTIONS[$option];
         }
 
-        return array_key_exists($option, static::ADDITIONAL_OPTIONS)
-            ? static::ADDITIONAL_OPTIONS[$option]
-            : null;
+        return static::ADDITIONAL_OPTIONS[$option] ?? null;
     }
 }

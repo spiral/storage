@@ -163,10 +163,16 @@ class StorageConfig extends InjectableConfig
                 break;
             case \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class:
             case \League\Flysystem\AsyncAwsS3\AsyncAwsS3Adapter::class:
-                $fsInfoDTO = new FileSystemInfo\Aws\AwsS3Info(
-                    $fs,
-                    array_merge([FileSystemInfo\Aws\AwsS3Info::BUCKET_KEY => $fs], $serverInfo)
+                $serverInfo[FileSystemInfo\Aws\AwsS3Info::OPTIONS_KEY] = array_merge(
+                    [
+                        FileSystemInfo\Aws\AwsS3Info::BUCKET_KEY => $bucketInfo->getOption(
+                            BucketInfoInterface::BUCKET_KEY
+                        )
+                    ],
+                    $serverInfo[FileSystemInfo\Aws\AwsS3Info::OPTIONS_KEY]
                 );
+
+                $fsInfoDTO = new FileSystemInfo\Aws\AwsS3Info($fs, $serverInfo);
                 break;
             default:
                 throw new ConfigException(

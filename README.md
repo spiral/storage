@@ -9,11 +9,9 @@ StorageEngine based on 2 basic interfaces:
 1. [StorageInterface](doc/StorageInterface.md)
     * works with all file servers that handle files
     * works with file paths in a specific format (`{serverName}://{filePath}` by default)
-      * to change it you can prepare your own `\Spiral\StorageEngine\Validation\FilePathValidatorInterface` class and make required binding
+      * to change it you can prepare your own `\Spiral\StorageEngine\Parser\UriParser` class and make required binding
 2. [ResolveManagerInterface](doc/ResolveManagerInterface.md)
     * build url (and urls list) for file download
-    * build bucket uri 
-      * for local file server
 
 ## Supported file servers
 Current release provides ability to work with:
@@ -28,13 +26,14 @@ You can receive more details about spiral configuration from [here](https://spir
 More details about specific file servers configuration you can find [here](#supported-file-servers)
 
 Configuration can contains:
-- servers*
+- servers (required)
   - file servers description
-- buckets
+- buckets (required)
   - server buckets description
-  - actual for local file server only  
-  - bucket info refers to server and has only one option - directory
-    - directory is relative to root directory for local file server
+  - main items for StorageEngine work. When you are working with filesystems from StorageEngine you are working with buckets.
+  - bucket info refers to server and has only specific options 
+    - `directory` is relative to root directory for local file server
+    - `bucket` is aws servers bucket name
 - tmp-dir
   - temp directory for creating some temp files for process
   - system temp directory by default 
@@ -55,14 +54,13 @@ $s3Client = new \Aws\S3\S3Client([
 
 return [
     'servers' => [
-        'aws' => [
+        'awsServer' => [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'options' => [
-                'bucket' => env('AWS_BUCKET'),
                 'client' => $s3Client,
             ]
         ],
-        'local' => [
+        'localServer' => [
             'adapter' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
             'options' => [
                 'rootDir' => '/var/www/tmpLocal',
@@ -71,11 +69,23 @@ return [
         ],
     ],
     'buckets' => [
-        'bucket1' => [
+        'local' => [
             'server' => 'local',
             'options' => [
                 'directory' => 'b1/',
             ],
+        ],
+        'aws' => [
+            'server' => 'aws',
+            'options' => [
+                'bucket' => env('AWS_BUCKET'),
+            ],
+        ],
+        'aws2' => [
+            'server' => 'aws',
+            'options' => [
+                'bucket' => env('AWS_BUCKET2'),
+            ]
         ],
     ],
     'tmp-dir' => '/var/www/tmp/',

@@ -10,9 +10,6 @@
 - buildUrl(string $uri, bool $throwException = true): ?string
   - returns url for provided uri
   - by default, throws exception if url can't be built
-- buildBucketUri(string $bucket, string $filePath): string
-  - build uri for file in specified bucket
-  - actual for local file server only
   
 ### Customization
 In case you need some specific customization Resolve manager can be replaced with your specific class 
