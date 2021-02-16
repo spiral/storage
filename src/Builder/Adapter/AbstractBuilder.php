@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Builder\Adapter;
 
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 use Spiral\StorageEngine\Exception\StorageException;
 
 abstract class AbstractBuilder implements AdapterBuilderInterface
 {
-    protected const SERVER_INFO_CLASS = '';
+    protected const FILE_SYSTEM_INFO_CLASS = '';
 
-    protected ServerInfoInterface $serverInfo;
+    protected FileSystemInfoInterface $fsInfo;
 
     /**
-     * @param ServerInfoInterface $serverInfo
+     * @param FileSystemInfoInterface $fsInfo
      * @throws StorageException
      */
-    public function __construct(ServerInfoInterface $serverInfo)
+    public function __construct(FileSystemInfoInterface $fsInfo)
     {
-        $requiredClass = static::SERVER_INFO_CLASS;
+        $requiredClass = static::FILE_SYSTEM_INFO_CLASS;
 
-        if (empty($requiredClass) || !$serverInfo instanceof $requiredClass) {
+        if (empty($requiredClass) || !$fsInfo instanceof $requiredClass) {
             throw new StorageException(
-                \sprintf('Wrong server info %s provided for %s', get_class($serverInfo), static::class)
+                \sprintf('Wrong file system info `%s` provided for `%s`', get_class($fsInfo), static::class)
             );
         }
 
-        $this->serverInfo = $serverInfo;
+        $this->fsInfo = $fsInfo;
     }
 }

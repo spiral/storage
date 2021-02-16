@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
+namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo;
 
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
 
-class LocalInfo extends ServerInfo
+class LocalInfo extends FileSystemInfo
 {
     public const ROOT_DIR_KEY = 'rootDir';
     public const WRITE_FLAGS_KEY = 'write-flags';
     public const LINK_HANDLING_KEY = 'link-handling';
     public const HOST_KEY = 'host';
 
-    protected const SERVER_INFO_TYPE = 'local';
+    protected const FILE_SYSTEM_INFO_TYPE = 'local';
 
     protected const REQUIRED_OPTIONS = [
         self::ROOT_DIR_KEY => self::STRING_TYPE,

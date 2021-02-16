@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\ServerInfo;
+namespace Spiral\StorageEngine\Tests\Unit\Config\DTO\FileSystemInfo;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\LocalInfo;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
 use Spiral\StorageEngine\Resolver\LocalSystemResolver;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class LocalInfoTest extends AbstractUnitTest
@@ -27,30 +27,30 @@ class LocalInfoTest extends AbstractUnitTest
 
         $options = [
             $rootDirOption => '/some/root/',
-            $hostOption => ServerTestInterface::CONFIG_HOST,
+            $hostOption => FsTestInterface::CONFIG_HOST,
             $missedOption => 'someMissedVal',
         ];
 
-        $serverName = 'someServer';
-        $serverInfo = new LocalInfo(
-            $serverName,
+        $fsName = 'some';
+        $fsInfo = new LocalInfo(
+            $fsName,
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => $options,
             ]
         );
 
-        $this->assertEquals(LocalFilesystemAdapter::class, $serverInfo->getAdapterClass());
-        $this->assertEquals(LocalSystemResolver::class, $serverInfo->getResolverClass());
-        $this->assertEquals($serverName, $serverInfo->getName());
+        $this->assertEquals(LocalFilesystemAdapter::class, $fsInfo->getAdapterClass());
+        $this->assertEquals(LocalSystemResolver::class, $fsInfo->getResolverClass());
+        $this->assertEquals($fsName, $fsInfo->getName());
 
         foreach ($options as $optionKey => $optionVal) {
             if ($optionKey === $missedOption) {
-                $this->assertNull($serverInfo->getOption($optionKey));
+                $this->assertNull($fsInfo->getOption($optionKey));
                 continue;
             }
 
-            $this->assertEquals($optionVal, $serverInfo->getOption($optionKey));
+            $this->assertEquals($optionVal, $fsInfo->getOption($optionKey));
         }
     }
 
@@ -59,39 +59,38 @@ class LocalInfoTest extends AbstractUnitTest
      */
     public function testGetResolver(): void
     {
-        $serverName = 'someServer';
-        $serverInfo = new LocalInfo(
-            $serverName,
+        $fsInfo = new LocalInfo(
+            'someServer',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 // wrong resolver but you can define any resolver
                 LocalInfo::RESOLVER_KEY => AwsS3Resolver::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                 ],
             ]
         );
 
-        $this->assertEquals(AwsS3Resolver::class, $serverInfo->getResolverClass());
+        $this->assertEquals(AwsS3Resolver::class, $fsInfo->getResolverClass());
     }
 
     /**
      * @dataProvider getMissedRequiredOptions
      *
-     * @param string $serverName
+     * @param string $fsName
      * @param array $options
      * @param string $exceptionMsg
      *
      * @throws StorageException
      */
-    public function testValidateRequiredOptionsFailed(string $serverName, array $options, string $exceptionMsg): void
+    public function testValidateRequiredOptionsFailed(string $fsName, array $options, string $exceptionMsg): void
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage($exceptionMsg);
 
         new LocalInfo(
-            $serverName,
+            $fsName,
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => $options,
@@ -106,16 +105,16 @@ class LocalInfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            'Option visibility defined in wrong format for server someServer, array expected'
+            'Option `visibility` defined in wrong format for file system `some`, array expected'
         );
 
         new LocalInfo(
-            'someServer',
+            'some',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/dir/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                     LocalInfo::VISIBILITY_KEY => 12,
                 ],
             ]
@@ -133,16 +132,16 @@ class LocalInfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            \sprintf('Option %s defined in wrong format for server someServer, int expected', $label)
+            \sprintf('Option `%s` defined in wrong format for file system `some`, int expected', $label)
         );
 
         new LocalInfo(
-            'someServer',
+            'some',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/dir/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                     $label => 'MyFlag',
                 ],
             ]
@@ -155,12 +154,12 @@ class LocalInfoTest extends AbstractUnitTest
     public function testIsAdvancedUsage(): void
     {
         $simpleLocal = new LocalInfo(
-            'someServer',
+            'some',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                 ],
             ]
         );
@@ -168,12 +167,12 @@ class LocalInfoTest extends AbstractUnitTest
         $this->assertFalse($simpleLocal->isAdvancedUsage());
 
         $baseAdvancedUsage = new LocalInfo(
-            'someServer',
+            'some',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS_KEY => LOCK_EX,
                 ],
             ]
@@ -182,12 +181,12 @@ class LocalInfoTest extends AbstractUnitTest
         $this->assertTrue($baseAdvancedUsage->isAdvancedUsage());
 
         $advancedUsage = new LocalInfo(
-            'someServer',
+            'some',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS_KEY => LOCK_EX,
                     LocalInfo::LINK_HANDLING_KEY => LocalFilesystemAdapter::DISALLOW_LINKS,
                     LocalInfo::VISIBILITY_KEY => [
@@ -213,12 +212,12 @@ class LocalInfoTest extends AbstractUnitTest
     public function testIntParamsUsage(): void
     {
         $baseAdvancedUsage = new LocalInfo(
-            'someServer',
+            'some',
             [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
                     LocalInfo::ROOT_DIR_KEY => '/some/root/',
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                     LocalInfo::WRITE_FLAGS_KEY => '15',
                 ],
             ]
@@ -229,20 +228,20 @@ class LocalInfoTest extends AbstractUnitTest
 
     public function getMissedRequiredOptions(): array
     {
-        $serverName = ServerTestInterface::SERVER_NAME;
+        $fsName = FsTestInterface::SERVER_NAME;
 
         return [
             [
-                $serverName,
+                $fsName,
                 [],
-                'Option rootDir not detected for server ' . $serverName,
+                \sprintf('Option `rootDir` not detected for file system `%s`', $fsName),
             ],
             [
-                'someServer',
+                'some',
                 [
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                 ],
-                'Option rootDir not detected for server someServer'
+                'Option `rootDir` not detected for file system `some`'
             ]
         ];
     }

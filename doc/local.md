@@ -22,11 +22,19 @@ Any of the additional options can be used to configure specific params
 <?php
 return [
     'servers' => [
-        'aws' => [
+        'localServer' => [
             'adapter' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
             'options' => [
                 'rootDir' => '/tmp/',
             ]
+        ],
+    ],
+    'buckets' => [
+        'local' => [
+            'server' => 'localServer',
+            'options' => [
+                'directory' => 'b1/',
+            ],
         ],
     ],
 ];
@@ -37,7 +45,7 @@ return [
 <?php
 return [
     'servers' => [
-        'aws' => [
+        'localServer' => [
             'adapter' => \League\Flysystem\Local\LocalFilesystemAdapter::class,
             'options' => [
                 'rootDir' => '/tmp/',
@@ -55,6 +63,20 @@ return [
                 'write-flag' => LOCK_EX,
                 'link-handling' => \League\Flysystem\Local\LocalFilesystemAdapter::DISALLOW_LINKS,
             ]
+        ],
+    ],
+    'buckets' => [
+        'localImages' => [
+            'server' => 'localServer',
+            'options' => [
+                'directory' => 'img/',
+            ],
+        ],
+        'localFiles' => [
+            'server' => 'localServer',
+            'options' => [
+                'directory' => 'files/',
+            ],
         ],
     ],
 ];

@@ -5,22 +5,20 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Builder;
 
 use League\Flysystem\FilesystemAdapter;
-use Spiral\StorageEngine\Builder\Adapter\AdapterBuilderInterface;
-use Spiral\StorageEngine\Builder\Adapter\AwsS3Builder;
-use Spiral\StorageEngine\Builder\Adapter\LocalBuilder;
-use Spiral\StorageEngine\Config\DTO\ServerInfo as ServerInfoDTO;
+use Spiral\StorageEngine\Builder\Adapter as AdapterBuilder;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo;
 use Spiral\StorageEngine\Exception\StorageException;
 
 class AdapterFactory
 {
     /**
-     * @param ServerInfoDTO\ServerInfoInterface $info
+     * @param FileSystemInfo\FileSystemInfoInterface $info
      *
      * @return FilesystemAdapter
      *
      * @throws StorageException
      */
-    public static function build(ServerInfoDTO\ServerInfoInterface $info): FilesystemAdapter
+    public static function build(FileSystemInfo\FileSystemInfoInterface $info): FilesystemAdapter
     {
         $builder = static::detectAdapterBuilder($info);
 
@@ -32,22 +30,23 @@ class AdapterFactory
     }
 
     /**
-     * @param ServerInfoDTO\ServerInfoInterface $info
+     * @param FileSystemInfo\FileSystemInfoInterface $info
      *
-     * @return AdapterBuilderInterface
+     * @return AdapterBuilder\AdapterBuilderInterface
      *
      * @throws StorageException
      */
-    private static function detectAdapterBuilder(ServerInfoDTO\ServerInfoInterface $info): AdapterBuilderInterface
-    {
+    private static function detectAdapterBuilder(
+        FileSystemInfo\FileSystemInfoInterface $info
+    ): AdapterBuilder\AdapterBuilderInterface {
         switch (get_class($info)) {
-            case ServerInfoDTO\LocalInfo::class:
-                return new LocalBuilder($info);
-            case ServerInfoDTO\Aws\AwsS3Info::class:
-                return new AwsS3Builder($info);
+            case FileSystemInfo\LocalInfo::class:
+                return new AdapterBuilder\LocalBuilder($info);
+            case FileSystemInfo\Aws\AwsS3Info::class:
+                return new AdapterBuilder\AwsS3Builder($info);
             default:
                 throw new StorageException(
-                    'Adapter can\'t be built by server info'
+                    \sprintf('Adapter can\'t be built by file system info `%s`', $info->getName())
                 );
         }
     }

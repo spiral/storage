@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\ServerInfo;
+namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo;
 
 interface ClassBasedInterface
 {

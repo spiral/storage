@@ -6,22 +6,22 @@ namespace Spiral\StorageEngine\Parser\DTO;
 
 class UriStructure implements UriStructureInterface
 {
-    public string $serverPathSeparator;
+    public string $fsPathSeparator;
 
-    public string $server;
+    public string $fileSystem;
     public string $path;
 
-    public function __construct(string $server, string $path, string $separator)
+    public function __construct(string $fileSystem, string $path, string $separator)
     {
-        $this->serverPathSeparator = $separator;
+        $this->fsPathSeparator = $separator;
 
-        $this->server = $server;
+        $this->fileSystem = $fileSystem;
         $this->path = $path;
     }
 
-    public function getServer(): string
+    public function getFileSystem(): string
     {
-        return $this->server;
+        return $this->fileSystem;
     }
 
     public function getPath(): string
@@ -33,8 +33,8 @@ class UriStructure implements UriStructureInterface
     {
         return \sprintf(
             '%s%s%s',
-            $this->server,
-            $this->serverPathSeparator,
+            $this->fileSystem,
+            $this->fsPathSeparator,
             $this->path
         );
     }

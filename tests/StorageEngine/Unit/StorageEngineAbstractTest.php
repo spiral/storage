@@ -5,34 +5,33 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Unit;
 
 use League\Flysystem\FilesystemOperator;
+use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\StorageEngine;
-use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\StorageConfigTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalFsBuilderTrait;
 
 abstract class StorageEngineAbstractTest extends AbstractUnitTest
 {
-    use LocalServerBuilderTrait;
-    use StorageConfigTrait;
+    use LocalFsBuilderTrait;
 
     /**
-     * @param string|null $mountServerKey
+     * @param string|null $fs
      * @param FilesystemOperator|null $fileSystem
      *
      * @return StorageEngine
      *
      * @throws StorageException
-     * @throws \Spiral\StorageEngine\Exception\ConfigException
+     * @throws ConfigException
      * @throws \ReflectionException
      */
     protected function buildSimpleStorageEngine(
-        ?string $mountServerKey = null,
+        ?string $fs = null,
         ?FilesystemOperator $fileSystem = null
     ): StorageEngine {
         $engine = new StorageEngine($this->buildStorageConfig(), $this->getUriParser());
 
-        if (!empty($mountServerKey) && $fileSystem !== null) {
-            $this->mountStorageEngineFileSystem($engine, $mountServerKey, $fileSystem);
+        if (!empty($fs) && $fileSystem !== null) {
+            $this->mountStorageEngineFileSystem($engine, $fs, $fileSystem);
         }
 
         return $engine;
@@ -40,16 +39,16 @@ abstract class StorageEngineAbstractTest extends AbstractUnitTest
 
     /**
      * @param StorageEngine $engine
-     * @param string $serverKey
+     * @param string $fs
      * @param FilesystemOperator $fileSystem
      *
      * @throws \ReflectionException
      */
     protected function mountStorageEngineFileSystem(
         StorageEngine $engine,
-        string $serverKey,
+        string $fs,
         FilesystemOperator $fileSystem
     ): void {
-        $this->callNotPublicMethod($engine, 'mountFilesystem', [$serverKey, $fileSystem]);
+        $this->callNotPublicMethod($engine, 'mountFilesystem', [$fs, $fileSystem]);
     }
 }

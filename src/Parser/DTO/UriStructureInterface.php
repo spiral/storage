@@ -6,7 +6,7 @@ namespace Spiral\StorageEngine\Parser\DTO;
 
 interface UriStructureInterface
 {
-    public function getServer(): string;
+    public function getFileSystem(): string;
 
     public function getPath(): string;
 

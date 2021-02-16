@@ -5,32 +5,55 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Tests\Traits;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\LocalInfo;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
 
 trait StorageConfigTrait
 {
     /**
      * @param array|null $servers
+     * @param array|null $buckets
      *
      * @return StorageConfig
      *
      * @throws ConfigException
      */
-    protected function buildStorageConfig(?array $servers = null): StorageConfig
+    protected function buildStorageConfig(?array $servers = null, ?array $buckets = null): StorageConfig
     {
         if (empty($servers)) {
-            $servers[ServerTestInterface::SERVER_NAME] = [
+            $servers[FsTestInterface::SERVER_NAME] = [
                 LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 LocalInfo::OPTIONS_KEY => [
-                    LocalInfo::ROOT_DIR_KEY => ServerTestInterface::ROOT_DIR,
-                    LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
+                    LocalInfo::ROOT_DIR_KEY => FsTestInterface::ROOT_DIR,
+                    LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
                 ],
             ];
         }
 
-        return new StorageConfig(['servers' => $servers]);
+        if (!empty($servers) && empty($buckets)) {
+            $buckets = [];
+            foreach ($servers as $server => $serverInfo) {
+                $buckets[$this->buildBucketNameByServer($server)] = $this->buildServerBucketInfoDesc($server);
+            }
+        }
+
+        return new StorageConfig(
+            ['servers' => $servers, 'buckets' => $buckets]
+        );
+    }
+
+    protected function buildServerBucketInfoDesc(string $serverName): array
+    {
+        return [
+            'server' => $serverName,
+            'directory' => 'tmp/',
+        ];
+    }
+
+    protected function buildBucketNameByServer(string $server): string
+    {
+        return $server . 'Bucket';
     }
 }

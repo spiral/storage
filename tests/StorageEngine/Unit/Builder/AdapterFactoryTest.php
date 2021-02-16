@@ -10,24 +10,22 @@ use League\Flysystem\PathPrefixer;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use PHPUnit\Framework\MockObject\MockObject;
 use Spiral\StorageEngine\Builder\AdapterFactory;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\LocalInfo;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfo;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo;
 use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Tests\Interfaces\ServerTestInterface;
-use Spiral\StorageEngine\Tests\Traits\AwsS3ServerBuilderTrait;
-use Spiral\StorageEngine\Tests\Traits\LocalServerBuilderTrait;
+use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
+use Spiral\StorageEngine\Tests\Traits\AwsS3FsBuilderTrait;
+use Spiral\StorageEngine\Tests\Traits\LocalFsBuilderTrait;
 use Spiral\StorageEngine\Tests\Unit\AbstractUnitTest;
 
 class AdapterFactoryTest extends AbstractUnitTest
 {
-    use LocalServerBuilderTrait;
-    use AwsS3ServerBuilderTrait;
+    use LocalFsBuilderTrait;
+    use AwsS3FsBuilderTrait;
 
     /**
      * @throws StorageException
      */
-    public function testBuildSimpleLocalServer(): void
+    public function testBuildSimpleLocalFs(): void
     {
         $info = $this->buildLocalInfo();
 
@@ -40,14 +38,14 @@ class AdapterFactoryTest extends AbstractUnitTest
      * @throws StorageException
      * @throws \ReflectionException
      */
-    public function testBuildAdvancedLocalServer(): void
+    public function testBuildAdvancedLocalFs(): void
     {
         $options = [
-            LocalInfo::ROOT_DIR_KEY => ServerTestInterface::ROOT_DIR,
-            LocalInfo::HOST_KEY => ServerTestInterface::CONFIG_HOST,
-            LocalInfo::WRITE_FLAGS_KEY => LOCK_NB,
-            LocalInfo::LINK_HANDLING_KEY => LocalFilesystemAdapter::SKIP_LINKS,
-            LocalInfo::VISIBILITY_KEY => [
+            FileSystemInfo\LocalInfo::ROOT_DIR_KEY => FsTestInterface::ROOT_DIR,
+            FileSystemInfo\LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
+            FileSystemInfo\LocalInfo::WRITE_FLAGS_KEY => LOCK_NB,
+            FileSystemInfo\LocalInfo::LINK_HANDLING_KEY => LocalFilesystemAdapter::SKIP_LINKS,
+            FileSystemInfo\LocalInfo::VISIBILITY_KEY => [
                 'file' => [
                     'public' => 0777,
                     'private' => 0644,
@@ -59,11 +57,11 @@ class AdapterFactoryTest extends AbstractUnitTest
             ],
         ];
 
-        $info = new LocalInfo(
-            'debugLocalServer',
+        $info = new FileSystemInfo\LocalInfo(
+            'debugLocal',
             [
-                LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                LocalInfo::OPTIONS_KEY => $options,
+                FileSystemInfo\LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                FileSystemInfo\LocalInfo::OPTIONS_KEY => $options,
             ]
         );
 
@@ -73,15 +71,15 @@ class AdapterFactoryTest extends AbstractUnitTest
 
 
         $this->assertEquals(
-            $options[LocalInfo::LINK_HANDLING_KEY],
+            $options[FileSystemInfo\LocalInfo::LINK_HANDLING_KEY],
             $this->getProtectedProperty($adapter, 'linkHandling')
         );
         $this->assertEquals(
-            $options[LocalInfo::WRITE_FLAGS_KEY],
+            $options[FileSystemInfo\LocalInfo::WRITE_FLAGS_KEY],
             $this->getProtectedProperty($adapter, 'writeFlags')
         );
         $this->assertEquals(
-            PortableVisibilityConverter::fromArray($options[LocalInfo::VISIBILITY_KEY]),
+            PortableVisibilityConverter::fromArray($options[FileSystemInfo\LocalInfo::VISIBILITY_KEY]),
             $this->getProtectedProperty($adapter, 'visibility')
         );
     }
@@ -90,21 +88,21 @@ class AdapterFactoryTest extends AbstractUnitTest
      * @throws StorageException
      * @throws \ReflectionException
      */
-    public function testBuildSimpleAwsS3Server(): void
+    public function testBuildSimpleAwsS3Fs(): void
     {
-        $serverDescription = $this->buildAwsS3ServerDescription();
-        $serverInfo = new AwsS3Info('awsS3', $serverDescription);
+        $fsDescription = $this->buildAwsS3ServerDescription();
+        $fsInfo = new FileSystemInfo\Aws\AwsS3Info('awsS3', $fsDescription);
 
-        $adapter = AdapterFactory::build($serverInfo);
+        $adapter = AdapterFactory::build($fsInfo);
 
         $this->assertInstanceOf(AwsS3V3Adapter::class, $adapter);
 
         $this->assertEquals(
-            $serverDescription[AwsS3Info::OPTIONS_KEY][AwsS3Info::BUCKET_KEY],
+            $fsDescription[FileSystemInfo\Aws\AwsS3Info::OPTIONS_KEY][FileSystemInfo\Aws\AwsS3Info::BUCKET_KEY],
             $this->getProtectedProperty($adapter, 'bucket')
         );
         $this->assertSame(
-            $serverInfo->getClient(),
+            $fsInfo->getClient(),
             $this->getProtectedProperty($adapter, 'client')
         );
     }
@@ -113,20 +111,20 @@ class AdapterFactoryTest extends AbstractUnitTest
      * @throws StorageException
      * @throws \ReflectionException
      */
-    public function testBuildAdvancedAwsS3Server(): void
+    public function testBuildAdvancedAwsS3Fs(): void
     {
         $options = [
-            AwsS3Info::BUCKET_KEY => 'testBucket',
-            AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
-            AwsS3Info::PATH_PREFIX_KEY => '/some/prefix/',
-            AwsS3Info::VISIBILITY_KEY => $this->getAwsS3VisibilityOption(),
+            FileSystemInfo\Aws\AwsS3Info::BUCKET_KEY => 'testBucket',
+            FileSystemInfo\Aws\AwsS3Info::CLIENT_KEY => $this->getAwsS3Client(),
+            FileSystemInfo\Aws\AwsS3Info::PATH_PREFIX_KEY => '/some/prefix/',
+            FileSystemInfo\Aws\AwsS3Info::VISIBILITY_KEY => $this->getAwsS3VisibilityOption(),
         ];
 
-        $info = new AwsS3Info(
-            'debugAwsS3Server',
+        $info = new FileSystemInfo\Aws\AwsS3Info(
+            'debugAwsS3',
             [
-                LocalInfo::ADAPTER_KEY => AwsS3V3Adapter::class,
-                LocalInfo::OPTIONS_KEY => $options,
+                FileSystemInfo\LocalInfo::ADAPTER_KEY => AwsS3V3Adapter::class,
+                FileSystemInfo\LocalInfo::OPTIONS_KEY => $options,
             ]
         );
 
@@ -136,28 +134,28 @@ class AdapterFactoryTest extends AbstractUnitTest
 
 
         $this->assertEquals(
-            new PathPrefixer($options[AwsS3Info::PATH_PREFIX_KEY]),
+            new PathPrefixer($options[FileSystemInfo\Aws\AwsS3Info::PATH_PREFIX_KEY]),
             $this->getProtectedProperty($adapter, 'prefixer')
         );
         $this->assertEquals(
-            $info->getVisibiltyConverter(),
+            $info->getVisibilityConverter(),
             $this->getProtectedProperty($adapter, 'visibility')
         );
     }
 
-    public function testWrongServerInfoUsage(): void
+    public function testWrongFsInfoUsage(): void
     {
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('Adapter can\'t be built by server info');
+        $this->expectExceptionMessage('Adapter can\'t be built by file system info');
 
-        /** @var MockObject|ServerInfo $info */
+        /** @var MockObject|FileSystemInfo\FileSystemInfo $info */
         $info = $this->getMockForAbstractClass(
-            ServerInfo::class,
+            FileSystemInfo\FileSystemInfo::class,
             [
                 'someName',
                 [
-                    ServerInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    ServerInfo::OPTIONS_KEY => [],
+                    FileSystemInfo\FileSystemInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                    FileSystemInfo\FileSystemInfo::OPTIONS_KEY => [],
                 ],
             ]
         );

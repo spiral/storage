@@ -38,25 +38,23 @@ class StorageEngine implements StorageInterface, SingletonInterface
         $this->config = $config;
         $this->uriParser = $uriParser;
 
-        if (!empty($config->getServersKeys())) {
-            foreach ($config->getServersKeys() as $serverKey) {
-                if (!is_string($serverKey) || empty($serverKey)) {
-                    throw new MountException(
-                        \sprintf(
-                            'Server %s can\'t be mounted - string required, %s received',
-                            is_scalar($serverKey) && !empty($serverKey) ? $serverKey : '--non-displayable--',
-                            empty($serverKey) ? 'empty val' : gettype($serverKey)
-                        )
-                    );
-                }
-
-                $this->mountFilesystem(
-                    $serverKey,
-                    new Filesystem(
-                        AdapterFactory::build($this->config->buildServerInfo($serverKey))
+        foreach ($config->getBucketsKeys() as $fs) {
+            if (!is_string($fs) || empty($fs)) {
+                throw new MountException(
+                    \sprintf(
+                        'File system `%s` can\'t be mounted - string required, %s received',
+                        is_scalar($fs) && !empty($fs) ? $fs : '--non-displayable--',
+                        empty($fs) ? 'empty val' : gettype($fs)
                     )
                 );
             }
+
+            $this->mountFilesystem(
+                $fs,
+                new Filesystem(
+                    AdapterFactory::build($this->config->buildFileSystemInfo($fs))
+                )
+            );
         }
     }
 
@@ -67,7 +65,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     {
         if (!$this->isFileSystemExists($key)) {
             throw new MountException(
-                \sprintf('Server %s was not identified', $key)
+                \sprintf('File system `%s` was not identified', $key)
             );
         }
 
@@ -243,7 +241,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
-     * @param string $server
+     * @param string $fileSystem
      * @param string $filePath
      * @param string $content
      * @param array $config
@@ -252,9 +250,9 @@ class StorageEngine implements StorageInterface, SingletonInterface
      *
      * @throws StorageException
      */
-    public function write(string $server, string $filePath, string $content, array $config = []): string
+    public function write(string $fileSystem, string $filePath, string $content, array $config = []): string
     {
-        $uri = (string)$this->uriParser->prepareUri($server, $filePath);
+        $uri = (string)$this->uriParser->prepareUri($fileSystem, $filePath);
 
         /** @var FilesystemOperator $filesystem */
         [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
@@ -269,7 +267,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
-     * @param string $server
+     * @param string $fileSystem
      * @param string $filePath
      * @param $content
      * @param array $config
@@ -278,9 +276,9 @@ class StorageEngine implements StorageInterface, SingletonInterface
      *
      * @throws StorageException
      */
-    public function writeStream(string $server, string $filePath, $content, array $config = []): string
+    public function writeStream(string $fileSystem, string $filePath, $content, array $config = []): string
     {
-        $uri = (string)$this->uriParser->prepareUri($server, $filePath);
+        $uri = (string)$this->uriParser->prepareUri($fileSystem, $filePath);
 
         /** @var FilesystemOperator $filesystem */
         [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
@@ -331,7 +329,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
     /**
      * @param string $sourceUri
-     * @param string $destinationServer
+     * @param string $destinationFileSystem
      * @param string|null $targetFilePath
      * @param array $config
      *
@@ -341,23 +339,23 @@ class StorageEngine implements StorageInterface, SingletonInterface
      */
     public function move(
         string $sourceUri,
-        string $destinationServer,
+        string $destinationFileSystem,
         ?string $targetFilePath = null,
         array $config = []
     ): string {
         /** @var FilesystemOperator $sourceFilesystem */
         [$sourceFilesystem, $sourcePath] = $this->determineFilesystemAndPath($sourceUri);
 
-        $destinationFilesystem = $this->getFileSystem($destinationServer);
+        $destinationFilesystem = $this->getFileSystem($destinationFileSystem);
 
         try {
             $targetFilePath = $targetFilePath ?: $sourcePath;
 
             $sourceFilesystem === $destinationFilesystem
                 ? $this->moveInTheSameFilesystem($sourceFilesystem, $sourcePath, $targetFilePath, $config)
-                : $this->moveAcrossFilesystems($sourceUri, $destinationServer, $targetFilePath, $config);
+                : $this->moveAcrossFilesystems($sourceUri, $destinationFileSystem, $targetFilePath, $config);
 
-            return (string)$this->uriParser->prepareUri($destinationServer, $targetFilePath);
+            return (string)$this->uriParser->prepareUri($destinationFileSystem, $targetFilePath);
         } catch (FilesystemException $e) {
             throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
@@ -365,7 +363,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
     /**
      * @param string $sourceUri
-     * @param string $destinationServer
+     * @param string $destinationFileSystem
      * @param string|null $targetFilePath
      * @param array $config
      *
@@ -375,14 +373,14 @@ class StorageEngine implements StorageInterface, SingletonInterface
      */
     public function copy(
         string $sourceUri,
-        string $destinationServer,
+        string $destinationFileSystem,
         ?string $targetFilePath = null,
         array $config = []
     ): string {
         /** @var FilesystemOperator $sourceFilesystem */
         [$sourceFilesystem, $sourcePath] = $this->determineFilesystemAndPath($sourceUri);
 
-        $destinationFilesystem = $this->getFileSystem($destinationServer);
+        $destinationFilesystem = $this->getFileSystem($destinationFileSystem);
 
         try {
             $targetFilePath = $targetFilePath ?: $sourcePath;
@@ -398,7 +396,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
                     $config
                 );
 
-            return (string)$this->uriParser->prepareUri($destinationServer, $targetFilePath);
+            return (string)$this->uriParser->prepareUri($destinationFileSystem, $targetFilePath);
         } catch (FilesystemException $e) {
             throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
         }
@@ -430,7 +428,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     {
         $uriStructure = $this->uriParser->parseUri($uri);
 
-        return [$this->getFileSystem($uriStructure->server), $uriStructure->path];
+        return [$this->getFileSystem($uriStructure->fileSystem), $uriStructure->path];
     }
 
     /**
@@ -502,7 +500,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
     /**
      * @param string $sourceUri
-     * @param string $destinationServer
+     * @param string $destinationFileSystem
      * @param string|null $targetFilePath
      * @param array $config
      *
@@ -510,11 +508,11 @@ class StorageEngine implements StorageInterface, SingletonInterface
      */
     protected function moveAcrossFilesystems(
         string $sourceUri,
-        string $destinationServer,
+        string $destinationFileSystem,
         ?string $targetFilePath = null,
         array $config = []
     ): void {
-        $this->copy($sourceUri, $destinationServer, $targetFilePath, $config);
+        $this->copy($sourceUri, $destinationFileSystem, $targetFilePath, $config);
         $this->delete($sourceUri);
     }
 }

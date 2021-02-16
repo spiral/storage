@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine;
 
 use Spiral\Core\Container\SingletonInterface;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\ResolveException;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Parser\UriParserInterface;
-use Spiral\StorageEngine\Resolver\AdapterResolver;
+use Spiral\StorageEngine\Resolver;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
 {
@@ -19,7 +19,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     protected UriParserInterface $uriParser;
 
     /**
-     * @var \Spiral\StorageEngine\Resolver\AdapterResolverInterface[]
+     * @var Resolver\AdapterResolverInterface[]
      */
     protected array $resolvers = [];
 
@@ -47,7 +47,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         try {
             $uriStructure = $this->uriParser->parseUri($uri);
 
-            return $this->getResolver($uriStructure->server)
+            return $this->getResolver($uriStructure->fileSystem)
                 ->buildUrl($uriStructure->path);
         } catch (StorageException $e) {
             if ($throwException) {
@@ -62,39 +62,28 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         return null;
     }
 
-    public function buildBucketUri(string $bucket, string $filePath): string
-    {
-        $bucketInfo = $this->storageConfig->buildBucketInfo($bucket);
-
-        return (string)$this->uriParser->prepareUri(
-            $bucketInfo->getServerKey(),
-            \sprintf('%s%s', $bucketInfo->getDirectory(), $filePath)
-        );
-    }
-
     /**
-     * @param string $serverKey
+     * @param string $fileSystem
      *
-     * @return \Spiral\StorageEngine\Resolver\AdapterResolverInterface
+     * @return Resolver\AdapterResolverInterface
      *
      * @throws StorageException
      */
-    protected function getResolver(string $serverKey): Resolver\AdapterResolverInterface
+    protected function getResolver(string $fileSystem): Resolver\AdapterResolverInterface
     {
-        if (!array_key_exists($serverKey, $this->resolvers)) {
-            $this->resolvers[$serverKey] = $this->prepareResolverForServer(
-                $this->storageConfig->buildServerInfo($serverKey)
+        if (!array_key_exists($fileSystem, $this->resolvers)) {
+            $this->resolvers[$fileSystem] = $this->prepareResolverForFileSystem(
+                $this->storageConfig->buildFileSystemInfo($fileSystem)
             );
         }
 
-        return $this->resolvers[$serverKey];
+        return $this->resolvers[$fileSystem];
     }
 
-    protected function prepareResolverForServer(
-        ServerInfoInterface $serverInfo
-    ): Resolver\AdapterResolverInterface {
-        $resolverClass = $serverInfo->getResolverClass();
+    protected function prepareResolverForFileSystem(FileSystemInfoInterface $fsInfo): Resolver\AdapterResolverInterface
+    {
+        $resolverClass = $fsInfo->getResolverClass();
 
-        return new $resolverClass($this->uriParser, $this->storageConfig, $serverInfo->getName());
+        return new $resolverClass($this->uriParser, $this->storageConfig, $fsInfo->getName());
     }
 }

@@ -5,37 +5,37 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Builder\Adapter;
 
 use League\Flysystem\FilesystemAdapter;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\ServerInfoInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 
 /**
- * @property ServerInfoInterface|AwsS3Info $serverInfo
+ * @property FileSystemInfoInterface|AwsS3Info $fsInfo
  */
 class AwsS3Builder extends AbstractBuilder
 {
-    protected const SERVER_INFO_CLASS = AwsS3Info::class;
+    protected const FILE_SYSTEM_INFO_CLASS = AwsS3Info::class;
 
     public function buildSimple(): FilesystemAdapter
     {
-        $adapterClass = $this->serverInfo->getAdapterClass();
+        $adapterClass = $this->fsInfo->getAdapterClass();
 
         return new $adapterClass(
-            $this->serverInfo->getClient(),
-            $this->serverInfo->getOption(AwsS3Info::BUCKET_KEY)
+            $this->fsInfo->getClient(),
+            $this->fsInfo->getOption(AwsS3Info::BUCKET_KEY)
         );
     }
 
     public function buildAdvanced(): FilesystemAdapter
     {
-        $adapterClass = $this->serverInfo->getAdapterClass();
+        $adapterClass = $this->fsInfo->getAdapterClass();
 
         return new $adapterClass(
-            $this->serverInfo->getClient(),
-            $this->serverInfo->getOption(AwsS3Info::BUCKET_KEY),
-            $this->serverInfo->hasOption(AwsS3Info::PATH_PREFIX_KEY)
-                ? $this->serverInfo->getOption(AwsS3Info::PATH_PREFIX_KEY)
+            $this->fsInfo->getClient(),
+            $this->fsInfo->getOption(AwsS3Info::BUCKET_KEY),
+            $this->fsInfo->hasOption(AwsS3Info::PATH_PREFIX_KEY)
+                ? $this->fsInfo->getOption(AwsS3Info::PATH_PREFIX_KEY)
                 : '',
-            $this->serverInfo->getVisibiltyConverter()
+            $this->fsInfo->getVisibilityConverter()
         );
     }
 }

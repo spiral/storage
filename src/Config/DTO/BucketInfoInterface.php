@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Config\DTO;
 
-interface BucketInfoInterface
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\OptionsBasedInterface;
+
+interface BucketInfoInterface extends OptionsBasedInterface
 {
-    public const DIRECTORY_KEY = 'directory';
     public const SERVER_KEY = 'server';
 
-    public function getDirectory(): ?string;
+    public const DIRECTORY_KEY = 'directory';
+    public const BUCKET_KEY = 'bucket';
 
-    public function getServerKey(): string;
+    public function getServer(): string;
+
+    public function setFileSystemInfo(FileSystemInfoInterface $fileSystemInfo): self;
+
+    public function getFileSystemInfo(): ?FileSystemInfoInterface;
 }

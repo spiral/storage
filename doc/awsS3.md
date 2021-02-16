@@ -8,7 +8,6 @@ To work with local file server you should use one of specific adapters:
   * `composer require league/flysystem-async-aws-s3` for adapter installation
 
 ### Required options
-- `bucket` - used bucket name
 - `client` - S3Client 
 
 ### Additional options
@@ -22,10 +21,9 @@ To work with local file server you should use one of specific adapters:
 
 return [
     'servers' => [
-        'aws' => [
+        'awsS3V3Server' => [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'options' => [
-                'bucket' => env('AWS_BUCKET'),
                 'client' => new \Aws\S3\S3Client([
                     'version' => 'latest',
                     'region' => env('AWS_REGION'),
@@ -34,6 +32,14 @@ return [
                     'endpoint' => env('AWS_PUBLIC_URL')
                 ]),
             ]
+        ],
+    ],
+    'buckets' => [
+        'aws' => [
+            'server' => 'awsS3V3Server',
+            'options' => [
+                'bucket' => env('AWS_BUCKET'),
+            ],
         ],
     ],
 ];
@@ -45,10 +51,9 @@ return [
 
 return [
     'servers' => [
-        'aws' => [
+        'awsS3V3Server' => [
             'adapter' => \League\Flysystem\AwsS3V3\AwsS3V3Adapter::class,
             'options' => [
-                'bucket' => env('AWS_BUCKET'),
                 'client' => new \Aws\S3\S3Client([
                     'version' => 'latest',
                     'region' => env('AWS_REGION'),
@@ -59,6 +64,14 @@ return [
                 'path-prefix' => '/some/prefixDir/',
                 'visibility' => 'public',
             ]
+        ],
+    ],    
+    'buckets' => [
+        'aws' => [
+            'server' => 'awsS3V3Server',
+            'options' => [
+                'bucket' => env('AWS_BUCKET'),
+            ],
         ],
     ],
 ];

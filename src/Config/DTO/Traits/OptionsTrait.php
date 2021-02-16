@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Spiral\StorageEngine\Config\DTO\Traits;
 
 use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\ServerInfo\OptionsBasedInterface;
+use Spiral\StorageEngine\Config\DTO\FileSystemInfo\OptionsBasedInterface;
 
 trait OptionsTrait
 {
@@ -47,7 +47,7 @@ trait OptionsTrait
             default:
                 throw new ConfigException(
                     \sprintf(
-                        'Unknown option type detected for option %s: %s',
+                        'Unknown option type detected for option `%s`: %s',
                         $optionLabel,
                         $type
                     )
@@ -71,12 +71,19 @@ trait OptionsTrait
         return $optionVal;
     }
 
+    /**
+     * @param array $requiredOptions
+     * @param array $options
+     * @param string $msgPostfix
+     *
+     * @throws ConfigException
+     */
     protected function validateRequiredOptions(array $requiredOptions, array $options, string $msgPostfix = ''): void
     {
         foreach ($requiredOptions as $requiredOption) {
             if (!array_key_exists($requiredOption, $options)) {
                 throw new ConfigException(
-                    \sprintf('Option %s not detected%s', $requiredOption, $msgPostfix)
+                    \sprintf('Option `%s` not detected%s', $requiredOption, $msgPostfix)
                 );
             }
         }
