@@ -6,9 +6,12 @@ namespace Spiral\StorageEngine\Config\DTO\Traits;
 
 use Spiral\StorageEngine\Exception\StorageException;
 
+/**
+ * Trait for dto based on class usage
+ */
 trait ClassBasedTrait
 {
-    protected string $class;
+    protected ?string $class = null;
 
     public function getClass(): string
     {
@@ -16,6 +19,8 @@ trait ClassBasedTrait
     }
 
     /**
+     * Set class for DTO and check if class exists
+     *
      * @param string $class
      * @param string|null $exceptionMsg
      *
@@ -33,6 +38,8 @@ trait ClassBasedTrait
     }
 
     /**
+     * Check if class exists
+     *
      * @param string $class
      * @param string $errorPostfix
      *

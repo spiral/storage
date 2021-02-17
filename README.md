@@ -7,7 +7,7 @@ Storage engine is based on [FlySystem](https://github.com/thephpleague/flysystem
 
 StorageEngine based on 2 basic interfaces:
 1. [StorageInterface](doc/StorageInterface.md)
-    * works with all file servers that handle files
+    * works with all supported file servers that handle files
     * works with file paths in a specific format (`{serverName}://{filePath}` by default)
       * to change it you can prepare your own `\Spiral\StorageEngine\Parser\UriParser` class and make required binding
 2. [ResolveManagerInterface](doc/ResolveManagerInterface.md)
@@ -113,7 +113,7 @@ $mimeType = $storageEngine->mimeType($copiedUri); // = 'text/plain'
 ``` php
 $resolveManager->buildUrl('local://someDir/myFile.txt'); // for example it can return smth like 'http://myhost.com/files/somedir/myfile.txt'
 ```
-* P.S. For local server info you should define host in server description to build url. In other case it will throw exception.
+* P.S. For local server you should define host in server description to build url. In other case it will throw exception.
 
 ## License:
 MIT License (MIT). Please see [`LICENSE`](./LICENSE) for more information. Maintained by [Spiral Scout](https://spiralscout.com).

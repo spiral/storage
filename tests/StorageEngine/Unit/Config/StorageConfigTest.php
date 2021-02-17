@@ -181,7 +181,7 @@ class StorageConfigTest extends AbstractUnitTest
         );
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Server `missedServer` info for file system `localBucket` was not detected');
+        $this->expectExceptionMessage('Server `missedServer` info for filesystem `localBucket` was not detected');
 
         /** @var FileSystemInfo\FileSystemInfoInterface|FileSystemInfo\OptionsBasedInterface $fs */
         $config->buildFileSystemInfo($bucketName);
@@ -207,7 +207,7 @@ class StorageConfigTest extends AbstractUnitTest
         );
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Adapter can\'t be identified for file system `%s`', $bucket));
+        $this->expectExceptionMessage(\sprintf('Adapter can\'t be identified for filesystem `%s`', $bucket));
 
         $config->buildFileSystemInfo($bucket);
     }

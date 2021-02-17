@@ -7,21 +7,40 @@ namespace Spiral\StorageEngine\Config\DTO\Traits;
 use Spiral\StorageEngine\Exception\ConfigException;
 use Spiral\StorageEngine\Config\DTO\FileSystemInfo\OptionsBasedInterface;
 
+/**
+ * Trait based on usage options array
+ */
 trait OptionsTrait
 {
     protected array $options = [];
 
+    /**
+     * Check if option was defined
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function hasOption(string $key): bool
     {
         return array_key_exists($key, $this->options);
     }
 
+    /**
+     * Get option value
+     *
+     * @param string $key
+     *
+     * @return mixed|null
+     */
     public function getOption(string $key)
     {
         return $this->hasOption($key) ? $this->options[$key] : null;
     }
 
     /**
+     * Check if option was defined with required type
+     *
      * @param string $optionLabel
      * @param $optionVal
      * @param string $type
@@ -55,6 +74,14 @@ trait OptionsTrait
         }
     }
 
+    /**
+     * Process option value to required type
+     *
+     * @param $optionVal
+     * @param string $type
+     *
+     * @return bool|float|int|string
+     */
     protected function processOptionByType($optionVal, string $type)
     {
         switch ($type) {
@@ -72,6 +99,8 @@ trait OptionsTrait
     }
 
     /**
+     * Validate required options defined
+     *
      * @param array $requiredOptions
      * @param array $options
      * @param string $msgPostfix

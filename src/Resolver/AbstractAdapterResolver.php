@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace Spiral\StorageEngine\Resolver;
 
-use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
 use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 use Spiral\StorageEngine\Config\StorageConfig;
 use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Exception\UriException;
 use Spiral\StorageEngine\Parser\UriParserInterface;
 
+/**
+ * Abstract class for any resolver
+ * Depends on adapter by default
+ */
 abstract class AbstractAdapterResolver implements AdapterResolverInterface
 {
+    /**
+     * Filesystem info class required for resolver
+     * In case other filesystem info will be provided - exception will be thrown
+     */
     protected const FILE_SYSTEM_INFO_CLASS = '';
 
     protected FileSystemInfoInterface $fsInfo;
 
     protected UriParserInterface $uriParser;
-
-    /**
-     * @var BucketInfoInterface[]
-     */
-    protected array $buckets = [];
 
     /**
      * @param UriParserInterface $uriParser
@@ -40,7 +42,7 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
         if (empty($requiredClass) || !$fsInfo instanceof $requiredClass) {
             throw new StorageException(
                 \sprintf(
-                    'Wrong file system info (`%s`) for resolver `%s`',
+                    'Wrong filesystem info (`%s`) for resolver `%s`',
                     get_class($fsInfo),
                     static::class
                 )
@@ -52,7 +54,16 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
         $this->fsInfo = $fsInfo;
     }
 
-    public function normalizeFilePathToUri(string $filePath): string
+    /**
+     * Normalize filepath for filesystem operation
+     * In case uri provided path to file will be extracted
+     * In case filepath provided it will be returned
+     *
+     * @param string $filePath
+     *
+     * @return string
+     */
+    public function normalizeFilePath(string $filePath): string
     {
         try {
             return $this->uriParser->parseUri($filePath)->path;

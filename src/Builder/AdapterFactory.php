@@ -12,6 +12,8 @@ use Spiral\StorageEngine\Exception\StorageException;
 class AdapterFactory
 {
     /**
+     * Build filesystem adapter by provided filesystem info
+     *
      * @param FileSystemInfo\FileSystemInfoInterface $info
      *
      * @return FilesystemAdapter
@@ -30,6 +32,8 @@ class AdapterFactory
     }
 
     /**
+     * Detect required builder by filesystem info
+     *
      * @param FileSystemInfo\FileSystemInfoInterface $info
      *
      * @return AdapterBuilder\AdapterBuilderInterface
@@ -46,7 +50,7 @@ class AdapterFactory
                 return new AdapterBuilder\AwsS3Builder($info);
             default:
                 throw new StorageException(
-                    \sprintf('Adapter can\'t be built by file system info `%s`', $info->getName())
+                    \sprintf('Adapter can\'t be built by filesystem info `%s`', $info->getName())
                 );
         }
     }

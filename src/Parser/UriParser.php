@@ -11,14 +11,34 @@ use Spiral\StorageEngine\Parser\DTO\UriStructureInterface;
 
 class UriParser implements UriParserInterface, SingletonInterface
 {
+    /**
+     * Name of filepath block name in regex patter
+     */
     protected const FILE_PATH_PART = 'path';
+
+    /**
+     * Name of filesystem name block name in regex patter
+     */
     protected const FILE_PATH_FS_PART = 'fs';
 
+    /**
+     * Separator between filesystem name and filepath
+     */
     protected const FS_PATH_SEPARATOR = '://';
 
+    /**
+     * File system name pattern block
+     */
     protected const FILE_SYSTEM_PATTERN = '(?\'' . self::FILE_PATH_FS_PART . '\'[\w\-]*)';
+
+    /**
+     * Filepath pattern block
+     */
     protected const FILE_PATH_PATTERN = '(?\'' . self::FILE_PATH_PART . '\'[\w\-+_\(\)\/\.,=\*\s]*)';
 
+    /**
+     * Full uri pattern
+     */
     protected const URI_PATTERN = '/^' . self::FILE_SYSTEM_PATTERN . ':\/\/' . self::FILE_PATH_PATTERN . '$/';
 
     /**
@@ -44,7 +64,7 @@ class UriParser implements UriParserInterface, SingletonInterface
             !array_key_exists(static::FILE_PATH_FS_PART, $match)
             || empty($match[static::FILE_PATH_FS_PART])
         ) {
-            throw new UriException(\sprintf('No file system was detected in uri `%s`', $uri));
+            throw new UriException(\sprintf('No filesystem was detected in uri `%s`', $uri));
         }
 
         if (
@@ -60,6 +80,16 @@ class UriParser implements UriParserInterface, SingletonInterface
         );
     }
 
+    /**
+     * Build uris structure object by provided filesystem name and path
+     * Can be built with another separator
+     *
+     * @param string $fs
+     * @param string $path
+     * @param string|null $separator
+     *
+     * @return UriStructureInterface
+     */
     protected function buildUriStructure(string $fs, string $path, ?string $separator = null): UriStructureInterface
     {
         return new UriStructure($fs, $path, $separator ?? self::FS_PATH_SEPARATOR);

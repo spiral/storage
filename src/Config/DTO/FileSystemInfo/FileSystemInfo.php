@@ -38,11 +38,11 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
 
         $this->name = $name;
 
-        $this->checkClass($info[static::ADAPTER_KEY], \sprintf('File system %s adapter', $this->name));
+        $this->checkClass($info[static::ADAPTER_KEY], \sprintf('Filesystem %s adapter', $this->name));
         $this->adapter = $info[static::ADAPTER_KEY];
 
         if (array_key_exists(static::RESOLVER_KEY, $info)) {
-            $this->checkClass($info[static::RESOLVER_KEY], \sprintf('File system %s resolver', $this->name));
+            $this->checkClass($info[static::RESOLVER_KEY], \sprintf('Filesystem %s resolver', $this->name));
             $this->resolver = $info[static::RESOLVER_KEY];
         }
 
@@ -53,21 +53,33 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getAdapterClass(): string
     {
         return $this->adapter;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getResolverClass(): string
     {
         return $this->resolver;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function isAdvancedUsage(): bool
     {
         foreach (static::ADDITIONAL_OPTIONS as $optionalOption => $type) {
@@ -80,6 +92,8 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
     }
 
     /**
+     * Validate and prepare options
+     *
      * @param array $options
      *
      * @throws ConfigException
@@ -89,7 +103,7 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
         $this->validateRequiredOptions(
             array_keys(static::REQUIRED_OPTIONS),
             $options,
-            \sprintf(' for file system `%s`', $this->getName())
+            \sprintf(' for filesystem `%s`', $this->getName())
         );
 
         foreach ($options as $optionKey => $option) {
@@ -104,6 +118,8 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
     }
 
     /**
+     * Validate if description contains all required options
+     *
      * @param string $fs
      * @param array $info
      *
@@ -113,18 +129,20 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
     {
         if (!array_key_exists(static::ADAPTER_KEY, $info)) {
             throw new ConfigException(
-                \sprintf('File system `%s` needs adapter class defined', $fs)
+                \sprintf('Filesystem `%s` needs adapter class defined', $fs)
             );
         }
 
         if (!array_key_exists(OptionsBasedInterface::OPTIONS_KEY, $info)) {
             throw new ConfigException(
-                \sprintf('File system `%s` needs options defined', $fs)
+                \sprintf('Filesystem `%s` needs options defined', $fs)
             );
         }
     }
 
     /**
+     * Validate option type is correct
+     *
      * @param string $optionLabel
      * @param string $optionType
      * @param $optionVal
@@ -136,7 +154,7 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
         if (!$this->isOptionHasRequiredType($optionLabel, $optionVal, $optionType)) {
             throw new ConfigException(
                 \sprintf(
-                    'Option `%s` defined in wrong format for file system `%s`, %s expected',
+                    'Option `%s` defined in wrong format for filesystem `%s`, %s expected',
                     $optionLabel,
                     $this->getName(),
                     $optionType
@@ -145,6 +163,13 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
         }
     }
 
+    /**
+     * Get expected option type by label
+     *
+     * @param string $option
+     *
+     * @return string|null
+     */
     protected function getOptionType(string $option): ?string
     {
         if (array_key_exists($option, static::REQUIRED_OPTIONS)) {

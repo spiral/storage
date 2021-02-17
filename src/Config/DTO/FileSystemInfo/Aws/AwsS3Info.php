@@ -6,7 +6,6 @@ namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws;
 
 use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfo;
 use Spiral\StorageEngine\Config\DTO\FileSystemInfo\SpecificConfigurableFileSystemInfo;
-use Spiral\StorageEngine\Exception\StorageException;
 use Spiral\StorageEngine\Resolver\AwsS3Resolver;
 
 class AwsS3Info extends FileSystemInfo implements SpecificConfigurableFileSystemInfo
@@ -32,9 +31,7 @@ class AwsS3Info extends FileSystemInfo implements SpecificConfigurableFileSystem
     protected ?AwsVisibilityConverter $visibilityConverter = null;
 
     /**
-     * @param array $info
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function constructSpecific(array $info): void
     {
@@ -43,6 +40,11 @@ class AwsS3Info extends FileSystemInfo implements SpecificConfigurableFileSystem
         }
     }
 
+    /**
+     * Get prepared visibility converter
+     *
+     * @return mixed|null
+     */
     public function getVisibilityConverter()
     {
         return $this->visibilityConverter instanceof AwsVisibilityConverter
@@ -50,6 +52,11 @@ class AwsS3Info extends FileSystemInfo implements SpecificConfigurableFileSystem
             : null;
     }
 
+    /**
+     * Get S3 client
+     *
+     * @return mixed|null
+     */
     public function getClient()
     {
         return $this->getOption(static::CLIENT_KEY);

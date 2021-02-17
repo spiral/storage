@@ -29,7 +29,7 @@ class AwsS3ResolverTest extends AbstractUnitTest
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage(
             \sprintf(
-                'Wrong file system info (`%s`) for resolver `%s`',
+                'Wrong filesystem info (`%s`) for resolver `%s`',
                 LocalInfo::class,
                 AwsS3Resolver::class
             )

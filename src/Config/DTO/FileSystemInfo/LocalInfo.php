@@ -28,6 +28,9 @@ class LocalInfo extends FileSystemInfo
 
     protected string $resolver = LocalSystemResolver::class;
 
+    /**
+     * @inheritDoc
+     */
     public function isAdvancedUsage(): bool
     {
         foreach (static::ADDITIONAL_OPTIONS as $optionalOption => $type) {

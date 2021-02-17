@@ -332,7 +332,7 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(MountException::class);
-        $this->expectExceptionMessage('File system `missed` was not identified');
+        $this->expectExceptionMessage('Filesystem `missed` was not identified');
 
         $this->assertEquals(
             \sprintf('%s://%s', $destinationFs, 'file.txt'),
@@ -436,7 +436,7 @@ class StorageEngineWriterTest extends StorageEngineAbstractTest
         $storage = $this->buildSimpleStorageEngine(static::LOCAL_FS, $localFs);
 
         $this->expectException(MountException::class);
-        $this->expectExceptionMessage('File system `missed` was not identified');
+        $this->expectExceptionMessage('Filesystem `missed` was not identified');
 
         $this->assertEquals(
             \sprintf('%s://%s', $destinationFs, 'file.txt'),

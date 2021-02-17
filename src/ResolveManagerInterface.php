@@ -10,6 +10,8 @@ use Spiral\StorageEngine\Exception\StorageException;
 interface ResolveManagerInterface
 {
     /**
+     * Build urls list by list of uris
+     *
      * @param string[] $files
      * @param bool $throwException
      *  true - throw exception in case any url can't be built
@@ -23,6 +25,9 @@ interface ResolveManagerInterface
     public function buildUrlsList(array $files, bool $throwException = true): \Generator;
 
     /**
+     * Build url by uri
+     * Please do not forget to check if file exists
+     *
      * @param string $uri
      * @param bool $throwException
      *  true - throw exception in case url can't be built

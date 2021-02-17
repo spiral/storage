@@ -16,6 +16,9 @@ class LocalBuilder extends AbstractBuilder
 {
     protected const FILE_SYSTEM_INFO_CLASS = LocalInfo::class;
 
+    /**
+     * @inheritDoc
+     */
     public function buildSimple(): FilesystemAdapter
     {
         $adapterClass = $this->fsInfo->getAdapterClass();
@@ -25,6 +28,9 @@ class LocalBuilder extends AbstractBuilder
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function buildAdvanced(): FilesystemAdapter
     {
         $adapterClass = $this->fsInfo->getAdapterClass();

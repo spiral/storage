@@ -27,11 +27,17 @@ class BucketInfo implements BucketInfoInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getServer(): string
     {
         return $this->server;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setFileSystemInfo(FileSystemInfoInterface $fileSystemInfo): BucketInfoInterface
     {
         $this->fileSystemInfo = $fileSystemInfo;
@@ -39,6 +45,9 @@ class BucketInfo implements BucketInfoInterface
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getFileSystemInfo(): ?FileSystemInfoInterface
     {
         return $this->fileSystemInfo;

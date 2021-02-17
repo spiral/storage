@@ -15,9 +15,18 @@ interface OptionsBasedInterface
     public const ARRAY_TYPE = 'array';
     public const MIXED_TYPE = 'mixed';
 
+    /**
+     * Check if option was defined
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function hasOption(string $key): bool;
 
     /**
+     * Get option by key
+     *
      * @param string $key
      *
      * @return mixed|null

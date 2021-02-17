@@ -63,6 +63,8 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     }
 
     /**
+     * Get resolver for filesystem by key
+     *
      * @param string $fileSystem
      *
      * @return Resolver\AdapterResolverInterface
@@ -80,6 +82,13 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
         return $this->resolvers[$fileSystem];
     }
 
+    /**
+     * Prepare resolver by provided filesystem info
+     *
+     * @param FileSystemInfoInterface $fsInfo
+     *
+     * @return Resolver\AdapterResolverInterface
+     */
     protected function prepareResolverForFileSystem(FileSystemInfoInterface $fsInfo): Resolver\AdapterResolverInterface
     {
         $resolverClass = $fsInfo->getResolverClass();
