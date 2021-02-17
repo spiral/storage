@@ -65,6 +65,11 @@ class AwsVisibilityConverter implements ClassBasedInterface, OptionsBasedInterfa
         }
     }
 
+    /**
+     * Get aws visibility converter of provided class
+     *
+     * @return mixed|null
+     */
     public function getConverter()
     {
         $class = $this->getClass();

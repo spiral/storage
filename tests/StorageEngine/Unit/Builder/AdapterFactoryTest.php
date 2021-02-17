@@ -146,7 +146,7 @@ class AdapterFactoryTest extends AbstractUnitTest
     public function testWrongFsInfoUsage(): void
     {
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('Adapter can\'t be built by file system info');
+        $this->expectExceptionMessage('Adapter can\'t be built by filesystem info');
 
         /** @var MockObject|FileSystemInfo\FileSystemInfo $info */
         $info = $this->getMockForAbstractClass(

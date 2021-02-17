@@ -10,6 +10,8 @@ use Spiral\StorageEngine\Exception\MountException;
 interface StorageInterface extends StorageReaderInterface, StorageWriterInterface
 {
     /**
+     * Get concrete filesystem for specific operations
+     *
      * @param string $key
      *
      * @return FilesystemOperator
@@ -18,5 +20,10 @@ interface StorageInterface extends StorageReaderInterface, StorageWriterInterfac
      */
     public function getFileSystem(string $key): FilesystemOperator;
 
+    /**
+     * Get list of all mounted filesystems
+     *
+     * @return array
+     */
     public function getFileSystemsNames(): array;
 }

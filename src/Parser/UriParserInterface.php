@@ -10,6 +10,8 @@ use Spiral\StorageEngine\Parser\DTO\UriStructureInterface;
 interface UriParserInterface
 {
     /**
+     * Prepare uri structure object by provided filesystem name and filepath
+     *
      * @param string $fs
      * @param string $path
      *
@@ -18,6 +20,8 @@ interface UriParserInterface
     public function prepareUri(string $fs, string $path): UriStructureInterface;
 
     /**
+     * Parse uri to uri structure object
+     *
      * @param string $uri
      *
      * @return UriStructureInterface

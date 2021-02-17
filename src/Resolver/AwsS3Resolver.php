@@ -20,6 +20,9 @@ class AwsS3Resolver extends AbstractAdapterResolver
      */
     protected FileSystemInfoInterface $fsInfo;
 
+    /**
+     * @inheritDoc
+     */
     public function buildUrl(string $uri, array $options = []): ?string
     {
         $s3Client = $this->fsInfo->getClient();
@@ -30,7 +33,7 @@ class AwsS3Resolver extends AbstractAdapterResolver
                     'GetObject',
                     [
                         'Bucket' => $this->fsInfo->getOption(AwsS3Info::BUCKET_KEY),
-                        'Key' => $this->normalizeFilePathToUri($uri),
+                        'Key' => $this->normalizeFilePath($uri),
                     ]
                 ),
                 array_key_exists(static::EXPIRES_OPTION, $options)

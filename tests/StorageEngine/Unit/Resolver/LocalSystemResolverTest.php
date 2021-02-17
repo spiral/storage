@@ -31,7 +31,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage(
             \sprintf(
-                'Wrong file system info (`%s`) for resolver `%s`',
+                'Wrong filesystem info (`%s`) for resolver `%s`',
                 AwsS3Info::class,
                 LocalSystemResolver::class
             )
@@ -106,7 +106,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
         );
 
         $this->expectException(ResolveException::class);
-        $this->expectExceptionMessage('Url can\'t be built for file system `someBucket` - host was not defined');
+        $this->expectExceptionMessage('Url can\'t be built for filesystem `someBucket` - host was not defined');
 
         $resolver->buildUrl('file1.txt');
     }
@@ -132,7 +132,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
             $this->buildBucketNameByServer($server)
         );
 
-        $this->assertEquals($uri, $resolver->normalizeFilePathToUri($filePath));
+        $this->assertEquals($uri, $resolver->normalizeFilePath($filePath));
     }
 
     public function getFileUrlList(): array

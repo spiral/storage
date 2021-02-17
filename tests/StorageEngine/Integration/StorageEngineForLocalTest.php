@@ -97,7 +97,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $this->buildSimpleVfsStructure();
 
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('File system `other` was not identified');
+        $this->expectExceptionMessage('Filesystem `other` was not identified');
 
         $this->buildStorageForFs('local')->fileExists('other://' . static::ROOT_FILE_NAME);
     }

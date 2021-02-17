@@ -42,7 +42,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
             if (!is_string($fs) || empty($fs)) {
                 throw new MountException(
                     \sprintf(
-                        'File system `%s` can\'t be mounted - string required, %s received',
+                        'Filesystem `%s` can\'t be mounted - string required, %s received',
                         is_scalar($fs) && !empty($fs) ? $fs : '--non-displayable--',
                         empty($fs) ? 'empty val' : gettype($fs)
                     )
@@ -65,23 +65,128 @@ class StorageEngine implements StorageInterface, SingletonInterface
     {
         if (!$this->isFileSystemExists($key)) {
             throw new MountException(
-                \sprintf('File system `%s` was not identified', $key)
+                \sprintf('Filesystem `%s` was not identified', $key)
             );
         }
 
         return $this->fileSystems[$key];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getFileSystemsNames(): array
     {
         return array_keys($this->fileSystems);
     }
 
     /**
-     * @param string|null $uri
-     * @return string
-     *
-     * @throws StorageException
+     * @inheritDoc
+     */
+    public function fileExists(string $uri): bool
+    {
+        /** @var FilesystemOperator $filesystem */
+        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+
+        try {
+            return $filesystem->fileExists($path);
+        } catch (FilesystemException $e) {
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function read(string $uri): string
+    {
+        /** @var FilesystemOperator $filesystem */
+        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+
+        try {
+            return $filesystem->read($path);
+        } catch (FilesystemException $e) {
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function readStream(string $uri)
+    {
+        /** @var FilesystemOperator $filesystem */
+        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+
+        try {
+            return $filesystem->readStream($path);
+        } catch (FilesystemException $e) {
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function lastModified(string $uri): int
+    {
+        /** @var FilesystemOperator $filesystem */
+        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+
+        try {
+            return $filesystem->lastModified($path);
+        } catch (FilesystemException $e) {
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function fileSize(string $uri): int
+    {
+        /** @var FilesystemOperator $filesystem */
+        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+
+        try {
+            return $filesystem->fileSize($path);
+        } catch (FilesystemException $e) {
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function mimeType(string $uri): string
+    {
+        /** @var FilesystemOperator $filesystem */
+        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+
+        try {
+            return $filesystem->mimeType($path);
+        } catch (FilesystemException $e) {
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function visibility(string $uri): string
+    {
+        /** @var FilesystemOperator $filesystem */
+        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+
+        try {
+            return $filesystem->visibility($path);
+        } catch (FilesystemException $e) {
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @inheritDoc
      */
     public function tempFilename(string $uri = null): string
     {
@@ -108,147 +213,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
-     * @param string $uri
-     *
-     * @return bool
-     *
-     * @throws StorageException
-     */
-    public function fileExists(string $uri): bool
-    {
-        /** @var FilesystemOperator $filesystem */
-        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-
-        try {
-            return $filesystem->fileExists($path);
-        } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $uri
-     *
-     * @return string
-     *
-     * @throws StorageException
-     */
-    public function read(string $uri): string
-    {
-        /** @var FilesystemOperator $filesystem */
-        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-
-        try {
-            return $filesystem->read($path);
-        } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $uri
-     *
-     * @return resource
-     *
-     * @throws StorageException
-     */
-    public function readStream(string $uri)
-    {
-        /** @var FilesystemOperator $filesystem */
-        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-
-        try {
-            return $filesystem->readStream($path);
-        } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $uri
-     *
-     * @return int
-     *
-     * @throws StorageException
-     */
-    public function lastModified(string $uri): int
-    {
-        /** @var FilesystemOperator $filesystem */
-        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-
-        try {
-            return $filesystem->lastModified($path);
-        } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $uri
-     *
-     * @return int
-     *
-     * @throws StorageException
-     */
-    public function fileSize(string $uri): int
-    {
-        /** @var FilesystemOperator $filesystem */
-        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-
-        try {
-            return $filesystem->fileSize($path);
-        } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $uri
-     *
-     * @return string
-     *
-     * @throws StorageException
-     */
-    public function mimeType(string $uri): string
-    {
-        /** @var FilesystemOperator $filesystem */
-        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-
-        try {
-            return $filesystem->mimeType($path);
-        } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $uri
-     *
-     * @return string
-     *
-     * @throws StorageException
-     */
-    public function visibility(string $uri): string
-    {
-        /** @var FilesystemOperator $filesystem */
-        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-
-        try {
-            return $filesystem->visibility($path);
-        } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $fileSystem
-     * @param string $filePath
-     * @param string $content
-     * @param array $config
-     *
-     * @return string
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function write(string $fileSystem, string $filePath, string $content, array $config = []): string
     {
@@ -267,14 +232,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
-     * @param string $fileSystem
-     * @param string $filePath
-     * @param $content
-     * @param array $config
-     *
-     * @return string
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function writeStream(string $fileSystem, string $filePath, $content, array $config = []): string
     {
@@ -293,10 +251,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
-     * @param string $uri
-     * @param string $visibility
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function setVisibility(string $uri, string $visibility): void
     {
@@ -311,31 +266,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
-     * @param string $uri
-     *
-     * @throws StorageException
-     */
-    public function delete(string $uri): void
-    {
-        /** @var FilesystemOperator $filesystem */
-        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
-
-        try {
-            $filesystem->delete($path);
-        } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * @param string $sourceUri
-     * @param string $destinationFileSystem
-     * @param string|null $targetFilePath
-     * @param array $config
-     *
-     * @return string
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function move(
         string $sourceUri,
@@ -362,14 +293,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
-     * @param string $sourceUri
-     * @param string $destinationFileSystem
-     * @param string|null $targetFilePath
-     * @param array $config
-     *
-     * @return string
-     *
-     * @throws StorageException
+     * @inheritDoc
      */
     public function copy(
         string $sourceUri,
@@ -402,21 +326,56 @@ class StorageEngine implements StorageInterface, SingletonInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function delete(string $uri): void
+    {
+        /** @var FilesystemOperator $filesystem */
+        [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
+
+        try {
+            $filesystem->delete($path);
+        } catch (FilesystemException $e) {
+            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * Mount new filesystem in collection
+     * Key should be unique
+     *
+     * @param string $key
+     * @param FilesystemOperator $filesystem
+     *
+     * @throws MountException
+     */
     protected function mountFilesystem(string $key, FilesystemOperator $filesystem): void
     {
         if ($this->isFileSystemExists($key)) {
-            return;
+            throw new MountException(
+                \sprintf('Filesystem %s is already mounted', $key)
+            );
         }
 
         $this->fileSystems[$key] = $filesystem;
     }
 
+    /**
+     * Check if filesystem was mounted
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     protected function isFileSystemExists(string $key): bool
     {
         return array_key_exists($key, $this->fileSystems);
     }
 
     /**
+     * Identify used filesystem key and filepath by provided uri
+     *
      * @param string $uri
      *
      * @return array{0:FilesystemOperator, 1:string}
@@ -432,6 +391,8 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
+     * Copy file in one filesystem
+     *
      * @param FilesystemOperator $sourceFilesystem
      * @param string $sourcePath
      * @param string $destinationPath
@@ -449,6 +410,8 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
+     * Copy file across different filesystems
+     *
      * @param string|null $visibility
      * @param FilesystemOperator $sourceFilesystem
      * @param string $sourcePath
@@ -478,6 +441,8 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
+     * Move file in one filesystem
+     *
      * @param FilesystemOperator $sourceFilesystem
      * @param string $sourcePath
      * @param string $destinationPath
@@ -499,6 +464,8 @@ class StorageEngine implements StorageInterface, SingletonInterface
     }
 
     /**
+     * Move file across different filesystems
+     *
      * @param string $sourceUri
      * @param string $destinationFileSystem
      * @param string|null $targetFilePath

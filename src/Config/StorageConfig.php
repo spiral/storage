@@ -26,16 +26,16 @@ class StorageConfig extends InjectableConfig
     ];
 
     /**
-     * @var FileSystemInfo\FileSystemInfoInterface[]
+     * Internal list allows to keep once built filesystems info
      *
-     * Internal list allows to keep once built file systems info
+     * @var FileSystemInfo\FileSystemInfoInterface[]
      */
     protected array $fileSystemsInfoList = [];
 
     /**
-     * @var BucketInfoInterface[]
-     *
      * Internal list allows to keep once built buckets info
+     *
+     * @var BucketInfoInterface[]
      */
     protected array $bucketsInfoList = [];
 
@@ -87,6 +87,11 @@ class StorageConfig extends InjectableConfig
         parent::__construct($config);
     }
 
+    /**
+     * Get all defined servers keys
+     *
+     * @return string[]
+     */
     public function getServersKeys(): array
     {
         return array_key_exists(static::SERVERS_KEY, $this->config)
@@ -94,12 +99,24 @@ class StorageConfig extends InjectableConfig
             : [];
     }
 
+    /**
+     * Check if server was defined
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function hasServer(string $key): bool
     {
         return array_key_exists($key, $this->config[static::SERVERS_KEY])
             && is_array($this->config[static::SERVERS_KEY][$key]);
     }
 
+    /**
+     * Get all defined buckets keys
+     *
+     * @return string[]
+     */
     public function getBucketsKeys(): array
     {
         return array_key_exists(static::BUCKETS_KEY, $this->config)
@@ -107,12 +124,25 @@ class StorageConfig extends InjectableConfig
             : [];
     }
 
+    /**
+     * Check if bucket was defined
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function hasBucket(string $key): bool
     {
         return array_key_exists($key, $this->config[static::BUCKETS_KEY])
             && is_array($this->config[static::BUCKETS_KEY][$key]);
     }
 
+    /**
+     * Get defined temp directory
+     * System temp directory by default
+     *
+     * @return string
+     */
     public function getTmpDir(): string
     {
         return array_key_exists(static::TMP_DIR_KEY, $this->config)
@@ -121,8 +151,8 @@ class StorageConfig extends InjectableConfig
     }
 
     /**
-     * Build file system info by provided fs (bucket) label
-     * Force mode allows to rebuild fs info for internal file systems info list
+     * Build filesystem info by provided fs (bucket) label
+     * Force mode allows to rebuild fs info for internal filesystems info list
      *
      * @param string $fs
      * @param bool|null $force
@@ -148,7 +178,7 @@ class StorageConfig extends InjectableConfig
         if (!$this->hasServer($bucketInfo->getServer())) {
             throw new ConfigException(
                 \sprintf(
-                    'Server `%s` info for file system `%s` was not detected',
+                    'Server `%s` info for filesystem `%s` was not detected',
                     $bucketInfo->getServer(),
                     $fs
                 )
@@ -176,7 +206,7 @@ class StorageConfig extends InjectableConfig
                 break;
             default:
                 throw new ConfigException(
-                    \sprintf('Adapter can\'t be identified for file system `%s`', $fs)
+                    \sprintf('Adapter can\'t be identified for filesystem `%s`', $fs)
                 );
         }
 
@@ -220,6 +250,13 @@ class StorageConfig extends InjectableConfig
         return $this->bucketsInfoList[$bucketLabel];
     }
 
+    /**
+     * Extract server adapter class from server description
+     *
+     * @param array $serverInfo
+     *
+     * @return string|null
+     */
     private function extractServerAdapter(array $serverInfo): ?string
     {
         return $serverInfo[FileSystemInfo\FileSystemInfoInterface::ADAPTER_KEY] ?? null;

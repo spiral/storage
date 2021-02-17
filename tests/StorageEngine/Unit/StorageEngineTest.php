@@ -94,7 +94,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
 
         $this->expectException(MountException::class);
         $this->expectExceptionMessage(
-            'File system `--non-displayable--` can\'t be mounted - string required, empty val received'
+            'Filesystem `--non-displayable--` can\'t be mounted - string required, empty val received'
         );
 
         new StorageEngine($config, $this->getUriParser());
@@ -161,7 +161,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
     public function testGetMissedFileSystem(): void
     {
         $this->expectException(MountException::class);
-        $this->expectExceptionMessage('File system `missed` was not identified');
+        $this->expectExceptionMessage('Filesystem `missed` was not identified');
 
         $this->storage->getFileSystem('missed');
     }
@@ -189,6 +189,11 @@ class StorageEngineTest extends StorageEngineAbstractTest
             AdapterFactory::build(
                 $this->buildLocalInfo(FsTestInterface::SERVER_NAME, false)
             )
+        );
+
+        $this->expectException(MountException::class);
+        $this->expectExceptionMessage(
+            \sprintf('Filesystem %s is already mounted', $bucket)
         );
 
         $this->mountStorageEngineFileSystem($this->storage, $bucket, $newFileSystem);
@@ -224,7 +229,7 @@ class StorageEngineTest extends StorageEngineAbstractTest
     public function testDetermineFilesystemAndPathUnknownFs(): void
     {
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('File system `missed` was not identified');
+        $this->expectExceptionMessage('Filesystem `missed` was not identified');
 
         $this->callNotPublicMethod($this->storage, 'determineFilesystemAndPath', ['missed://file.txt']);
     }

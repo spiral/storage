@@ -184,7 +184,7 @@ class AwsS3InfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            'Option `visibility` defined in wrong format for file system `some`, array expected'
+            'Option `visibility` defined in wrong format for filesystem `some`, array expected'
         );
 
         new AwsS3Info(
@@ -233,7 +233,7 @@ class AwsS3InfoTest extends AbstractUnitTest
     {
         $this->expectException(ConfigException::class);
         $this->expectExceptionMessage(
-            'Option `path-prefix` defined in wrong format for file system `some`, string expected'
+            'Option `path-prefix` defined in wrong format for filesystem `some`, string expected'
         );
 
         new AwsS3Info(
@@ -285,7 +285,7 @@ class AwsS3InfoTest extends AbstractUnitTest
     public function getWrongUrlExpiresList(): array
     {
         $fsName = FsTestInterface::SERVER_NAME;
-        $errorMsgPrefix = 'Url expires should be string or DateTimeInterface implemented object for file system ';
+        $errorMsgPrefix = 'Url expires should be string or DateTimeInterface implemented object for filesystem ';
 
         return [
             [
@@ -314,17 +314,17 @@ class AwsS3InfoTest extends AbstractUnitTest
             [
                 $fsName,
                 [],
-                \sprintf('Option `bucket` not detected for file system `%s`', $fsName),
+                \sprintf('Option `bucket` not detected for filesystem `%s`', $fsName),
             ],
             [
                 $fsName,
                 [AwsS3Info::CLIENT_KEY => 'client'],
-                \sprintf('Option `bucket` not detected for file system `%s`', $fsName),
+                \sprintf('Option `bucket` not detected for filesystem `%s`', $fsName),
             ],
             [
                 'some',
                 [AwsS3Info::BUCKET_KEY => 'someBucket'],
-                'Option `client` not detected for file system `some`',
+                'Option `client` not detected for filesystem `some`',
             ],
         ];
     }

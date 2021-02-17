@@ -15,6 +15,9 @@ class AwsS3Builder extends AbstractBuilder
 {
     protected const FILE_SYSTEM_INFO_CLASS = AwsS3Info::class;
 
+    /**
+     * @inheritDoc
+     */
     public function buildSimple(): FilesystemAdapter
     {
         $adapterClass = $this->fsInfo->getAdapterClass();
@@ -25,6 +28,9 @@ class AwsS3Builder extends AbstractBuilder
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function buildAdvanced(): FilesystemAdapter
     {
         $adapterClass = $this->fsInfo->getAdapterClass();

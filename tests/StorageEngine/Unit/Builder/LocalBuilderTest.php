@@ -18,7 +18,7 @@ class LocalBuilderTest extends AbstractUnitTest
     {
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage(
-            \sprintf('Wrong file system info `%s` provided for `%s`', AwsS3Info::class, LocalBuilder::class)
+            \sprintf('Wrong filesystem info `%s` provided for `%s`', AwsS3Info::class, LocalBuilder::class)
         );
 
         new LocalBuilder($this->buildAwsS3Info());

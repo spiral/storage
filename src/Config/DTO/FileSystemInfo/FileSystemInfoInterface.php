@@ -13,15 +13,24 @@ interface FileSystemInfoInterface
     public const VISIBILITY_KEY = 'visibility';
 
     /**
+     * Get used adapter class
+     *
      * @return string
      */
     public function getAdapterClass(): string;
 
     /**
+     * Get used resolver class
+     *
      * @return string
      */
     public function getResolverClass(): string;
 
+    /**
+     * Get filesystem name
+     *
+     * @return string
+     */
     public function getName(): string;
 
     /**

@@ -9,12 +9,16 @@ use Spiral\StorageEngine\Exception\StorageException;
 
 abstract class AbstractBuilder implements AdapterBuilderInterface
 {
+    /**
+     * Filesystem info class required for builder
+     */
     protected const FILE_SYSTEM_INFO_CLASS = '';
 
     protected FileSystemInfoInterface $fsInfo;
 
     /**
      * @param FileSystemInfoInterface $fsInfo
+     *
      * @throws StorageException
      */
     public function __construct(FileSystemInfoInterface $fsInfo)
@@ -23,7 +27,7 @@ abstract class AbstractBuilder implements AdapterBuilderInterface
 
         if (empty($requiredClass) || !$fsInfo instanceof $requiredClass) {
             throw new StorageException(
-                \sprintf('Wrong file system info `%s` provided for `%s`', get_class($fsInfo), static::class)
+                \sprintf('Wrong filesystem info `%s` provided for `%s`', get_class($fsInfo), static::class)
             );
         }
 
