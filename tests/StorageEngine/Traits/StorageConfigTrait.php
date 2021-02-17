@@ -13,6 +13,9 @@ use Spiral\StorageEngine\Tests\Interfaces\FsTestInterface;
 trait StorageConfigTrait
 {
     /**
+     * Build storage config by provided servers and buckets
+     * If no buckets were defined it will be built for each defined server
+     *
      * @param array|null $servers
      * @param array|null $buckets
      *

@@ -63,18 +63,12 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $fs1 = $this->buildBucketNameByServer($local1Name);
         $fs2 = $this->buildBucketNameByServer($local2Name);
 
-        $fsList = [$fs1, $fs2];
+        $fsList = [$this->buildBucketNameByServer($local1Name), $this->buildBucketNameByServer($local2Name)];
 
-        $storageConfig = new StorageConfig(
+        $storageConfig = $this->buildStorageConfig(
             [
-                'servers' => [
-                    $local1Name => $this->buildLocalInfoDescription(),
-                    $local2Name => $this->buildLocalInfoDescription(),
-                ],
-                'buckets' => [
-                    $fs1 => $this->buildServerBucketInfoDesc($local1Name),
-                    $fs2 => $this->buildServerBucketInfoDesc($local2Name),
-                ],
+                $local1Name => $this->buildLocalInfoDescription(),
+                $local2Name => $this->buildLocalInfoDescription(),
             ]
         );
 
@@ -114,19 +108,12 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $local1Name = 'local1';
         $local2Name = 'local2';
 
-        $fs1 = $this->buildBucketNameByServer($local1Name);
-        $fs2 = $this->buildBucketNameByServer($local2Name);
-
-        $fsList = [$fs1, $fs2];
+        $fsList = [$this->buildBucketNameByServer($local1Name), $this->buildBucketNameByServer($local2Name)];
 
         $storageConfig = $this->buildStorageConfig(
             [
                 $local1Name => $this->buildLocalInfoDescription(),
                 $local2Name => $this->buildLocalInfoDescription(),
-            ],
-            [
-                $fs1 => $this->buildServerBucketInfoDesc($local1Name),
-                $fs2 => $this->buildServerBucketInfoDesc($local2Name),
             ]
         );
 
@@ -210,41 +197,6 @@ class StorageEngineTest extends StorageEngineAbstractTest
     }
 
     /**
-     * @dataProvider getWrongFileSystemsList
-     *
-     * @param array $servers
-     * @param string $expectedException
-     * @param string $expectedMsg
-     *
-     * @throws StorageException
-     * @throws ConfigException
-     */
-    /*public function testMountWrongFileSystemsThrowsException(
-        array $servers,
-        string $expectedException,
-        string $expectedMsg
-    ): void {
-        $this->expectException($expectedException);
-        $this->expectExceptionMessage($expectedMsg);
-
-        $buckets = [];
-
-        foreach ($servers as $server => $serverInfo) {
-            $buckets[$this->buildBucketNameByServer($server)] = [
-                'server' => $server,
-                'directory' => '',
-            ];
-        }
-
-        $storageConfig = new StorageConfig([
-            'servers' => $servers,
-            'buckets' => $buckets,
-        ]);
-
-        new StorageEngine($storageConfig, $this->getUriParser());
-    }*/
-
-    /**
      * @dataProvider getUrisInfoToDetermine
      *
      * @param StorageEngine $storage
@@ -302,16 +254,10 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $local2Name = 'local2';
         $local2Fs = new Filesystem(AdapterFactory::build($this->buildLocalInfo($local2Name)));
 
-        $storageConfig = new StorageConfig(
+        $storageConfig = $this->buildStorageConfig(
             [
-                'servers' => [
-                    $localName => $this->buildLocalInfoDescription(),
-                    $local2Name => $this->buildLocalInfoDescription(),
-                ],
-                'buckets' => [
-                    $this->buildBucketNameByServer($localName) => $this->buildServerBucketInfoDesc($localName),
-                    $this->buildBucketNameByServer($local2Name) => $this->buildServerBucketInfoDesc($local2Name),
-                ],
+                $localName => $this->buildLocalInfoDescription(),
+                $local2Name => $this->buildLocalInfoDescription(),
             ]
         );
 
@@ -332,46 +278,4 @@ class StorageEngineTest extends StorageEngineAbstractTest
             ]
         ];
     }
-
-    /*public function getWrongFileSystemsList(): array
-    {
-        $local2Name = 'local2';
-        $localFsDesc = $this->buildLocalInfoDescription();
-
-        $dateTime = new \DateTimeImmutable();
-
-        return [
-            [
-                [
-                    5 => $localFsDesc,
-                ],
-                MountException::class,
-                \sprintf(
-                    'File system `%s` can\'t be mounted - string required, %s received',
-                    5,
-                    gettype(5)
-                )
-            ],
-            [
-                [
-                    'local' => $localFsDesc,
-                    null => $localFsDesc,
-                ],
-                MountException::class,
-                'File system --non-displayable-- can\'t be mounted - string required, empty val received',
-            ],
-            [
-                [
-                    'local' => $localFsDesc,
-                    $local2Name => $dateTime,
-                ],
-                ConfigException::class,
-                \sprintf(
-                    'File system info for `%s` was provided in wrong format, array expected, %s received',
-                    $local2Name,
-                    gettype($dateTime)
-                ),
-            ],
-        ];
-    }*/
 }
