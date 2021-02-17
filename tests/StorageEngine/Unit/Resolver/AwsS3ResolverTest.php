@@ -44,13 +44,9 @@ class AwsS3ResolverTest extends AbstractUnitTest
                 [
                     $localServer => $this->buildLocalInfoDescription(),
                     $awsServer => $this->buildAwsS3ServerDescription(),
-                ],
-                [
-                    'localBucket' => $this->buildServerBucketInfoDesc($localServer),
-                    'awsBucket' => $this->buildServerBucketInfoDesc($awsServer),
                 ]
             ),
-            'localBucket'
+            $this->buildBucketNameByServer($localServer)
         );
     }
 

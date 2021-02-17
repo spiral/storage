@@ -42,12 +42,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $this->buildSimpleVfsStructure();
 
         $engine = new StorageEngine(
-            new StorageConfig(
-                [
-                    'servers' => ['local' => $this->buildLocalInfoDescription(true)],
-                    'buckets' => ['localB' => $this->buildServerBucketInfoDesc('local')],
-                ]
-            ),
+            $this->buildStorageConfig(['local' => $this->buildLocalInfoDescription(true)]),
             $this->getUriParser()
         );
 
@@ -62,12 +57,7 @@ class StorageEngineForLocalTest extends AbstractTest
         $this->buildSimpleVfsStructure();
 
         $engine = new StorageEngine(
-            new StorageConfig(
-                [
-                    'servers' => ['local' => $this->buildLocalInfoDescription(true)],
-                    'buckets' => ['localBucket' => $this->buildServerBucketInfoDesc('local')],
-                ]
-            ),
+            $this->buildStorageConfig(['local' => $this->buildLocalInfoDescription(true)]),
             $this->getUriParser()
         );
 
@@ -334,14 +324,7 @@ class StorageEngineForLocalTest extends AbstractTest
     private function buildStorageForFs(string $name): StorageEngine
     {
         return new StorageEngine(
-            new StorageConfig(
-                [
-                    'servers' => [$name => $this->buildLocalInfoDescription(true)],
-                    'buckets' => [
-                        $this->buildBucketNameByServer($name) => $this->buildServerBucketInfoDesc($name)
-                    ],
-                ]
-            ),
+            $this->buildStorageConfig([$name => $this->buildLocalInfoDescription(true)]),
             $this->getUriParser()
         );
     }

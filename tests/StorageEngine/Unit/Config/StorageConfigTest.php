@@ -80,9 +80,13 @@ class StorageConfigTest extends AbstractUnitTest
     public function testBuildFsInfo(string $serverName, array $serverDescription, string $class): void
     {
         $bucketName = $this->buildBucketNameByServer($serverName);
-        $config = $this->buildStorageConfig(
-            [$serverName => $serverDescription],
-            [$bucketName => $this->buildServerBucketInfoDesc($serverName)],
+        $config = new StorageConfig(
+            [
+                'servers' => [$serverName => $serverDescription],
+                'buckets' => [
+                    $this->buildBucketNameByServer($serverName) => $this->buildServerBucketInfoDesc($serverName),
+                ]
+            ]
         );
 
         /** @var FileSystemInfo\FileSystemInfoInterface|FileSystemInfo\OptionsBasedInterface $fs */
@@ -105,17 +109,21 @@ class StorageConfigTest extends AbstractUnitTest
 
         $bucket = $this->buildBucketNameByServer($localServer);
 
-        $config = $this->buildStorageConfig(
+        $config = new StorageConfig(
             [
-                $localServer => [
-                    FileSystemInfo\LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    FileSystemInfo\LocalInfo::OPTIONS_KEY => [
-                        FileSystemInfo\LocalInfo::ROOT_DIR_KEY => $rootDir,
-                        FileSystemInfo\LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
+                'servers' => [
+                    $localServer => [
+                        FileSystemInfo\LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                        FileSystemInfo\LocalInfo::OPTIONS_KEY => [
+                            FileSystemInfo\LocalInfo::ROOT_DIR_KEY => $rootDir,
+                            FileSystemInfo\LocalInfo::HOST_KEY => FsTestInterface::CONFIG_HOST,
+                        ],
                     ],
                 ],
-            ],
-            [$bucket => $this->buildServerBucketInfoDesc($localServer)]
+                'buckets' => [
+                    $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
+                ]
+            ]
         );
 
         $fsInfo = $config->buildFileSystemInfo($bucket);
@@ -132,11 +140,16 @@ class StorageConfigTest extends AbstractUnitTest
         $localServer = 'local';
         $anotherFs = 'anotherBucket';
 
-        $config = $this->buildStorageConfig(
+        $config = new StorageConfig(
             [
-                $localServer => [
-                    FileSystemInfo\FileSystemInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                'servers' => [
+                    $localServer => [
+                        FileSystemInfo\FileSystemInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                    ],
                 ],
+                'buckets' => [
+                    $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
+                ]
             ]
         );
 
@@ -159,9 +172,12 @@ class StorageConfigTest extends AbstractUnitTest
         $serverName = 'local';
 
         $bucketName = $this->buildBucketNameByServer($serverName);
-        $config = $this->buildStorageConfig(
-            [$serverName => $this->buildLocalInfoDescription()],
-            [$bucketName => $this->buildServerBucketInfoDesc('missedServer')],
+
+        $config = new StorageConfig(
+            [
+                'servers' => [$serverName => $this->buildLocalInfoDescription()],
+                'buckets' => [$bucketName => $this->buildServerBucketInfoDesc('missedServer')],
+            ]
         );
 
         $this->expectException(ConfigException::class);
@@ -179,13 +195,15 @@ class StorageConfigTest extends AbstractUnitTest
         $serverName = 'another';
         $bucket = 'anotherBucket';
 
-        $config = $this->buildStorageConfig(
+        $config = new StorageConfig(
             [
-                $serverName => [
-                    FileSystemInfo\FileSystemInfoInterface::ADAPTER_KEY => \DateTime::class,
+                'servers' => [
+                    $serverName => [
+                        FileSystemInfo\FileSystemInfoInterface::ADAPTER_KEY => \DateTime::class,
+                    ],
                 ],
-            ],
-            [$bucket => $this->buildServerBucketInfoDesc($serverName)]
+                'buckets' => [$bucket => $this->buildServerBucketInfoDesc($serverName)]
+            ]
         );
 
         $this->expectException(ConfigException::class);
@@ -199,14 +217,23 @@ class StorageConfigTest extends AbstractUnitTest
      */
     public function testGetServersKeys(): void
     {
-        $servers = [
-            'local' => [],
-            'aws' => [],
-        ];
+        $localServer = 'local';
+        $awsServer = 'aws';
 
-        $config = $this->buildStorageConfig($servers);
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    $localServer => $this->buildLocalInfoDescription(),
+                    $awsServer => $this->buildAwsS3ServerDescription(),
+                ],
+                'buckets' => [
+                    $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
+                    $this->buildBucketNameByServer($awsServer) => $this->buildServerBucketInfoDesc($awsServer),
+                ]
+            ]
+        );
 
-        $this->assertEquals(array_keys($servers), $config->getServersKeys());
+        $this->assertEquals([$localServer, $awsServer], $config->getServersKeys());
     }
 
     /**
@@ -214,16 +241,24 @@ class StorageConfigTest extends AbstractUnitTest
      */
     public function testGetBucketsKeys(): void
     {
-        $buckets = ['b1' => [], 'b2' => []];
+        $localServer = 'local';
 
         $config = new StorageConfig(
             [
-                'servers' => ['local' => []],
-                'buckets' => $buckets,
+                'servers' => [
+                    $localServer => $this->buildLocalInfoDescription(),
+                ],
+                'buckets' => [
+                    'b1' => $this->buildServerBucketInfoDesc($localServer),
+                    'b2' => [
+                        'server' => $localServer,
+                        'directory' => 'tmp/specDir/',
+                    ],
+                ],
             ]
         );
 
-        $this->assertEquals(array_keys($buckets), $config->getBucketsKeys());
+        $this->assertEquals(['b1', 'b2'], $config->getBucketsKeys());
     }
 
     /**
@@ -233,7 +268,16 @@ class StorageConfigTest extends AbstractUnitTest
     {
         $localServer = 'local';
 
-        $config = $this->buildStorageConfig([$localServer => $this->buildLocalInfoDescription()]);
+        $config = new StorageConfig(
+            [
+                'servers' => [
+                    $localServer => $this->buildLocalInfoDescription(),
+                ],
+                'buckets' => [
+                    $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
+                ],
+            ]
+        );
 
         $this->assertTrue($config->hasServer($localServer));
         $this->assertFalse($config->hasServer('missing'));
@@ -244,7 +288,18 @@ class StorageConfigTest extends AbstractUnitTest
      */
     public function testGetTmpDir(): void
     {
-        $configBasic = $this->buildStorageConfig(['local' => $this->buildLocalInfoDescription()]);
+        $localServer = 'local';
+
+        $configBasic = new StorageConfig(
+            [
+                'servers' => [
+                    $localServer => $this->buildLocalInfoDescription(),
+                ],
+                'buckets' => [
+                    $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
+                ],
+            ]
+        );
 
         $this->assertEquals(sys_get_temp_dir(), $configBasic->getTmpDir());
 

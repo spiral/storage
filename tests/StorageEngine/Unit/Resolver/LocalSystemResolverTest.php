@@ -26,6 +26,8 @@ class LocalSystemResolverTest extends AbstractUnitTest
      */
     public function testWrongFsInfo(): void
     {
+        $server = 'aws';
+
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage(
             \sprintf(
@@ -38,10 +40,9 @@ class LocalSystemResolverTest extends AbstractUnitTest
         new LocalSystemResolver(
             $this->getUriParser(),
             $this->buildStorageConfig(
-                ['aws' => $this->buildAwsS3ServerDescription()],
-                ['awsBucket' => $this->buildServerBucketInfoDesc('aws')]
+                [$server => $this->buildAwsS3ServerDescription()]
             ),
-            'awsBucket'
+            $this->buildBucketNameByServer($server)
         );
     }
 
@@ -74,8 +75,7 @@ class LocalSystemResolverTest extends AbstractUnitTest
                             LocalInfo::HOST_KEY => $host,
                         ],
                     ],
-                ],
-                [$this->buildBucketNameByServer($serverName) => $this->buildServerBucketInfoDesc($serverName)]
+                ]
             ),
             $this->buildBucketNameByServer($serverName)
         );
@@ -100,9 +100,6 @@ class LocalSystemResolverTest extends AbstractUnitTest
                             LocalInfo::ROOT_DIR_KEY => 'rootDir',
                         ],
                     ]
-                ],
-                [
-                    $this->buildBucketNameByServer($server) => $this->buildServerBucketInfoDesc($server)
                 ]
             ),
             $this->buildBucketNameByServer($server)
@@ -124,15 +121,15 @@ class LocalSystemResolverTest extends AbstractUnitTest
      */
     public function testNormalizePathForServer(string $filePath, string $uri): void
     {
+        $server = 'local';
         $resolver = new LocalSystemResolver(
             $this->getUriParser(),
             $this->buildStorageConfig(
                 [
-                    'local' => $this->buildLocalInfoDescription(),
-                ],
-                ['localBucket' => $this->buildServerBucketInfoDesc('local')]
+                    $server => $this->buildLocalInfoDescription(),
+                ]
             ),
-            'localBucket'
+            $this->buildBucketNameByServer($server)
         );
 
         $this->assertEquals($uri, $resolver->normalizeFilePathToUri($filePath));

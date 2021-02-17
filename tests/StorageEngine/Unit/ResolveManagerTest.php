@@ -64,7 +64,7 @@ class ResolveManagerTest extends AbstractUnitTest
 
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig(
-                [$server => $this->buildLocalInfoDescription()],
+                [$server => $this->buildLocalInfoDescription()]
             ),
             $this->getUriParser()
         );
@@ -98,11 +98,7 @@ class ResolveManagerTest extends AbstractUnitTest
                 [
                     $localServer => $this->buildLocalInfoDescription(),
                     $awsServer => $this->buildAwsS3ServerDescription(),
-                ],
-                [
-                    'localBucket' => $this->buildServerBucketInfoDesc($localServer),
-                    'awsBucket' => $this->buildServerBucketInfoDesc($awsServer),
-                ],
+                ]
             ),
             $this->getUriParser()
         );
@@ -133,14 +129,6 @@ class ResolveManagerTest extends AbstractUnitTest
                             FileSystemInfo\LocalInfo::HOST_KEY => static::LOCAL_SERVER_HOST_2,
                         ],
                     ],
-                ],
-                [
-                    $this->buildBucketNameByServer(static::LOCAL_SERVER_1) => $this->buildServerBucketInfoDesc(
-                        static::LOCAL_SERVER_1
-                    ),
-                    $this->buildBucketNameByServer(static::LOCAL_SERVER_2) => $this->buildServerBucketInfoDesc(
-                        static::LOCAL_SERVER_2
-                    ),
                 ]
             ),
             $this->getUriParser()
@@ -160,7 +148,7 @@ class ResolveManagerTest extends AbstractUnitTest
     {
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig(
-                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()],
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
             ),
             $this->getUriParser()
         );
@@ -179,7 +167,7 @@ class ResolveManagerTest extends AbstractUnitTest
 
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig(
-                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()],
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
             ),
             $this->getUriParser()
         );
@@ -224,7 +212,7 @@ class ResolveManagerTest extends AbstractUnitTest
     {
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig(
-                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()],
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
             ),
             $this->getUriParser()
         );
@@ -239,7 +227,7 @@ class ResolveManagerTest extends AbstractUnitTest
     {
         $resolveManager = new ResolveManager(
             $this->buildStorageConfig(
-                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()],
+                [static::LOCAL_SERVER_1 => $this->buildLocalInfoDescription()]
             ),
             $this->getUriParser()
         );
