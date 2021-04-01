@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO;
+namespace Spiral\Storage\Config\DTO;
 
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\OptionsBasedInterface;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\Storage\Config\DTO\FileSystemInfo\OptionsBasedInterface;
 
 interface BucketInfoInterface extends OptionsBasedInterface
 {

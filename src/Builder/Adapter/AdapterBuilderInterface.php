@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Builder\Adapter;
+namespace Spiral\Storage\Builder\Adapter;
 
 use League\Flysystem\FilesystemAdapter;
 

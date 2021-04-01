@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config;
+namespace Spiral\Storage\Config;
 
-use Spiral\StorageEngine\Exception\ConfigException;
+use Spiral\Storage\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
-use Spiral\StorageEngine\Config\DTO\BucketInfo;
-use Spiral\StorageEngine\Config\DTO\BucketInfoInterface;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo;
-use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\Storage\Config\DTO\BucketInfo;
+use Spiral\Storage\Config\DTO\BucketInfoInterface;
+use Spiral\Storage\Config\DTO\FileSystemInfo;
+use Spiral\Storage\Exception\StorageException;
 
 class StorageConfig extends InjectableConfig
 {

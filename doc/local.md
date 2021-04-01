@@ -15,7 +15,7 @@ Any of the additional options can be used to configure specific params
 - `write-flags` - write flags. LOCK_EX by default.
 - `link-handling` - How to deal with links, either LocalFilesystemAdapter::DISALLOW_LINKS or LocalFilesystemAdapter::SKIP_LINKS
   * Disallowing them causes exceptions when encountered
-- `resolver` - specific adapter resolver for handling url. Resolver must implements `\Spiral\StorageEngine\Resolver\AdapterResolverInterface`
+- `resolver` - specific adapter resolver for handling url. Resolver must implements `\Spiral\Storage\Resolver\AdapterResolverInterface`
 
 ### Example config file for basic usage
 ```php

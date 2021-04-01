@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Builder\Adapter;
+namespace Spiral\Storage\Builder\Adapter;
 
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\LocalInfo;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\Storage\Config\DTO\FileSystemInfo\LocalInfo;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 
 /**
  * @property FileSystemInfoInterface|LocalInfo $fsInfo

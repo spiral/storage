@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Builder;
+namespace Spiral\Storage\Builder;
 
 use League\Flysystem\FilesystemAdapter;
-use Spiral\StorageEngine\Builder\Adapter as AdapterBuilder;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo;
-use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\Storage\Builder\Adapter as AdapterBuilder;
+use Spiral\Storage\Config\DTO\FileSystemInfo;
+use Spiral\Storage\Exception\StorageException;
 
 class AdapterFactory
 {

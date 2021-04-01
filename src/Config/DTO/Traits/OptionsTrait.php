@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\Traits;
+namespace Spiral\Storage\Config\DTO\Traits;
 
-use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\OptionsBasedInterface;
+use Spiral\Storage\Exception\ConfigException;
+use Spiral\Storage\Config\DTO\FileSystemInfo\OptionsBasedInterface;
 
 /**
  * Trait based on usage options array

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine;
+namespace Spiral\Storage;
 
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Spiral\Core\Container\SingletonInterface;
-use Spiral\StorageEngine\Builder\AdapterFactory;
-use Spiral\StorageEngine\Config\StorageConfig;
-use Spiral\StorageEngine\Exception\FileOperationException;
-use Spiral\StorageEngine\Exception\MountException;
-use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Exception\UriException;
-use Spiral\StorageEngine\Parser\UriParserInterface;
+use Spiral\Storage\Builder\AdapterFactory;
+use Spiral\Storage\Config\StorageConfig;
+use Spiral\Storage\Exception\FileOperationException;
+use Spiral\Storage\Exception\MountException;
+use Spiral\Storage\Exception\StorageException;
+use Spiral\Storage\Exception\UriException;
+use Spiral\Storage\Parser\UriParserInterface;
 
 class StorageEngine implements StorageInterface, SingletonInterface
 {

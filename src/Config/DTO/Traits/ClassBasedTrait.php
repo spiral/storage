@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\Traits;
+namespace Spiral\Storage\Config\DTO\Traits;
 
-use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\Storage\Exception\StorageException;
 
 /**
  * Trait for dto based on class usage

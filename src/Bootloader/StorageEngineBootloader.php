@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Bootloader;
+namespace Spiral\Storage\Bootloader;
 
 use Spiral\Boot\Bootloader\Bootloader;
-use Spiral\StorageEngine\Parser\UriParser;
-use Spiral\StorageEngine\Parser\UriParserInterface;
-use Spiral\StorageEngine\ResolveManager;
-use Spiral\StorageEngine\ResolveManagerInterface;
-use Spiral\StorageEngine\StorageEngine;
-use Spiral\StorageEngine\StorageInterface;
+use Spiral\Storage\Parser\UriParser;
+use Spiral\Storage\Parser\UriParserInterface;
+use Spiral\Storage\ResolveManager;
+use Spiral\Storage\ResolveManagerInterface;
+use Spiral\Storage\StorageEngine;
+use Spiral\Storage\StorageInterface;
 
 class StorageEngineBootloader extends Bootloader
 {

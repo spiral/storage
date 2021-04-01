@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine;
+namespace Spiral\Storage;
 
-use Spiral\StorageEngine\Exception\ResolveException;
-use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\Storage\Exception\ResolveException;
+use Spiral\Storage\Exception\StorageException;
 
 interface ResolveManagerInterface
 {

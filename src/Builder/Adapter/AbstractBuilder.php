@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Builder\Adapter;
+namespace Spiral\Storage\Builder\Adapter;
 
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
-use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\Storage\Exception\StorageException;
 
 abstract class AbstractBuilder implements AdapterBuilderInterface
 {

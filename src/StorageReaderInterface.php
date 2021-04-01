@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine;
+namespace Spiral\Storage;
 
-use Spiral\StorageEngine\Exception\FileOperationException;
-use Spiral\StorageEngine\Exception\MountException;
-use Spiral\StorageEngine\Exception\UriException;
+use Spiral\Storage\Exception\FileOperationException;
+use Spiral\Storage\Exception\MountException;
+use Spiral\Storage\Exception\UriException;
 
 interface StorageReaderInterface
 {

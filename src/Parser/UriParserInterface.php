@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Parser;
+namespace Spiral\Storage\Parser;
 
-use Spiral\StorageEngine\Exception\UriException;
-use Spiral\StorageEngine\Parser\DTO\UriStructureInterface;
+use Spiral\Storage\Exception\UriException;
+use Spiral\Storage\Parser\DTO\UriStructureInterface;
 
 interface UriParserInterface
 {

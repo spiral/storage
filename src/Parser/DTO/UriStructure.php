@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Parser\DTO;
+namespace Spiral\Storage\Parser\DTO;
 
 class UriStructure implements UriStructureInterface
 {

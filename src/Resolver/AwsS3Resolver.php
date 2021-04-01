@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\Storage\Resolver;
 
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\Storage\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 
 class AwsS3Resolver extends AbstractAdapterResolver
 {

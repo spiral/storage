@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\Storage\Resolver;
 
-use Spiral\StorageEngine\Exception\StorageException;
+use Spiral\Storage\Exception\StorageException;
 
 interface AdapterResolverInterface
 {

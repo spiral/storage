@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine;
+namespace Spiral\Storage;
 
 use League\Flysystem\FilesystemOperator;
-use Spiral\StorageEngine\Exception\MountException;
+use Spiral\Storage\Exception\MountException;
 
 interface StorageInterface extends StorageReaderInterface, StorageWriterInterface
 {

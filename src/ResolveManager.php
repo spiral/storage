@@ -1,16 +1,23 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine;
+namespace Spiral\Storage;
 
 use Spiral\Core\Container\SingletonInterface;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
-use Spiral\StorageEngine\Config\StorageConfig;
-use Spiral\StorageEngine\Exception\ResolveException;
-use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Parser\UriParserInterface;
-use Spiral\StorageEngine\Resolver;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\Storage\Config\StorageConfig;
+use Spiral\Storage\Exception\ResolveException;
+use Spiral\Storage\Exception\StorageException;
+use Spiral\Storage\Parser\UriParserInterface;
+use Spiral\Storage\Resolver;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
 {

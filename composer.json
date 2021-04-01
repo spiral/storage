@@ -1,40 +1,55 @@
 {
-  "name": "spiral/storage-engine",
-  "type": "library",
-  "description": "Storage Engine for file storage interaction",
-  "license": "MIT",
-  "version": "0.2",
-  "authors": [
-    {
-      "name": "Evgeny Barinov",
-      "email": "evgeny.barinov@spiralscout.com"
+    "name": "spiral/storage",
+    "type": "library",
+    "description": "Storage Engine for file storage interaction",
+    "license": "MIT",
+    "homepage": "https://spiral.dev",
+    "support": {
+        "issues": "https://github.com/spiral/framework/issues",
+        "source": "https://github.com/spiral/storage"
     },
-    {
-      "name": "Aleksandr Novikov",
-      "email": "aleksandr.novikov@spiralscout.com"
-    }
-  ],
-  "require": {
-    "php": "^7.4",
-    "spiral/framework": "^2.7",
-    "league/flysystem": "^2.0"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "~8.0",
-    "mockery/mockery": "^1.1",
-    "spiral/code-style": "^1.0",
-    "mikey179/vfsstream": "^1.6",
-    "league/flysystem-aws-s3-v3": "^2.0",
-    "league/flysystem-async-aws-s3": "^2.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Spiral\\StorageEngine\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Spiral\\StorageEngine\\Tests\\": "tests/StorageEngine"
-    }
-  }
+    "authors": [
+        {
+            "name": "Evgeny Barinov",
+            "email": "evgeny.barinov@spiralscout.com"
+        },
+        {
+            "name": "Aleksandr Novikov",
+            "email": "aleksandr.novikov@spiralscout.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "league/flysystem": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spiral\\Storage\\": "src"
+        }
+    },
+    "require-dev": {
+        "spiral/framework": "^2.8",
+        "phpunit/phpunit": "^8.5|^9.0",
+        "mockery/mockery": "^1.3",
+        "spiral/code-style": "^1.0",
+        "mikey179/vfsstream": "^1.6",
+        "league/flysystem-aws-s3-v3": "^2.0",
+        "league/flysystem-async-aws-s3": "^2.0",
+        "vimeo/psalm": "^4.6"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Spiral\\Tests\\Storage\\": "tests"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.8.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

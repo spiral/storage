@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Builder\Adapter;
+namespace Spiral\Storage\Builder\Adapter;
 
 use League\Flysystem\FilesystemAdapter;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\Storage\Config\DTO\FileSystemInfo\Aws\AwsS3Info;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 
 /**
  * @property FileSystemInfoInterface|AwsS3Info $fsInfo

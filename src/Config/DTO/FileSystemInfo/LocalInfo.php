@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo;
+namespace Spiral\Storage\Config\DTO\FileSystemInfo;
 
-use Spiral\StorageEngine\Resolver\LocalSystemResolver;
+use Spiral\Storage\Resolver\LocalSystemResolver;
 
 class LocalInfo extends FileSystemInfo
 {

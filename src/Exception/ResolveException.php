@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Exception;
+namespace Spiral\Storage\Exception;
 
 /**
  * Resolve exception on building urls

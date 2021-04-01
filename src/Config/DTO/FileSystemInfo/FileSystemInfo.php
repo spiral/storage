@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo;
+namespace Spiral\Storage\Config\DTO\FileSystemInfo;
 
-use Spiral\StorageEngine\Exception\ConfigException;
-use Spiral\StorageEngine\Config\DTO\Traits\OptionsTrait;
-use Spiral\StorageEngine\Exception\StorageException;
-use Spiral\StorageEngine\Config\DTO\Traits\ClassBasedTrait;
+use Spiral\Storage\Exception\ConfigException;
+use Spiral\Storage\Config\DTO\Traits\OptionsTrait;
+use Spiral\Storage\Exception\StorageException;
+use Spiral\Storage\Config\DTO\Traits\ClassBasedTrait;
 
 abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInterface, OptionsBasedInterface
 {

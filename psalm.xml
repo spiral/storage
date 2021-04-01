@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<psalm
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+
+    errorLevel="8"
+    hoistConstants="true"
+    resolveFromConfigFile="true"
+    allowPhpStormGenerics="true"
+    findUnusedPsalmSuppress="true"
+    findUnusedVariablesAndParams="true"
+    ensureArrayStringOffsetsExist="true"
+    addParamDefaultToDocblockType="true"
+>
+    <projectFiles>
+        <directory name="src/*/src" />
+        <directory name="src/Framework" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+    <issueHandlers>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <file name="src/Framework/Bootloader/Server/RoadRunnerBootloader.php" />
+                <file name="src/Framework/Bootloader/Server/LegacyRoadRunnerBootloader.php" />
+                <file name="src/Framework/Bootloader/Jobs/JobsBootloader.php" />
+                <file name="src/Framework/Http/RrDispatcher.php" />
+                <file name="src/Framework/Http/LegacyRrDispatcher.php" />
+            </errorLevel>
+        </UndefinedClass>
+        <UndefinedDocblockClass>
+            <errorLevel type="suppress">
+                <file name="src/Framework/Jobs/JobQueue.php" />
+            </errorLevel>
+        </UndefinedDocblockClass>
+        <UnusedClosureParam errorLevel="suppress" />
+    </issueHandlers>
+    <stubs>
+        <file name="resources/stubs/php/reflection/Attribute.phpstub" />
+        <file name="resources/stubs/php/reflection/ReflectionAttribute.phpstub" />
+        <file name="resources/stubs/php/reflection/ReflectionUnionType.phpstub" />
+    </stubs>
+</psalm>

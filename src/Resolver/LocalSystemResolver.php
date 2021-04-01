@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Resolver;
+namespace Spiral\Storage\Resolver;
 
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\LocalInfo;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
-use Spiral\StorageEngine\Exception\ResolveException;
+use Spiral\Storage\Config\DTO\FileSystemInfo\LocalInfo;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\Storage\Exception\ResolveException;
 
 class LocalSystemResolver extends AbstractAdapterResolver
 {

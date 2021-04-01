@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Spiral\StorageEngine\Config\DTO\FileSystemInfo\Aws;
+namespace Spiral\Storage\Config\DTO\FileSystemInfo\Aws;
 
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\FileSystemInfo;
-use Spiral\StorageEngine\Config\DTO\FileSystemInfo\SpecificConfigurableFileSystemInfo;
-use Spiral\StorageEngine\Resolver\AwsS3Resolver;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfo;
+use Spiral\Storage\Config\DTO\FileSystemInfo\SpecificConfigurableFileSystemInfo;
+use Spiral\Storage\Resolver\AwsS3Resolver;
 
 class AwsS3Info extends FileSystemInfo implements SpecificConfigurableFileSystemInfo
 {

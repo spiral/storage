@@ -13,22 +13,22 @@
   
 ### Customization
 In case you need some specific customization Resolve manager can be replaced with your specific class 
-by implementing `\Spiral\StorageEngine\ResolveManagerInterface` and binding it by the interface.
+by implementing `\Spiral\Storage\ResolveManagerInterface` and binding it by the interface.
 
 #### Specific server resolver
 In case you need to use some specific rules you can prepare your own resolver for a server. In description 
 you should add parameter `resolver` with your specific class.
-- the class must implement `\Spiral\StorageEngine\Resolver\AdapterResolverInterface`.
-- the class can be inherited from `\Spiral\StorageEngine\Resolver\AbstractAdapterResolver`
+- the class must implement `\Spiral\Storage\Resolver\AdapterResolverInterface`.
+- the class can be inherited from `\Spiral\Storage\Resolver\AbstractAdapterResolver`
 
 #### Specific uri format
 If you need some specific uri pattern you can do it via preparing your own class 
-implemented by `\Spiral\StorageEngine\Parser\UriParserInterface`.
-This class must work with specified DTO implements `\Spiral\StorageEngine\Parser\DTO\UriStructureInterface`
+implemented by `\Spiral\Storage\Parser\UriParserInterface`.
+This class must work with specified DTO implements `\Spiral\Storage\Parser\DTO\UriStructureInterface`
 
 For example if you want to change separator between a server and filepath you can prepare your own class like this:
 ```php
-class MyUriParser extends \Spiral\StorageEngine\Parser\UriParser
+class MyUriParser extends \Spiral\Storage\Parser\UriParser
 {
     protected const SERVER_PATH_SEPARATOR = ':++';
 
