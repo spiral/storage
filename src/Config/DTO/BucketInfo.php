@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spiral\Storage\Config\DTO;
@@ -11,12 +18,26 @@ class BucketInfo implements BucketInfoInterface
 {
     use OptionsTrait;
 
-    public string $name;
+    /**
+     * @var string
+     */
+    public $name;
 
-    public string $server;
+    /**
+     * @var string
+     */
+    public $server;
 
-    protected ?FileSystemInfoInterface $fileSystemInfo = null;
+    /**
+     * @var FileSystemInfoInterface|null
+     */
+    protected $fileSystemInfo = null;
 
+    /**
+     * @param string $name
+     * @param string $server
+     * @param array $info
+     */
     public function __construct(string $name, string $server, array $info = [])
     {
         $this->name = $name;

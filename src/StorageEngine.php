@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spiral\Storage;
@@ -18,14 +25,20 @@ use Spiral\Storage\Parser\UriParserInterface;
 
 class StorageEngine implements StorageInterface, SingletonInterface
 {
-    protected StorageConfig $config;
+    /**
+     * @var StorageConfig
+     */
+    protected $config;
 
-    protected UriParserInterface $uriParser;
+    /**
+     * @var UriParserInterface
+     */
+    protected $uriParser;
 
     /**
      * @var array<string, FilesystemOperator>
      */
-    protected array $fileSystems = [];
+    protected $fileSystems = [];
 
     /**
      * @param StorageConfig $config
@@ -77,7 +90,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
      */
     public function getFileSystemsNames(): array
     {
-        return array_keys($this->fileSystems);
+        return \array_keys($this->fileSystems);
     }
 
     /**
@@ -106,7 +119,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->read($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -121,7 +134,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->readStream($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -136,7 +149,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->lastModified($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -151,7 +164,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->fileSize($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -166,7 +179,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->mimeType($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -181,7 +194,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             return $filesystem->visibility($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -208,7 +221,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
             return $filePath;
         } catch (\Throwable $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -227,7 +240,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
             return $uri;
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -246,7 +259,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
             return $uri;
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -261,7 +274,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             $filesystem->setVisibility($path, $visibility);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -288,7 +301,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
             return (string)$this->uriParser->prepareUri($destinationFileSystem, $targetFilePath);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -322,7 +335,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
 
             return (string)$this->uriParser->prepareUri($destinationFileSystem, $targetFilePath);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -337,7 +350,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
         try {
             $filesystem->delete($path);
         } catch (FilesystemException $e) {
-            throw new FileOperationException($e->getMessage(), $e->getCode(), $e);
+            throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
@@ -353,9 +366,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     protected function mountFilesystem(string $key, FilesystemOperator $filesystem): void
     {
         if ($this->isFileSystemExists($key)) {
-            throw new MountException(
-                \sprintf('Filesystem %s is already mounted', $key)
-            );
+            throw new MountException(\sprintf('Filesystem %s is already mounted', $key));
         }
 
         $this->fileSystems[$key] = $filesystem;
@@ -370,7 +381,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
      */
     protected function isFileSystemExists(string $key): bool
     {
-        return array_key_exists($key, $this->fileSystems);
+        return \array_key_exists($key, $this->fileSystems);
     }
 
     /**

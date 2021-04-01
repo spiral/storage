@@ -1,9 +1,17 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spiral\Storage\Config;
 
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 use Spiral\Storage\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
 use Spiral\Storage\Config\DTO\BucketInfo;
@@ -28,16 +36,16 @@ class StorageConfig extends InjectableConfig
     /**
      * Internal list allows to keep once built filesystems info
      *
-     * @var FileSystemInfo\FileSystemInfoInterface[]
+     * @var FileSystemInfoInterface[]
      */
-    protected array $fileSystemsInfoList = [];
+    protected $fileSystemsInfoList = [];
 
     /**
      * Internal list allows to keep once built buckets info
      *
      * @var BucketInfoInterface[]
      */
-    protected array $bucketsInfoList = [];
+    protected $bucketsInfoList = [];
 
     /**
      * @param array $config
@@ -157,11 +165,11 @@ class StorageConfig extends InjectableConfig
      * @param string $fs
      * @param bool|null $force
      *
-     * @return FileSystemInfo\FileSystemInfoInterface
+     * @return FileSystemInfoInterface
      *
      * @throws StorageException
      */
-    public function buildFileSystemInfo(string $fs, ?bool $force = false): FileSystemInfo\FileSystemInfoInterface
+    public function buildFileSystemInfo(string $fs, ?bool $force = false): FileSystemInfoInterface
     {
         if (!$this->hasBucket($fs)) {
             throw new ConfigException(
@@ -259,6 +267,6 @@ class StorageConfig extends InjectableConfig
      */
     private function extractServerAdapter(array $serverInfo): ?string
     {
-        return $serverInfo[FileSystemInfo\FileSystemInfoInterface::ADAPTER_KEY] ?? null;
+        return $serverInfo[FileSystemInfoInterface::ADAPTER_KEY] ?? null;
     }
 }

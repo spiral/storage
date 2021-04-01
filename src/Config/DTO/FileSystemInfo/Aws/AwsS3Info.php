@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spiral\Storage\Config\DTO\FileSystemInfo\Aws;
@@ -26,9 +33,15 @@ class AwsS3Info extends FileSystemInfo implements SpecificConfigurableFileSystem
         self::VISIBILITY_KEY => self::ARRAY_TYPE,
     ];
 
-    protected string $resolver = AwsS3Resolver::class;
+    /**
+     * @var string
+     */
+    protected $resolver = AwsS3Resolver::class;
 
-    protected ?AwsVisibilityConverter $visibilityConverter = null;
+    /**
+     * @var AwsVisibilityConverter|null
+     */
+    protected $visibilityConverter = null;
 
     /**
      * @inheritDoc

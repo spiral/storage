@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spiral\Storage\Builder\Adapter;
@@ -45,7 +52,7 @@ class LocalBuilder extends AbstractBuilder
                 : \LOCK_EX,
             $this->fsInfo->hasOption(LocalInfo::LINK_HANDLING_KEY)
                 ? $this->fsInfo->getOption(LocalInfo::LINK_HANDLING_KEY)
-                : $adapterClass::DISALLOW_LINKS,
+                : $adapterClass::DISALLOW_LINKS
         );
     }
 }

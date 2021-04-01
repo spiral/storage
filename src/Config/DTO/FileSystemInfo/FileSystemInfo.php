@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spiral\Storage\Config\DTO\FileSystemInfo;
@@ -20,11 +27,20 @@ abstract class FileSystemInfo implements FileSystemInfoInterface, ClassBasedInte
 
     protected const FILE_SYSTEM_INFO_TYPE = '';
 
-    protected string $name;
+    /**
+     * @var string
+     */
+    protected $name;
 
-    protected string $adapter;
+    /**
+     * @var string
+     */
+    protected $adapter;
 
-    protected string $resolver;
+    /**
+     * @var string
+     */
+    protected $resolver;
 
     /**
      * @param string $name

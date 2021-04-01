@@ -71,15 +71,15 @@ class AdapterFactoryTest extends UnitTestCase
 
         $this->assertEquals(
             $options[FileSystemInfo\LocalInfo::LINK_HANDLING_KEY],
-            $this->getProtectedProperty($adapter, 'linkHandling')
+            $this->getNotPublicProperty($adapter, 'linkHandling')
         );
         $this->assertEquals(
             $options[FileSystemInfo\LocalInfo::WRITE_FLAGS_KEY],
-            $this->getProtectedProperty($adapter, 'writeFlags')
+            $this->getNotPublicProperty($adapter, 'writeFlags')
         );
         $this->assertEquals(
             PortableVisibilityConverter::fromArray($options[FileSystemInfo\LocalInfo::VISIBILITY_KEY]),
-            $this->getProtectedProperty($adapter, 'visibility')
+            $this->getNotPublicProperty($adapter, 'visibility')
         );
     }
 
@@ -98,11 +98,11 @@ class AdapterFactoryTest extends UnitTestCase
 
         $this->assertEquals(
             $fsDescription[FileSystemInfo\Aws\AwsS3Info::OPTIONS_KEY][FileSystemInfo\Aws\AwsS3Info::BUCKET_KEY],
-            $this->getProtectedProperty($adapter, 'bucket')
+            $this->getNotPublicProperty($adapter, 'bucket')
         );
         $this->assertSame(
             $fsInfo->getClient(),
-            $this->getProtectedProperty($adapter, 'client')
+            $this->getNotPublicProperty($adapter, 'client')
         );
     }
 
@@ -134,11 +134,11 @@ class AdapterFactoryTest extends UnitTestCase
 
         $this->assertEquals(
             new PathPrefixer($options[FileSystemInfo\Aws\AwsS3Info::PATH_PREFIX_KEY]),
-            $this->getProtectedProperty($adapter, 'prefixer')
+            $this->getNotPublicProperty($adapter, 'prefixer')
         );
         $this->assertEquals(
             $info->getVisibilityConverter(),
-            $this->getProtectedProperty($adapter, 'visibility')
+            $this->getNotPublicProperty($adapter, 'visibility')
         );
     }
 

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spiral\Storage;
@@ -17,12 +24,12 @@ interface ResolveManagerInterface
      *  true - throw exception in case any url can't be built
      *  false - return null instead of url in case one url can't be built
      *
-     * @return \Generator
+     * @return iterable
      *
      * @throws ResolveException
      * @throws StorageException
      */
-    public function buildUrlsList(array $files, bool $throwException = true): \Generator;
+    public function buildUrlsList(array $files, bool $throwException = true): iterable;
 
     /**
      * Build url by uri

@@ -231,7 +231,7 @@ class OptionsTraitTest extends UnitTestCase
     {
         $trait = $this->getMockForTrait(OptionsTrait::class);
 
-        $this->setProtectedProperty($trait, 'options', $options);
+        $this->setNotPublicProperty($trait, 'options', $options);
 
         return $trait;
     }

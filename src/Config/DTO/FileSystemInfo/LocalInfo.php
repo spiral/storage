@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This file is part of Spiral Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace Spiral\Storage\Config\DTO\FileSystemInfo;
@@ -26,7 +33,10 @@ class LocalInfo extends FileSystemInfo
         self::HOST_KEY => self::STRING_TYPE,
     ];
 
-    protected string $resolver = LocalSystemResolver::class;
+    /**
+     * @var class-string
+     */
+    protected $resolver = LocalSystemResolver::class;
 
     /**
      * @inheritDoc

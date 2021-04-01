@@ -21,9 +21,15 @@ class StorageEngineTest extends StorageEngineAbstractTest
 {
     private const DEFAULT_FS = 'default';
 
-    private StorageEngine $storage;
+    /**
+     * @var StorageEngine
+     */
+    private $storage;
 
-    private FilesystemOperator $localFileSystem;
+    /**
+     * @var FilesystemOperator
+     */
+    private $localFileSystem;
 
     /**
      * @throws StorageException

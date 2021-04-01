@@ -17,19 +17,29 @@ use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Exception\ResolveException;
 use Spiral\Storage\Exception\StorageException;
 use Spiral\Storage\Parser\UriParserInterface;
-use Spiral\Storage\Resolver;
+use Spiral\Storage\Resolver\AdapterResolverInterface;
 
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
 {
-    protected StorageConfig $storageConfig;
-
-    protected UriParserInterface $uriParser;
+    /**
+     * @var StorageConfig
+     */
+    protected $storageConfig;
 
     /**
-     * @var Resolver\AdapterResolverInterface[]
+     * @var UriParserInterface
      */
-    protected array $resolvers = [];
+    protected $uriParser;
 
+    /**
+     * @var array<AdapterResolverInterface>
+     */
+    protected $resolvers = [];
+
+    /**
+     * @param StorageConfig $storageConfig
+     * @param UriParserInterface $uriParser
+     */
     public function __construct(StorageConfig $storageConfig, UriParserInterface $uriParser)
     {
         $this->storageConfig = $storageConfig;
@@ -37,9 +47,9 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    public function buildUrlsList(array $files, bool $throwException = true): \Generator
+    public function buildUrlsList(array $files, bool $throwException = true): iterable
     {
         foreach ($files as $uri) {
             yield $this->buildUrl($uri, $throwException);
@@ -47,7 +57,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function buildUrl(string $uri, bool $throwException = true): ?string
     {
@@ -62,7 +72,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
             }
         } catch (\Throwable $e) {
             if ($throwException) {
-                throw new ResolveException($e->getMessage(), $e->getCode(), $e);
+                throw new ResolveException($e->getMessage(), (int)$e->getCode(), $e);
             }
         }
 
@@ -74,11 +84,11 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      *
      * @param string $fileSystem
      *
-     * @return Resolver\AdapterResolverInterface
+     * @return AdapterResolverInterface
      *
      * @throws StorageException
      */
-    protected function getResolver(string $fileSystem): Resolver\AdapterResolverInterface
+    protected function getResolver(string $fileSystem): AdapterResolverInterface
     {
         if (!array_key_exists($fileSystem, $this->resolvers)) {
             $this->resolvers[$fileSystem] = $this->prepareResolverForFileSystem(
@@ -94,9 +104,9 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      *
      * @param FileSystemInfoInterface $fsInfo
      *
-     * @return Resolver\AdapterResolverInterface
+     * @return AdapterResolverInterface
      */
-    protected function prepareResolverForFileSystem(FileSystemInfoInterface $fsInfo): Resolver\AdapterResolverInterface
+    protected function prepareResolverForFileSystem(FileSystemInfoInterface $fsInfo): AdapterResolverInterface
     {
         $resolverClass = $fsInfo->getResolverClass();
 

@@ -40,7 +40,7 @@ class StorageEngineForLocalTestCase extends FeatureTestCase
             $this->getUriParser()
         );
 
-        $this->assertRegExp('/^\/tmp\/tmpStorageFile_[\w]*$/', $engine->tempFilename());
+        $this->assertMatchesRegularExpression('/^\/tmp\/tmpStorageFile_[\w]*$/', $engine->tempFilename());
     }
 
     /**
@@ -57,7 +57,7 @@ class StorageEngineForLocalTestCase extends FeatureTestCase
 
         $tmpFilePath = $engine->tempFilename('localBucket://' . static::ROOT_FILE_NAME);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             \sprintf('/^\/tmp\/%s_[\w]*$/', static::ROOT_FILE_NAME),
             $tmpFilePath
         );
