@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\Tests\Storage\Unit\Config;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
+use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 use Spiral\Storage\Exception\ConfigException;
 use Spiral\Storage\Config\DTO\BucketInfoInterface;
 use Spiral\Storage\Config\DTO\FileSystemInfo;
@@ -22,49 +23,41 @@ class StorageConfigTest extends UnitTestCase
     public function testConstructorWrongServerKeyThrowsException(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(
-            'Server `--non-displayable--[0]` has incorrect key - string expected empty val received'
-        );
+        $this->expectExceptionMessage('Storage server name must be a string, but int(0) defined');
 
-        new StorageConfig(
-            ['servers' => [0 => $this->buildLocalInfoDescription()]]
-        );
+        new StorageConfig([
+            'servers' => [
+                0 => $this->buildLocalInfoDescription()
+            ]
+        ]);
     }
 
     public function testConstructorWrongBucketKeyThrowsException(): void
     {
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(
-            'Bucket `--non-displayable--[0]` has incorrect key - string expected empty val received'
-        );
+        $this->expectExceptionMessage('Storage bucket name must be a string, but int(0) defined');
 
-        new StorageConfig(
-            [
-                'servers' => ['local' => $this->buildLocalInfoDescription()],
-                'buckets' => [0 => $this->buildBucketNameByServer('local')]
-            ]
-        );
+        new StorageConfig([
+            'servers' => ['local' => $this->buildLocalInfoDescription()],
+            'buckets' => [0 => $this->buildBucketNameByServer('local')]
+        ]);
     }
 
-    public function testConstructorNoServersThrowsException(): void
+    public function testConstructorNoServersDoNotThrowsException(): void
     {
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Servers must be defined for storage work');
+        $this->expectNotToPerformAssertions();
 
         new StorageConfig(['servers' => []]);
     }
 
-    public function testConstructorNoBucketsThrowsException(): void
+    public function testConstructorNoBucketsDoNotThrowsException(): void
     {
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Buckets must be defined for storage work');
+        $this->expectNotToPerformAssertions();
 
-        new StorageConfig(
-            [
-                'servers' => ['local' => $this->buildLocalInfoDescription()],
-                'buckets' => []
-            ]
-        );
+        new StorageConfig([
+            'servers' => ['local' => $this->buildLocalInfoDescription()],
+            'buckets' => []
+        ]);
     }
 
     /**
@@ -79,16 +72,16 @@ class StorageConfigTest extends UnitTestCase
     public function testBuildFsInfo(string $serverName, array $serverDescription, string $class): void
     {
         $bucketName = $this->buildBucketNameByServer($serverName);
-        $config = new StorageConfig(
-            [
-                'servers' => [$serverName => $serverDescription],
-                'buckets' => [
-                    $this->buildBucketNameByServer($serverName) => $this->buildServerBucketInfoDesc($serverName),
-                ]
+        $config = new StorageConfig([
+            'servers' => [
+                $serverName => $serverDescription
+            ],
+            'buckets' => [
+                $this->buildBucketNameByServer($serverName) => $this->buildServerBucketInfoDesc($serverName),
             ]
-        );
+        ]);
 
-        /** @var FileSystemInfo\FileSystemInfoInterface|FileSystemInfo\OptionsBasedInterface $fs */
+        /** @var FileSystemInfoInterface|FileSystemInfo\OptionsBasedInterface $fs */
         $fs = $config->buildFileSystemInfo($bucketName);
 
         $this->assertInstanceOf($class, $fs);
@@ -108,22 +101,20 @@ class StorageConfigTest extends UnitTestCase
 
         $bucket = $this->buildBucketNameByServer($localServer);
 
-        $config = new StorageConfig(
-            [
-                'servers' => [
-                    $localServer => [
-                        FileSystemInfo\LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                        FileSystemInfo\LocalInfo::OPTIONS_KEY => [
-                            FileSystemInfo\LocalInfo::ROOT_DIR_KEY => $rootDir,
-                            FileSystemInfo\LocalInfo::HOST_KEY => self::CONFIG_HOST,
-                        ],
+        $config = new StorageConfig([
+            'servers' => [
+                $localServer => [
+                    FileSystemInfo\LocalInfo::ADAPTER_KEY => LocalFilesystemAdapter::class,
+                    FileSystemInfo\LocalInfo::OPTIONS_KEY => [
+                        FileSystemInfo\LocalInfo::ROOT_DIR_KEY => $rootDir,
+                        FileSystemInfo\LocalInfo::HOST_KEY => self::CONFIG_HOST,
                     ],
                 ],
-                'buckets' => [
-                    $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
-                ]
+            ],
+            'buckets' => [
+                $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
             ]
-        );
+        ]);
 
         $fsInfo = $config->buildFileSystemInfo($bucket);
 
@@ -139,26 +130,19 @@ class StorageConfigTest extends UnitTestCase
         $localServer = 'local';
         $anotherFs = 'anotherBucket';
 
-        $config = new StorageConfig(
-            [
-                'servers' => [
-                    $localServer => [
-                        FileSystemInfo\FileSystemInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
-                    ],
+        $config = new StorageConfig([
+            'servers' => [
+                $localServer => [
+                    FileSystemInfoInterface::ADAPTER_KEY => LocalFilesystemAdapter::class,
                 ],
-                'buckets' => [
-                    $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
-                ]
+            ],
+            'buckets' => [
+                $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
             ]
-        );
+        ]);
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(
-            \sprintf(
-                'Bucket `%s` was not found',
-                $anotherFs
-            )
-        );
+        $this->expectExceptionMessage(\sprintf('Bucket `%s` was not found', $anotherFs));
 
         $config->buildFileSystemInfo($anotherFs);
     }
@@ -168,21 +152,24 @@ class StorageConfigTest extends UnitTestCase
      */
     public function testBuildFsInfoUnknownServer(): void
     {
-        $serverName = 'local';
-
-        $bucketName = $this->buildBucketNameByServer($serverName);
-
-        $config = new StorageConfig(
-            [
-                'servers' => [$serverName => $this->buildLocalInfoDescription()],
-                'buckets' => [$bucketName => $this->buildServerBucketInfoDesc('missedServer')],
-            ]
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(
+            'Storage server `missedServer` of bucket `localBucket` has not been defined, one of [local] required'
         );
 
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage('Server `missedServer` info for filesystem `localBucket` was not detected');
+        $serverName = 'local';
+        $bucketName = $this->buildBucketNameByServer($serverName);
 
-        /** @var FileSystemInfo\FileSystemInfoInterface|FileSystemInfo\OptionsBasedInterface $fs */
+        $config = new StorageConfig([
+            'servers' => [
+                $serverName => $this->buildLocalInfoDescription()
+            ],
+            'buckets' => [
+                $bucketName => $this->buildServerBucketInfoDesc('missedServer')
+            ],
+        ]);
+
+        /** @var FileSystemInfoInterface|FileSystemInfo\OptionsBasedInterface $fs */
         $config->buildFileSystemInfo($bucketName);
     }
 
@@ -191,22 +178,25 @@ class StorageConfigTest extends UnitTestCase
      */
     public function testBuildFsInfoUnknownAdapter(): void
     {
+        $this->expectException(ConfigException::class);
+        $this->expectExceptionMessage(
+            'Storage server `another` adapter must be a class string that ' .
+            'implements League\Flysystem\FilesystemAdapter interface, but string(DateTime) defined'
+        );
+
         $serverName = 'another';
         $bucket = 'anotherBucket';
 
-        $config = new StorageConfig(
-            [
-                'servers' => [
-                    $serverName => [
-                        FileSystemInfo\FileSystemInfoInterface::ADAPTER_KEY => \DateTime::class,
-                    ],
+        $config = new StorageConfig([
+            'servers' => [
+                $serverName => [
+                    FileSystemInfoInterface::ADAPTER_KEY => \DateTime::class,
                 ],
-                'buckets' => [$bucket => $this->buildServerBucketInfoDesc($serverName)]
+            ],
+            'buckets' => [
+                $bucket => $this->buildServerBucketInfoDesc($serverName)
             ]
-        );
-
-        $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(\sprintf('Adapter can\'t be identified for filesystem `%s`', $bucket));
+        ]);
 
         $config->buildFileSystemInfo($bucket);
     }
@@ -287,37 +277,11 @@ class StorageConfigTest extends UnitTestCase
      */
     public function testGetTmpDir(): void
     {
-        $localServer = 'local';
+        $config = new StorageConfig();
+        $this->assertEquals(\sys_get_temp_dir(), $config->getTmpDir());
 
-        $configBasic = new StorageConfig(
-            [
-                'servers' => [
-                    $localServer => $this->buildLocalInfoDescription(),
-                ],
-                'buckets' => [
-                    $this->buildBucketNameByServer($localServer) => $this->buildServerBucketInfoDesc($localServer),
-                ],
-            ]
-        );
-
-        $this->assertEquals(sys_get_temp_dir(), $configBasic->getTmpDir());
-
-        $tmpDir = __DIR__;
-        $server = 'local';
-
-        $config = new StorageConfig(
-            [
-                'servers' => [
-                    $server => [],
-                ],
-                'buckets' => [
-                    $server . 'B' => $this->buildServerBucketInfoDesc($server),
-                ],
-                'tmp-dir' => $tmpDir,
-            ]
-        );
-
-        $this->assertEquals($tmpDir, $config->getTmpDir());
+        $config = new StorageConfig(['tmp-dir' => __DIR__]);
+        $this->assertEquals(__DIR__, $config->getTmpDir());
     }
 
     /**
@@ -328,22 +292,12 @@ class StorageConfigTest extends UnitTestCase
         $tmpDir = '/my+=Dir/some#3Dir/tmp';
 
         $this->expectException(ConfigException::class);
-        $this->expectExceptionMessage(
-            \sprintf('Defined tmp directory `%s` was not detected', $tmpDir)
-        );
+        $this->expectExceptionMessage(\sprintf(
+            'Storage temporary directory `%s` must be a valid directory',
+            $tmpDir
+        ));
 
-        $server = 'local';
-        new StorageConfig(
-            [
-                'servers' => [
-                    $server => [],
-                ],
-                'buckets' => [
-                    $server . 'B' => $this->buildServerBucketInfoDesc($server),
-                ],
-                'tmp-dir' => $tmpDir,
-            ]
-        );
+        new StorageConfig(['tmp-dir' => $tmpDir]);
     }
 
     /**

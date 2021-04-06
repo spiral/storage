@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Spiral\Storage\Config;
 
+use League\Flysystem\FilesystemAdapter;
 use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 use Spiral\Storage\Exception\ConfigException;
 use Spiral\Core\InjectableConfig;
@@ -19,16 +20,58 @@ use Spiral\Storage\Config\DTO\BucketInfoInterface;
 use Spiral\Storage\Config\DTO\FileSystemInfo;
 use Spiral\Storage\Exception\StorageException;
 
-class StorageConfig extends InjectableConfig
+/**
+ * @psalm-type ConfigServerSection = array {
+ *      adapter:  class-string<FilesystemAdapter>,
+ *      options?: array<string, mixed>
+ * }
+ *
+ * @psalm-type ConfigBucketSection = array {
+ *      server:   string,
+ *      options?: array<string, mixed>
+ * }
+ *
+ * @psalm-type ConfigArray = array {
+ *      servers: array<string, ConfigServerSection>,
+ *      buckets: array<string, ConfigBucketSection>,
+ *      tmp-dir: string
+ * }
+ *
+ * @psalm-type ConfigInputArray = array {
+ *      servers?: array<string, ConfigServerSection>|null,
+ *      buckets?: array<string, ConfigBucketSection>|null,
+ *      tmp-dir?: string|null
+ * }
+ *
+ * @see FilesystemAdapter
+ */
+final class StorageConfig extends InjectableConfig implements ConfigInterface
 {
+    /**
+     * @var string
+     */
     public const CONFIG = 'storage';
 
+    /**
+     * @var string
+     */
     private const SERVERS_KEY = 'servers';
+
+    /**
+     * @var string
+     */
     private const BUCKETS_KEY = 'buckets';
+
+    /**
+     * @var string
+     */
     private const TMP_DIR_KEY = 'tmp-dir';
 
+    /**
+     * @var ConfigArray
+     */
     protected $config = [
-        self::SERVERS_KEY   => [],
+        self::SERVERS_KEY => [],
         self::BUCKETS_KEY => [],
         self::TMP_DIR_KEY => '',
     ];
@@ -48,126 +91,246 @@ class StorageConfig extends InjectableConfig
     protected $bucketsInfoList = [];
 
     /**
-     * @param array $config
-     *
+     * @param ConfigInputArray $config
      * @throws ConfigException
      */
     public function __construct(array $config = [])
     {
-        if (!array_key_exists(static::SERVERS_KEY, $config) || empty($config[static::SERVERS_KEY])) {
-            throw new ConfigException('Servers must be defined for storage work');
-        }
-
-        foreach (array_keys($config[static::SERVERS_KEY]) as $key => $server) {
-            if (!is_string($server) || empty($server)) {
-                throw new ConfigException(
-                    \sprintf(
-                        'Server `%s` has incorrect key - string expected %s received',
-                        is_scalar($server) && !empty($server) ? $server : '--non-displayable--' . "[$key]",
-                        empty($server) ? 'empty val' : gettype($server)
-                    )
-                );
-            }
-        }
-
-        if (!array_key_exists(static::BUCKETS_KEY, $config) || empty($config[static::BUCKETS_KEY])) {
-            throw new ConfigException('Buckets must be defined for storage work');
-        }
-
-        foreach (array_keys($config[static::BUCKETS_KEY]) as $key => $bucket) {
-            if (!is_string($bucket) || empty($bucket)) {
-                throw new ConfigException(
-                    \sprintf(
-                        'Bucket `%s` has incorrect key - string expected %s received',
-                        is_scalar($bucket) && !empty($bucket) ? $bucket : '--non-displayable--' . "[$key]",
-                        empty($bucket) ? 'empty val' : gettype($bucket)
-                    )
-                );
-            }
-        }
-
-        if (array_key_exists(static::TMP_DIR_KEY, $config) && !is_dir($config[static::TMP_DIR_KEY])) {
-            throw new ConfigException(
-                \sprintf('Defined tmp directory `%s` was not detected', $config[static::TMP_DIR_KEY])
-            );
-        }
-
-        parent::__construct($config);
+        parent::__construct(
+            $this->normalize($config)
+        );
     }
 
     /**
-     * Get all defined servers keys
-     *
-     * @return string[]
+     * @param ConfigInputArray $config
+     * @return ConfigArray
+     * @throws ConfigException
+     */
+    private function normalize(array $config): array
+    {
+        $config = $this->normalizeServers($config);
+        $config = $this->normalizeBuckets($config);
+        $config = $this->normalizeTemporaryDirectory($config);
+
+        return $config;
+    }
+
+    /**
+     * @param ConfigInputArray $config
+     * @return ConfigArray
+     * @throws ConfigException
+     * @psalm-suppress DocblockTypeContradiction
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
+     */
+    private function normalizeServers(array $config): array
+    {
+        if (! isset($config[self::SERVERS_KEY])) {
+            $config[self::SERVERS_KEY] = [];
+
+            return $config;
+        }
+
+        $servers = $config[self::SERVERS_KEY];
+
+        if (! \is_array($servers)) {
+            $message = 'Storage servers list must be an array, but `%s` defined';
+            throw new ConfigException(\sprintf($message, $this->valueToString($servers)), 0x01);
+        }
+
+        foreach ($servers as $name => $server) {
+            if (! \is_string($name)) {
+                $message = 'Storage server name must be a string, but %s defined';
+                $message = \sprintf($message, $this->valueToString($name));
+
+                throw new ConfigException($message, 0x02);
+            }
+
+            if (! \is_array($server)) {
+                $message = 'Storage server `%s` config must be an array, but %s defined';
+                $message = \sprintf($message, $name, $this->valueToString($server));
+
+                throw new ConfigException($message, 0x03);
+            }
+
+            $adapter = $server['adapter'] ?? null;
+
+            if (! \is_string($adapter) || ! \is_subclass_of($adapter, FilesystemAdapter::class, true)) {
+                $message = 'Storage server `%s` adapter must be a class ' .
+                    'string that implements %s interface, but %s defined'
+                ;
+
+                $message = \sprintf($message, $name, FilesystemAdapter::class, $this->valueToString($adapter));
+
+                throw new ConfigException($message, 0x04);
+            }
+
+            if (isset($server['options']) && ! \is_array($server['options'])) {
+                $message = 'Storage server `%s` options must be an array, but %s defined';
+                $message = \sprintf($message, $name, $this->valueToString($server['options']));
+
+                throw new ConfigException($message, 0x05);
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param ConfigInputArray $config
+     * @return ConfigArray
+     * @throws ConfigException
+     * @psalm-suppress DocblockTypeContradiction
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
+     */
+    private function normalizeBuckets(array $config): array
+    {
+        if (! isset($config[self::BUCKETS_KEY])) {
+            $config[self::BUCKETS_KEY] = [];
+
+            return $config;
+        }
+
+        $buckets = $config[self::BUCKETS_KEY];
+
+        if (! \is_array($buckets)) {
+            $message = 'Storage buckets list must be an array, but `%s` defined';
+            throw new ConfigException(\sprintf($message, $this->valueToString($buckets)), 0x06);
+        }
+
+        foreach ($buckets as $name => $bucket) {
+            if (! \is_string($name)) {
+                $message = 'Storage bucket name must be a string, but %s defined';
+                $message = \sprintf($message, $this->valueToString($name));
+
+                throw new ConfigException($message, 0x07);
+            }
+
+            if (! \is_array($bucket)) {
+                $message = 'Storage bucket `%s` config must be an array, but %s defined';
+                $message = \sprintf($message, $name, $this->valueToString($bucket));
+
+                throw new ConfigException($message, 0x08);
+            }
+
+            $server = $bucket['server'] ?? null;
+
+            if (! \is_string($server)) {
+                $message = 'Storage server of bucket `%s` must be a string, but %s defined';
+                $message = \sprintf($message, $name, $this->valueToString($server));
+
+                throw new ConfigException($message, 0x09);
+            }
+
+            if (! isset($config[self::SERVERS_KEY][$server])) {
+                $variants = \implode(', ', \array_keys($config[self::SERVERS_KEY] ?? []));
+                $message = 'Storage server `%s` of bucket `%s` has not been defined, one of [%s] required';
+                $message = \sprintf($message, $server, $name, $variants);
+
+                throw new ConfigException($message, 0x0A);
+            }
+
+            if (isset($bucket['options']) && ! \is_array($bucket['options'])) {
+                $message = 'Storage bucket `%s` options must be an array, but %s defined';
+                $message = \sprintf($message, $name, $this->valueToString($bucket['options']));
+
+                throw new ConfigException($message, 0x0B);
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param ConfigInputArray $config
+     * @return ConfigArray
+     * @throws ConfigException
+     * @psalm-suppress DocblockTypeContradiction
+     * @psalm-suppress MoreSpecificReturnType
+     * @psalm-suppress LessSpecificReturnStatement
+     */
+    private function normalizeTemporaryDirectory(array $config): array
+    {
+        if (! isset($config[self::TMP_DIR_KEY]) ) {
+            $config[self::TMP_DIR_KEY] = \sys_get_temp_dir();
+
+            return $config;
+        }
+
+        $directory = $config[self::TMP_DIR_KEY];
+
+        if (! \is_string($directory)) {
+            $message = 'Storage temporary directory must be a string, but `%s` defined';
+            throw new ConfigException(\sprintf($message, $this->valueToString($directory)), 0x0C);
+        }
+
+        if (! \is_dir($directory)) {
+            $message = 'Storage temporary directory `%s` must be a valid directory';
+            throw new ConfigException(\sprintf($message, $directory), 0x0D);
+        }
+
+        if (! \is_writable($directory)) {
+            $message = 'Storage temporary directory `%s` must be writable';
+            throw new ConfigException(\sprintf($message, $directory), 0x0E);
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    private function valueToString($value): string
+    {
+        $suffix = \is_scalar($value) ? "($value)" : (string)$value;
+
+        return \get_debug_type($value) . $suffix;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function getServersKeys(): array
     {
-        return array_key_exists(static::SERVERS_KEY, $this->config)
-            ? array_keys($this->config[static::SERVERS_KEY])
-            : [];
+        return \array_keys($this->config[self::SERVERS_KEY]);
     }
 
     /**
-     * Check if server was defined
-     *
-     * @param string $key
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function hasServer(string $key): bool
     {
-        return array_key_exists($key, $this->config[static::SERVERS_KEY])
-            && is_array($this->config[static::SERVERS_KEY][$key]);
+        return isset($this->config[self::SERVERS_KEY][$key]);
     }
 
     /**
-     * Get all defined buckets keys
-     *
-     * @return string[]
+     * {@inheritDoc}
      */
     public function getBucketsKeys(): array
     {
-        return array_key_exists(static::BUCKETS_KEY, $this->config)
-            ? array_keys($this->config[static::BUCKETS_KEY])
-            : [];
+        return \array_keys($this->config[self::BUCKETS_KEY]);
     }
 
     /**
-     * Check if bucket was defined
-     *
-     * @param string $key
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function hasBucket(string $key): bool
     {
-        return array_key_exists($key, $this->config[static::BUCKETS_KEY])
-            && is_array($this->config[static::BUCKETS_KEY][$key]);
+        return isset($this->config[self::BUCKETS_KEY][$key]);
     }
 
     /**
-     * Get defined temp directory
-     * System temp directory by default
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getTmpDir(): string
     {
-        return array_key_exists(static::TMP_DIR_KEY, $this->config)
-            ? $this->config[static::TMP_DIR_KEY]
-            : sys_get_temp_dir();
+        return $this->config[self::TMP_DIR_KEY];
     }
 
     /**
-     * Build filesystem info by provided fs (bucket) label
-     * Force mode allows to rebuild fs info for internal filesystems info list
-     *
-     * @param string $fs
-     * @param bool|null $force
-     *
-     * @return FileSystemInfoInterface
-     *
-     * @throws StorageException
+     * {@inheritDoc}
      */
     public function buildFileSystemInfo(string $fs, ?bool $force = false): FileSystemInfoInterface
     {
@@ -193,7 +356,7 @@ class StorageConfig extends InjectableConfig
             );
         }
 
-        $serverInfo = $this->config[static::SERVERS_KEY][$bucketInfo->getServer()];
+        $serverInfo = $this->config[self::SERVERS_KEY][$bucketInfo->getServer()];
 
         switch ($this->extractServerAdapter($serverInfo)) {
             case \League\Flysystem\Local\LocalFilesystemAdapter::class:
@@ -225,15 +388,7 @@ class StorageConfig extends InjectableConfig
     }
 
     /**
-     * Build bucket info by provided label
-     * Force mode allows to rebuild bucket info for internal list
-     *
-     * @param string $bucketLabel
-     * @param bool|null $force
-     *
-     * @return BucketInfoInterface
-     *
-     * @throws StorageException
+     * {@inheritDoc}
      */
     public function buildBucketInfo(string $bucketLabel, ?bool $force = false): BucketInfoInterface
     {

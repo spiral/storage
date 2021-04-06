@@ -89,25 +89,6 @@ class StorageEngineTest extends StorageEngineAbstractTest
     /**
      * @throws StorageException
      */
-    public function testConstructorNoServersThrowsException(): void
-    {
-        $config = $this->createMock(StorageConfig::class);
-
-        $config->expects($this->once())
-            ->method('getBucketsKeys')
-            ->willReturn([0]);
-
-        $this->expectException(MountException::class);
-        $this->expectExceptionMessage(
-            'Filesystem `--non-displayable--` can\'t be mounted - string required, empty val received'
-        );
-
-        new StorageEngine($config, $this->getUriParser());
-    }
-
-    /**
-     * @throws StorageException
-     */
     public function testMountSystemsByConfig(): void
     {
         $local1Name = 'local1';

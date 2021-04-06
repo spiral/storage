@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Spiral\Storage;
 
 use Spiral\Core\Container\SingletonInterface;
+use Spiral\Storage\Config\ConfigInterface;
 use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
-use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Exception\ResolveException;
 use Spiral\Storage\Exception\StorageException;
 use Spiral\Storage\Parser\UriParserInterface;
@@ -22,9 +22,9 @@ use Spiral\Storage\Resolver\AdapterResolverInterface;
 class ResolveManager implements SingletonInterface, ResolveManagerInterface
 {
     /**
-     * @var StorageConfig
+     * @var ConfigInterface
      */
-    protected $storageConfig;
+    protected $config;
 
     /**
      * @var UriParserInterface
@@ -37,12 +37,12 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     protected $resolvers = [];
 
     /**
-     * @param StorageConfig $storageConfig
+     * @param ConfigInterface $config
      * @param UriParserInterface $uriParser
      */
-    public function __construct(StorageConfig $storageConfig, UriParserInterface $uriParser)
+    public function __construct(ConfigInterface $config, UriParserInterface $uriParser)
     {
-        $this->storageConfig = $storageConfig;
+        $this->config = $config;
         $this->uriParser = $uriParser;
     }
 
@@ -92,7 +92,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     {
         if (!array_key_exists($fileSystem, $this->resolvers)) {
             $this->resolvers[$fileSystem] = $this->prepareResolverForFileSystem(
-                $this->storageConfig->buildFileSystemInfo($fileSystem)
+                $this->config->buildFileSystemInfo($fileSystem)
             );
         }
 
@@ -110,6 +110,6 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     {
         $resolverClass = $fsInfo->getResolverClass();
 
-        return new $resolverClass($this->uriParser, $this->storageConfig, $fsInfo->getName());
+        return new $resolverClass($this->uriParser, $this->config, $fsInfo->getName());
     }
 }

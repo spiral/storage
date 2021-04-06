@@ -16,7 +16,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Spiral\Core\Container\SingletonInterface;
 use Spiral\Storage\Builder\AdapterFactory;
-use Spiral\Storage\Config\StorageConfig;
+use Spiral\Storage\Config\ConfigInterface;
 use Spiral\Storage\Exception\FileOperationException;
 use Spiral\Storage\Exception\MountException;
 use Spiral\Storage\Exception\StorageException;
@@ -26,7 +26,7 @@ use Spiral\Storage\Parser\UriParserInterface;
 class StorageEngine implements StorageInterface, SingletonInterface
 {
     /**
-     * @var StorageConfig
+     * @var ConfigInterface
      */
     protected $config;
 
@@ -41,12 +41,11 @@ class StorageEngine implements StorageInterface, SingletonInterface
     protected $fileSystems = [];
 
     /**
-     * @param StorageConfig $config
+     * @param ConfigInterface $config
      * @param UriParserInterface $uriParser
-     *
      * @throws StorageException
      */
-    public function __construct(StorageConfig $config, UriParserInterface $uriParser)
+    public function __construct(ConfigInterface $config, UriParserInterface $uriParser)
     {
         $this->config = $config;
         $this->uriParser = $uriParser;

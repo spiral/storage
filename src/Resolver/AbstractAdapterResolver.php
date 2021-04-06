@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Spiral\Storage\Resolver;
 
+use Spiral\Storage\Config\ConfigInterface;
 use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
-use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Exception\StorageException;
 use Spiral\Storage\Exception\UriException;
 use Spiral\Storage\Parser\UriParserInterface;
@@ -41,16 +41,16 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
 
     /**
      * @param UriParserInterface $uriParser
-     * @param StorageConfig $storageConfig
+     * @param ConfigInterface $config
      * @param string $fs
      *
      * @throws StorageException
      */
-    public function __construct(UriParserInterface $uriParser, StorageConfig $storageConfig, string $fs)
+    public function __construct(UriParserInterface $uriParser, ConfigInterface $config, string $fs)
     {
         $requiredClass = static::FILE_SYSTEM_INFO_CLASS;
 
-        $fsInfo = $storageConfig->buildFileSystemInfo($fs);
+        $fsInfo = $config->buildFileSystemInfo($fs);
 
         if (empty($requiredClass) || !$fsInfo instanceof $requiredClass) {
             throw new StorageException(
