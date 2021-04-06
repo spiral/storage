@@ -79,7 +79,9 @@ abstract class AbstractAdapterResolver implements AdapterResolverInterface
     public function normalizeFilePath(string $filePath): string
     {
         try {
-            return $this->uriParser->parseUri($filePath)->path;
+            $uri = $this->uriParser->parse($filePath);
+
+            return $uri->getPath();
         } catch (UriException $e) {
             // if filePath is not uri we suppose it is short form of filepath - without fs part
         }

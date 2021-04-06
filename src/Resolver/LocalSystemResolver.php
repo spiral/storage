@@ -28,11 +28,11 @@ class LocalSystemResolver extends AbstractAdapterResolver
      * @param string $uri
      * @param array $options
      *
-     * @return string|null
+     * @return string
      *
      * @throws ResolveException
      */
-    public function buildUrl(string $uri, array $options = []): ?string
+    public function buildUrl(string $uri, array $options = [])
     {
         if (!$this->fsInfo->hasOption(LocalInfo::HOST_KEY)) {
             throw new ResolveException(

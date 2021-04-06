@@ -11,94 +11,66 @@ declare(strict_types=1);
 
 namespace Spiral\Storage\Parser;
 
-use Spiral\Core\Container\SingletonInterface;
+use Psr\Http\Message\UriInterface as PsrUriInterface;
 use Spiral\Storage\Exception\UriException;
-use Spiral\Storage\Parser\DTO\UriStructure;
-use Spiral\Storage\Parser\DTO\UriStructureInterface;
 
-class UriParser implements UriParserInterface, SingletonInterface
+final class UriParser implements UriParserInterface
 {
     /**
-     * Name of filepath block name in regex patter
+     * @var string
      */
-    protected const FILE_PATH_PART = 'path';
+    private const ERROR_INVALID_URI_TYPE =
+        'URI argument must be a string-like ' .
+        'or instance of one of [%s], but %s passed'
+    ;
 
     /**
-     * Name of filesystem name block name in regex patter
+     * {@inheritDoc}
      */
-    protected const FILE_PATH_FS_PART = 'fs';
-
-    /**
-     * Separator between filesystem name and filepath
-     */
-    protected const FS_PATH_SEPARATOR = '://';
-
-    /**
-     * File system name pattern block
-     */
-    protected const FILE_SYSTEM_PATTERN = '(?\'' . self::FILE_PATH_FS_PART . '\'[\w\-]*)';
-
-    /**
-     * Filepath pattern block
-     */
-    protected const FILE_PATH_PATTERN = '(?\'' . self::FILE_PATH_PART . '\'[\w\-+_\(\)\/\.,=\*\s]*)';
-
-    /**
-     * Full uri pattern
-     */
-    protected const URI_PATTERN = '/^' . self::FILE_SYSTEM_PATTERN . ':\/\/' . self::FILE_PATH_PATTERN . '$/';
-
-    /**
-     * @inheritDoc
-     */
-    public function prepareUri(string $fs, string $path): UriStructureInterface
+    public function parse($uri): UriInterface
     {
-        return $this->buildUriStructure($fs, $path);
+        switch (true) {
+            case $uri instanceof UriInterface:
+                return $uri;
+
+            case \is_string($uri):
+            case $uri instanceof \Stringable:
+                return $this->fromString((string)$uri);
+
+            case $uri instanceof PsrUriInterface:
+                return $this->fromPsrUri($uri);
+
+            default:
+                $message = \vsprintf(self::ERROR_INVALID_URI_TYPE, [
+                    \implode(', ', [UriInterface::class, PsrUriInterface::class]),
+                    \get_debug_type($uri)
+                ]);
+
+                throw new UriException($message);
+        }
     }
 
     /**
-     * @inheritDoc
+     * @param PsrUriInterface $uri
+     * @return UriInterface
+     * @throws UriException
      */
-    public function parseUri(string $uri): UriStructureInterface
+    private function fromPsrUri(PsrUriInterface $uri): UriInterface
     {
-        preg_match(static::URI_PATTERN, $uri, $match);
+        $path = \implode('/', [$uri->getHost(), $uri->getPath()]);
 
-        if (empty($match)) {
-            throw new UriException(\sprintf('No uri structure was detected in uri `%s`', $uri));
-        }
-
-        if (
-            !array_key_exists(static::FILE_PATH_FS_PART, $match)
-            || empty($match[static::FILE_PATH_FS_PART])
-        ) {
-            throw new UriException(\sprintf('No filesystem was detected in uri `%s`', $uri));
-        }
-
-        if (
-            !array_key_exists(static::FILE_PATH_PART, $match)
-            || empty($match[static::FILE_PATH_PART])
-        ) {
-            throw new UriException(\sprintf('No path was detected in uri `%s`', $uri));
-        }
-
-        return $this->buildUriStructure(
-            $match[static::FILE_PATH_FS_PART],
-            $match[static::FILE_PATH_PART]
-        );
+        return new Uri($uri->getScheme(), $path);
     }
 
     /**
-     * Build uris structure object by provided filesystem name and path
-     * Can be built with another separator
-     *
-     * @param string $fs
-     * @param string $path
-     * @param string|null $separator
-     *
-     * @return UriStructureInterface
+     * @param string $uri
+     * @return UriInterface
+     * @throws UriException
      */
-    protected function buildUriStructure(string $fs, string $path, ?string $separator = null): UriStructureInterface
+    private function fromString(string $uri): UriInterface
     {
-        return new UriStructure($fs, $path, $separator ?? self::FS_PATH_SEPARATOR);
+        $chunks = \explode('://', $uri);
+
+        return new Uri(\array_shift($chunks), \implode('/', $chunks));
     }
 }

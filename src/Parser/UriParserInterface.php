@@ -12,28 +12,21 @@ declare(strict_types=1);
 namespace Spiral\Storage\Parser;
 
 use Spiral\Storage\Exception\UriException;
-use Spiral\Storage\Parser\DTO\UriStructureInterface;
 
+use Psr\Http\Message\UriInterface as PsrUriInterface;
+
+/**
+ * @psalm-type UriLikeType = string | \Stringable | UriInterface | PsrUriInterface
+ * @see PsrUriInterface
+ */
 interface UriParserInterface
 {
     /**
-     * Prepare uri structure object by provided filesystem name and filepath
+     * Parse uri to URI value object that representing a FileSystem URI.
      *
-     * @param string $fs
-     * @param string $path
-     *
-     * @return UriStructureInterface
-     */
-    public function prepareUri(string $fs, string $path): UriStructureInterface;
-
-    /**
-     * Parse uri to uri structure object
-     *
-     * @param string $uri
-     *
-     * @return UriStructureInterface
-     *
+     * @param UriLikeType $uri
+     * @return UriInterface
      * @throws UriException
      */
-    public function parseUri(string $uri): UriStructureInterface;
+    public function parse($uri): UriInterface;
 }

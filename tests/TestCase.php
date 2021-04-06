@@ -46,4 +46,15 @@ class TestCase extends BaseTestCase
 
         return $this->uriParser;
     }
+
+    /**
+     * @param string $message
+     */
+    protected function notice(string $message): void
+    {
+        if (\method_exists($this, 'addWarning')) {
+            /** @psalm-suppress InternalMethod */
+            $this->addWarning($message);
+        }
+    }
 }

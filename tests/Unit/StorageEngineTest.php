@@ -8,7 +8,6 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemOperator;
 use Spiral\Storage\Builder\AdapterFactory;
 use Spiral\Storage\Config\StorageConfig;
-use Spiral\Storage\Exception\ConfigException;
 use Spiral\Storage\Exception\MountException;
 use Spiral\Storage\Exception\StorageException;
 use Spiral\Storage\Exception\UriException;
@@ -19,6 +18,9 @@ use Spiral\Storage\StorageEngine;
  */
 class StorageEngineTest extends StorageEngineAbstractTest
 {
+    /**
+     * @var string
+     */
     private const DEFAULT_FS = 'default';
 
     /**
@@ -45,9 +47,9 @@ class StorageEngineTest extends StorageEngineAbstractTest
             )
         );
 
-        $storageConfig = $this->buildStorageConfig(
-            [static::DEFAULT_FS => $this->buildLocalInfoDescription()]
-        );
+        $storageConfig = $this->buildStorageConfig([
+            self::DEFAULT_FS => $this->buildLocalInfoDescription()
+        ]);
 
         $this->storage = new StorageEngine($storageConfig, $this->getUriParser());
         $this->mountStorageEngineFileSystem(
@@ -65,17 +67,15 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $local1Name = 'local1';
         $local2Name = 'local2';
 
-        $fs1 = $this->buildBucketNameByServer($local1Name);
-        $fs2 = $this->buildBucketNameByServer($local2Name);
+        $fsList = [
+            $this->buildBucketNameByServer($local1Name),
+            $this->buildBucketNameByServer($local2Name)
+        ];
 
-        $fsList = [$this->buildBucketNameByServer($local1Name), $this->buildBucketNameByServer($local2Name)];
-
-        $storageConfig = $this->buildStorageConfig(
-            [
-                $local1Name => $this->buildLocalInfoDescription(),
-                $local2Name => $this->buildLocalInfoDescription(),
-            ]
-        );
+        $storageConfig = $this->buildStorageConfig([
+            $local1Name => $this->buildLocalInfoDescription(),
+            $local2Name => $this->buildLocalInfoDescription(),
+        ]);
 
         $storage = new StorageEngine($storageConfig, $this->getUriParser());
 
@@ -222,6 +222,8 @@ class StorageEngineTest extends StorageEngineAbstractTest
         FilesystemOperator $filesystem,
         string $filePath
     ): void {
+        $this->notice('This is an unreliable test because it invokes a non-public implementation method');
+
         $determined = $this->callNotPublicMethod($storage, 'determineFilesystemAndPath', [$uri]);
 
         $this->assertEquals($determined[0], $filesystem);
@@ -233,6 +235,8 @@ class StorageEngineTest extends StorageEngineAbstractTest
      */
     public function testDetermineFilesystemAndPathUnknownFs(): void
     {
+        $this->notice('This is an unreliable test because it invokes a non-public implementation method');
+
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage('Filesystem `missed` was not identified');
 
@@ -244,9 +248,11 @@ class StorageEngineTest extends StorageEngineAbstractTest
      */
     public function testDetermineFilesystemAndPathWrongFormat(): void
     {
+        $this->notice('This is an unreliable test because it invokes a non-public implementation method');
+
         $file = 'missed:/-/file.txt';
         $this->expectException(UriException::class);
-        $this->expectExceptionMessage(\sprintf('No uri structure was detected in uri `%s`', $file));
+        $this->expectExceptionMessage('Filesystem pathname can not be empty');
 
         $this->callNotPublicMethod($this->storage, 'determineFilesystemAndPath', [$file]);
     }
@@ -264,12 +270,10 @@ class StorageEngineTest extends StorageEngineAbstractTest
         $local2Name = 'local2';
         $local2Fs = new Filesystem(AdapterFactory::build($this->buildLocalInfo($local2Name)));
 
-        $storageConfig = $this->buildStorageConfig(
-            [
-                $localName => $this->buildLocalInfoDescription(),
-                $local2Name => $this->buildLocalInfoDescription(),
-            ]
-        );
+        $storageConfig = $this->buildStorageConfig([
+            $localName => $this->buildLocalInfoDescription(),
+            $local2Name => $this->buildLocalInfoDescription(),
+        ]);
 
         $storage = new StorageEngine($storageConfig, $this->getUriParser());
 
