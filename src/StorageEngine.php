@@ -51,22 +51,9 @@ class StorageEngine implements StorageInterface, SingletonInterface
         $this->uriParser = $uriParser;
 
         foreach ($config->getBucketsKeys() as $fs) {
-            if (!is_string($fs) || empty($fs)) {
-                throw new MountException(
-                    \sprintf(
-                        'Filesystem `%s` can\'t be mounted - string required, %s received',
-                        is_scalar($fs) && !empty($fs) ? $fs : '--non-displayable--',
-                        empty($fs) ? 'empty val' : gettype($fs)
-                    )
-                );
-            }
-
-            $this->mountFilesystem(
-                $fs,
-                new Filesystem(
-                    AdapterFactory::build($this->config->buildFileSystemInfo($fs))
-                )
-            );
+            $this->mountFilesystem($fs, new Filesystem(
+                AdapterFactory::build($this->config->buildFileSystemInfo($fs))
+            ));
         }
     }
 
@@ -76,9 +63,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
     public function getFileSystem(string $key): FilesystemOperator
     {
         if (!$this->isFileSystemExists($key)) {
-            throw new MountException(
-                \sprintf('Filesystem `%s` was not identified', $key)
-            );
+            throw new MountException(\sprintf('Filesystem `%s` has not been defined', $key));
         }
 
         return $this->fileSystems[$key];
