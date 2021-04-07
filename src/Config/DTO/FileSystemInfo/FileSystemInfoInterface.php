@@ -11,25 +11,37 @@ declare(strict_types=1);
 
 namespace Spiral\Storage\Config\DTO\FileSystemInfo;
 
+use League\Flysystem\FilesystemAdapter;
+use Spiral\Storage\Resolver\AdapterResolverInterface;
+
 interface FileSystemInfoInterface
 {
+    /**
+     * @var string
+     */
     public const ADAPTER_KEY = 'adapter';
 
+    /**
+     * @var string
+     */
     public const RESOLVER_KEY = 'resolver';
 
+    /**
+     * @var string
+     */
     public const VISIBILITY_KEY = 'visibility';
 
     /**
      * Get used adapter class
      *
-     * @return string
+     * @return class-string<FilesystemAdapter>
      */
     public function getAdapterClass(): string;
 
     /**
      * Get used resolver class
      *
-     * @return string
+     * @return class-string<AdapterResolverInterface>
      */
     public function getResolverClass(): string;
 

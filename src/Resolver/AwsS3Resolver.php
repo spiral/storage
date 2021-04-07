@@ -30,7 +30,7 @@ class AwsS3Resolver extends AbstractAdapterResolver
     /**
      * @inheritDoc
      */
-    public function buildUrl(string $uri, array $options = []): ?string
+    public function buildUrl(string $uri, array $options = [])
     {
         $s3Client = $this->fsInfo->getClient();
 

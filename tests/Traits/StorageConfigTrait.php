@@ -41,9 +41,10 @@ trait StorageConfigTrait
             }
         }
 
-        return new StorageConfig(
-            ['servers' => $servers, 'buckets' => $buckets]
-        );
+        return new StorageConfig([
+            'servers' => $servers,
+            'buckets' => $buckets
+        ]);
     }
 
     protected function buildServerBucketInfoDesc(string $serverName): array

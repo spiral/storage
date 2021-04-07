@@ -12,6 +12,8 @@ trait ReflectionHelperTrait
      * @param string $constant
      * @return mixed
      * @throws \ReflectionException
+     *
+     * @deprecated Tests should not use this method to call internal implementation
      */
     protected function getNotPublicConst($object, string $constant)
     {
@@ -26,6 +28,8 @@ trait ReflectionHelperTrait
      * @param string $property
      * @return mixed
      * @throws \ReflectionException
+     *
+     * @deprecated Tests should not use this method to call internal implementation
      */
     protected function getNotPublicProperty($object, string $property)
     {
@@ -43,6 +47,8 @@ trait ReflectionHelperTrait
      * @param string $property
      * @param mixed $value
      * @throws \ReflectionException
+     *
+     * @deprecated Tests should not use this method to call internal implementation
      */
     protected function setNotPublicProperty($object, string $property, $value): void
     {
@@ -61,6 +67,8 @@ trait ReflectionHelperTrait
      * @param array $args
      * @return mixed
      * @throws \ReflectionException
+     *
+     * @deprecated Tests should not use this method to call internal implementation
      */
     protected function callNotPublicMethod($object, string $method, array $args = [])
     {
