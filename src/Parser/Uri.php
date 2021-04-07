@@ -13,7 +13,7 @@ namespace Spiral\Storage\Parser;
 
 use Spiral\Storage\Exception\UriException;
 
-final class Uri implements MutableUriInterface
+final class Uri implements UriInterface
 {
     /**
      * @var string
@@ -89,7 +89,7 @@ final class Uri implements MutableUriInterface
     /**
      * {@inheritDoc}
      */
-    public function withFileSystem(string $fs): MutableUriInterface
+    public function withFileSystem(string $fs): UriInterface
     {
         $self = clone $this;
         $self->setFileSystem($fs);
@@ -100,7 +100,7 @@ final class Uri implements MutableUriInterface
     /**
      * {@inheritDoc}
      */
-    public function withPath(string $path): MutableUriInterface
+    public function withPath(string $path): UriInterface
     {
         $self = clone $this;
         $self->setPath($path);

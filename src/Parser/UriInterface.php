@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Spiral\Storage\Parser;
 
+use Spiral\Storage\Exception\UriException;
+
 /**
  * Value object representing a FileSystem URI.
  */
@@ -30,6 +32,16 @@ interface UriInterface extends \Stringable
      * @return string The filesystem name.
      */
     public function getFileSystem(): string;
+
+    /**
+     * Updates a filesystem name which will be
+     * returned by {@see UriInterface::getFileSystem()} method.
+     *
+     * @param string $fs
+     * @return $this
+     * @throws UriException In case of an bad URI scheme (fs name) component.
+     */
+    public function withFileSystem(string $fs): self;
 
     /**
      * Retrieve the filesystem's path component of the URI.
@@ -57,4 +69,14 @@ interface UriInterface extends \Stringable
      * @return string The URI path.
      */
     public function getPath(): string;
+
+    /**
+     * Updates a filesystem path component which will be
+     * returned by {@see UriInterface::getPath()} method.
+     *
+     * @param string $path
+     * @return $this
+     * @throws UriException In case of an bad URI path component.
+     */
+    public function withPath(string $path): self;
 }
