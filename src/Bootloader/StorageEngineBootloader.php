@@ -12,6 +12,9 @@ declare(strict_types=1);
 namespace Spiral\Storage\Bootloader;
 
 use Spiral\Boot\Bootloader\Bootloader;
+use Spiral\Config\ConfiguratorInterface;
+use Spiral\Core\Container;
+use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Parser\UriParser;
 use Spiral\Storage\Parser\UriParserInterface;
 use Spiral\Storage\ResolveManager;
@@ -26,4 +29,9 @@ class StorageEngineBootloader extends Bootloader
         ResolveManagerInterface::class => ResolveManager::class,
         UriParserInterface::class => UriParser::class,
     ];
+
+    public function boot(Container $app): void
+    {
+        $app->bindInjector(StorageConfig::class, ConfiguratorInterface::class);
+    }
 }

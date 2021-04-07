@@ -14,7 +14,6 @@ namespace Spiral\Storage\Config;
 use League\Flysystem\FilesystemAdapter;
 use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
 use Spiral\Storage\Exception\ConfigException;
-use Spiral\Core\InjectableConfig;
 use Spiral\Storage\Config\DTO\BucketInfo;
 use Spiral\Storage\Config\DTO\BucketInfoInterface;
 use Spiral\Storage\Config\DTO\FileSystemInfo;
@@ -45,7 +44,7 @@ use Spiral\Storage\Exception\StorageException;
  *
  * @see FilesystemAdapter
  */
-final class StorageConfig extends InjectableConfig implements ConfigInterface
+final class StorageConfig implements ConfigInterface
 {
     /**
      * @var string
