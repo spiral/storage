@@ -3,6 +3,7 @@
 namespace Spiral\Tests\Storage\Unit\Parser;
 
 use Spiral\Storage\Exception\UriException;
+use Spiral\Storage\Parser\Uri;
 use Spiral\Tests\Storage\Unit\UnitTestCase;
 
 class UriParserTest extends UnitTestCase
@@ -13,10 +14,11 @@ class UriParserTest extends UnitTestCase
      * @param string $fs
      * @param string $path
      * @param string $uri
+     * @throws UriException
      */
     public function testPrepareUri(string $fs, string $path, string $uri): void
     {
-        $uriStructure = $this->getUriParser()->prepareUri($fs, $path);
+        $uriStructure = Uri::create($fs, $path);
 
         $this->assertEquals($fs, $uriStructure->getFileSystem());
         $this->assertEquals($path, $uriStructure->getPath());
@@ -34,7 +36,7 @@ class UriParserTest extends UnitTestCase
      */
     public function testParseUri(string $fs, string $path, string $uri): void
     {
-        $uriStructure = $this->getUriParser()->parseUri($uri);
+        $uriStructure = $this->getUriParser()->parse($uri);
 
         $this->assertEquals($fs, $uriStructure->getFileSystem());
         $this->assertEquals($path, $uriStructure->getPath());
@@ -54,7 +56,7 @@ class UriParserTest extends UnitTestCase
         $this->expectException(UriException::class);
         $this->expectExceptionMessage($expectedMsg);
 
-        $this->getUriParser()->parseUri($uri);
+        $this->getUriParser()->parse($uri);
     }
 
     /**
@@ -63,17 +65,12 @@ class UriParserTest extends UnitTestCase
      * @param string $fs
      * @param string $path
      * @param string $uri
-     * @param string|null $separator
      *
      * @throws \ReflectionException
      */
-    public function testBuildUriStructure(string $fs, string $path, string $uri, ?string $separator = null): void
+    public function testBuildUriStructure(string $fs, string $path, string $uri): void
     {
-        $uriStructure = $this->callNotPublicMethod(
-            $this->getUriParser(),
-            'buildUriStructure',
-            [$fs, $path, $separator]
-        );
+        $uriStructure = Uri::create($fs, $path);
 
         $this->assertEquals($fs, $uriStructure->getFileSystem());
         $this->assertEquals($path, $uriStructure->getPath());
@@ -102,38 +99,21 @@ class UriParserTest extends UnitTestCase
             [
                 'local',
                 'file.txt',
-                'local://file.txt',
-                null,
+                'local://file.txt'
             ],
             [
                 'local',
                 'dir/file.txt',
-                'local://dir/file.txt',
-                '://',
-            ],
-            [
-                'aws',
-                'some/specific/dir/dirFile.txt',
-                'aws+-+some/specific/dir/dirFile.txt',
-                '+-+',
+                'local://dir/file.txt'
             ],
         ];
     }
 
     public function getBadUriList(): array
     {
-        $noFsUri = '://file.txt';
-        $noPathUri = 'aws://';
-
         return [
-            [
-                $noFsUri,
-                \sprintf('No filesystem was detected in uri `%s`', $noFsUri),
-            ],
-            [
-                $noPathUri,
-                \sprintf('No path was detected in uri `%s`', $noPathUri),
-            ],
+            ['://file.txt', 'Filesystem name can not be empty'],
+            ['aws://', 'Filesystem pathname can not be empty'],
         ];
     }
 }

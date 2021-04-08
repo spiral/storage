@@ -14,12 +14,17 @@ namespace Spiral\Storage;
 use Spiral\Core\Container\SingletonInterface;
 use Spiral\Storage\Config\ConfigInterface;
 use Spiral\Storage\Config\DTO\FileSystemInfo\FileSystemInfoInterface;
+use Spiral\Storage\Config\StorageConfig;
 use Spiral\Storage\Exception\ResolveException;
 use Spiral\Storage\Exception\StorageException;
+use Spiral\Storage\Parser\UriParser;
 use Spiral\Storage\Parser\UriParserInterface;
 use Spiral\Storage\Resolver\AdapterResolverInterface;
 
-class ResolveManager implements SingletonInterface, ResolveManagerInterface
+/**
+ * @psalm-import-type UriLikeType from UriResolverInterface
+ */
+class UriResolver implements UriResolverInterface
 {
     /**
      * @var ConfigInterface
@@ -29,7 +34,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
     /**
      * @var UriParserInterface
      */
-    protected $uriParser;
+    protected $parser;
 
     /**
      * @var array<AdapterResolverInterface>
@@ -38,45 +43,40 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
 
     /**
      * @param ConfigInterface $config
-     * @param UriParserInterface $uriParser
+     * @param UriParserInterface|null $uriParser
      */
-    public function __construct(ConfigInterface $config, UriParserInterface $uriParser)
+    public function __construct(ConfigInterface $config, UriParserInterface $parser = null)
     {
         $this->config = $config;
-        $this->uriParser = $uriParser;
+        $this->parser = $parser ?? new UriParser();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function buildUrlsList(array $files, bool $throwException = true): iterable
+    public function resolveAll(iterable $uris): iterable
     {
-        foreach ($files as $uri) {
-            yield $this->buildUrl($uri, $throwException);
+        foreach ($uris as $uri) {
+            yield $this->resolve($uri);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function buildUrl(string $uri, bool $throwException = true): ?string
+    public function resolve($uri)
     {
         try {
-            $uriStructure = $this->uriParser->parseUri($uri);
+            $uri = $this->parser->parse($uri);
 
-            return $this->getResolver($uriStructure->fileSystem)
-                ->buildUrl($uriStructure->path);
+            return $this->getResolver($uri->getFileSystem())
+                ->buildUrl($uri->getPath())
+            ;
         } catch (StorageException $e) {
-            if ($throwException) {
-                throw $e;
-            }
+            throw $e;
         } catch (\Throwable $e) {
-            if ($throwException) {
-                throw new ResolveException($e->getMessage(), (int)$e->getCode(), $e);
-            }
+            throw new ResolveException($e->getMessage(), (int)$e->getCode(), $e);
         }
-
-        return null;
     }
 
     /**
@@ -90,7 +90,7 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      */
     protected function getResolver(string $fileSystem): AdapterResolverInterface
     {
-        if (!array_key_exists($fileSystem, $this->resolvers)) {
+        if (!\array_key_exists($fileSystem, $this->resolvers)) {
             $this->resolvers[$fileSystem] = $this->prepareResolverForFileSystem(
                 $this->config->buildFileSystemInfo($fileSystem)
             );
@@ -108,8 +108,8 @@ class ResolveManager implements SingletonInterface, ResolveManagerInterface
      */
     protected function prepareResolverForFileSystem(FileSystemInfoInterface $fsInfo): AdapterResolverInterface
     {
-        $resolverClass = $fsInfo->getResolverClass();
+        $resolver = $fsInfo->getResolverClass();
 
-        return new $resolverClass($this->uriParser, $this->config, $fsInfo->getName());
+        return new $resolver($this->parser, $this->config, $fsInfo->getName());
     }
 }

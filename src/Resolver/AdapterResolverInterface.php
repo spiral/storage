@@ -21,9 +21,9 @@ interface AdapterResolverInterface
      * @param string $uri
      * @param array $options any required options can be used
      *
-     * @return string|null
+     * @return string|\Stringable
      *
      * @throws StorageException
      */
-    public function buildUrl(string $uri, array $options = []): ?string;
+    public function buildUrl(string $uri, array $options = []);
 }

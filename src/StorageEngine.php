@@ -21,6 +21,7 @@ use Spiral\Storage\Exception\FileOperationException;
 use Spiral\Storage\Exception\MountException;
 use Spiral\Storage\Exception\StorageException;
 use Spiral\Storage\Exception\UriException;
+use Spiral\Storage\Parser\Uri;
 use Spiral\Storage\Parser\UriParserInterface;
 
 class StorageEngine implements StorageInterface, SingletonInterface
@@ -214,7 +215,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
      */
     public function write(string $fileSystem, string $filePath, string $content, array $config = []): string
     {
-        $uri = (string)$this->uriParser->prepareUri($fileSystem, $filePath);
+        $uri = (string)Uri::create($fileSystem, $filePath);
 
         /** @var FilesystemOperator $filesystem */
         [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
@@ -233,7 +234,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
      */
     public function writeStream(string $fileSystem, string $filePath, $content, array $config = []): string
     {
-        $uri = (string)$this->uriParser->prepareUri($fileSystem, $filePath);
+        $uri = (string)Uri::create($fileSystem, $filePath);
 
         /** @var FilesystemOperator $filesystem */
         [$filesystem, $path] = $this->determineFilesystemAndPath($uri);
@@ -283,7 +284,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
                 ? $this->moveInTheSameFilesystem($sourceFilesystem, $sourcePath, $targetFilePath, $config)
                 : $this->moveAcrossFilesystems($sourceUri, $destinationFileSystem, $targetFilePath, $config);
 
-            return (string)$this->uriParser->prepareUri($destinationFileSystem, $targetFilePath);
+            return (string)Uri::create($destinationFileSystem, $targetFilePath);
         } catch (FilesystemException $e) {
             throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
@@ -317,7 +318,7 @@ class StorageEngine implements StorageInterface, SingletonInterface
                     $config
                 );
 
-            return (string)$this->uriParser->prepareUri($destinationFileSystem, $targetFilePath);
+            return (string)Uri::create($destinationFileSystem, $targetFilePath);
         } catch (FilesystemException $e) {
             throw new FileOperationException($e->getMessage(), (int)$e->getCode(), $e);
         }
@@ -373,16 +374,19 @@ class StorageEngine implements StorageInterface, SingletonInterface
      *
      * @param string $uri
      *
-     * @return array{0:FilesystemOperator, 1:string}
+     * @return array { 0: FilesystemOperator, 1: string }
      *
      * @throws MountException
      * @throws UriException
      */
     protected function determineFilesystemAndPath(string $uri): array
     {
-        $uriStructure = $this->uriParser->parseUri($uri);
+        $uriStructure = $this->uriParser->parse($uri);
 
-        return [$this->getFileSystem($uriStructure->fileSystem), $uriStructure->path];
+        return [
+            $this->getFileSystem($uriStructure->getFileSystem()),
+            $uriStructure->getPath()
+        ];
     }
 
     /**
