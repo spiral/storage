@@ -1,25 +1,16 @@
 <?php
 
-/**
- * This file is part of Spiral Framework package.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 declare(strict_types=1);
 
 namespace Spiral\Storage\Storage;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Psr\Http\Message\UriInterface;
 use Spiral\Storage\Storage;
 use Spiral\Storage\StorageInterface;
 use Spiral\Storage\BucketInterface;
 use Spiral\Storage\Visibility;
 
-/**
- * @mixin ReadableInterface
- */
 trait ReadableTrait
 {
     /**
@@ -27,93 +18,67 @@ trait ReadableTrait
      */
     abstract public function bucket(string $name = null): BucketInterface;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getContents($id): string
+    public function getContents(string|\Stringable $id): string
     {
         [$name, $pathname] = $this->parseUri($id);
 
-        $bucket = $this->bucket($name);
-
-        return $bucket->getContents($pathname);
+        return $this->bucket($name)->getContents($pathname);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getStream($id)
+    public function getStream(string|\Stringable $id)
     {
         [$name, $pathname] = $this->parseUri($id);
 
-        $bucket = $this->bucket($name);
-
-        return $bucket->getStream($pathname);
+        return $this->bucket($name)->getStream($pathname);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function exists($id): bool
+    public function exists(string|\Stringable $id): bool
     {
         [$name, $pathname] = $this->parseUri($id);
 
-        $bucket = $this->bucket($name);
-
-        return $bucket->exists($pathname);
+        return $this->bucket($name)->exists($pathname);
     }
 
     /**
-     * {@inheritDoc}
+     * @return positive-int|0
      */
-    public function getLastModified($id): int
+    public function getLastModified(string|\Stringable $id): int
     {
         [$name, $pathname] = $this->parseUri($id);
 
-        $bucket = $this->bucket($name);
-
-        return $bucket->getLastModified($pathname);
+        return $this->bucket($name)->getLastModified($pathname);
     }
 
     /**
-     * {@inheritDoc}
+     * @return positive-int|0
      */
-    public function getSize($id): int
+    public function getSize(string|\Stringable $id): int
     {
         [$name, $pathname] = $this->parseUri($id);
 
-        $bucket = $this->bucket($name);
-
-        return $bucket->getSize($pathname);
+        return $this->bucket($name)->getSize($pathname);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getMimeType($id): string
+    public function getMimeType(string|\Stringable $id): string
     {
         [$name, $pathname] = $this->parseUri($id);
 
-        $bucket = $this->bucket($name);
-
-        return $bucket->getMimeType($pathname);
+        return $this->bucket($name)->getMimeType($pathname);
     }
 
     /**
-     * {@inheritDoc}
+     * @return Visibility::VISIBILITY_*
      */
     #[ExpectedValues(valuesFromClass: Visibility::class)]
-    public function getVisibility($id): string
+    public function getVisibility(string|\Stringable $id): string
     {
         [$name, $pathname] = $this->parseUri($id);
 
-        $bucket = $this->bucket($name);
-
-        return $bucket->getVisibility($pathname);
+        return $this->bucket($name)->getVisibility($pathname);
     }
 
     /**
      * {@see Storage::parseUri()}
      */
-    abstract protected function parseUri($uri, bool $withScheme = true): array;
+    abstract protected function parseUri(string|\Stringable $uri, bool $withScheme = true): array;
 }
