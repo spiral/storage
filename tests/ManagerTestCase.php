@@ -10,7 +10,9 @@ use Spiral\Storage\Storage;
 use Spiral\Storage\Bucket;
 use Spiral\Storage\Visibility;
 
-#[\PHPUnit\Framework\Attributes\Group('unit')]
+/**
+ * @group unit
+ */
 class ManagerTestCase extends TestCase
 {
     /**
