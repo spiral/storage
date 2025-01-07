@@ -10,10 +10,15 @@ use Spiral\Storage\Storage;
 use Spiral\Storage\Bucket;
 use Spiral\Storage\Visibility;
 
-#[\PHPUnit\Framework\Attributes\Group('unit')]
+/**
+ * @group unit
+ */
 class ManagerTestCase extends TestCase
 {
-    private Storage $manager;
+    /**
+     * @var Storage
+     */
+    private $manager;
 
     public function setUp(): void
     {
@@ -25,12 +30,12 @@ class ManagerTestCase extends TestCase
 
     public function testDefaultResolver(): void
     {
-        self::assertSame($this->local, $this->manager->bucket());
+        $this->assertSame($this->local, $this->manager->bucket());
     }
 
     public function testResolverByName(): void
     {
-        self::assertSame($this->local, $this->manager->bucket('default'));
+        $this->assertSame($this->local, $this->manager->bucket('default'));
     }
 
     public function testUnknownResolver(): void
@@ -45,8 +50,8 @@ class ManagerTestCase extends TestCase
     {
         $this->manager->add('known', $this->second);
 
-        self::assertSame($this->local, $this->manager->bucket());
-        self::assertSame($this->second, $this->manager->bucket('known'));
+        $this->assertSame($this->local, $this->manager->bucket());
+        $this->assertSame($this->second, $this->manager->bucket('known'));
     }
 
     public function testIterator(): void
@@ -54,12 +59,12 @@ class ManagerTestCase extends TestCase
         $manager = clone $this->manager;
 
         $resolvers = \iterator_to_array($manager->getIterator());
-        self::assertSame([Storage::DEFAULT_STORAGE => $this->local], $resolvers);
+        $this->assertSame([Storage::DEFAULT_STORAGE => $this->local], $resolvers);
 
         $manager->add('example', $this->second);
 
         $resolvers = \iterator_to_array($manager->getIterator());
-        self::assertSame([
+        $this->assertSame([
             Storage::DEFAULT_STORAGE => $this->local,
             'example'                => $this->second
         ], $resolvers);
@@ -69,11 +74,11 @@ class ManagerTestCase extends TestCase
     {
         $manager = clone $this->manager;
 
-        self::assertCount(1, $manager);
+        $this->assertSame(1, $manager->count());
 
         $manager->add('example', $this->second);
 
-        self::assertCount(2, $manager);
+        $this->assertSame(2, $manager->count());
     }
 
     public function testInvalidUri(): void
@@ -93,7 +98,7 @@ class ManagerTestCase extends TestCase
     {
         $this->manager->create('file.txt');
 
-        self::assertTrue($this->manager->exists('file.txt'));
+        $this->assertTrue($this->manager->exists('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -112,7 +117,7 @@ class ManagerTestCase extends TestCase
     {
         $this->manager->create('file.txt');
 
-        self::assertTrue($this->manager->exists('file.txt'));
+        $this->assertTrue($this->manager->exists('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -122,8 +127,8 @@ class ManagerTestCase extends TestCase
         $content = \random_bytes(64);
         $this->manager->write('file.txt', $content);
 
-        self::assertTrue($this->manager->exists('file.txt'));
-        self::assertSame($content, $this->manager->getContents('file.txt'));
+        $this->assertTrue($this->manager->exists('file.txt'));
+        $this->assertSame($content, $this->manager->getContents('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -136,8 +141,8 @@ class ManagerTestCase extends TestCase
 
         $this->manager->write('file.txt', $stream);
 
-        self::assertTrue($this->manager->exists('file.txt'));
-        self::assertSame($content, $this->manager->getContents('file.txt'));
+        $this->assertTrue($this->manager->exists('file.txt'));
+        $this->assertSame($content, $this->manager->getContents('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -156,10 +161,10 @@ class ManagerTestCase extends TestCase
         $private = Visibility::VISIBILITY_PRIVATE;
 
         $this->manager->setVisibility('file.txt', $public);
-        self::assertSame($public, $this->manager->getVisibility('file.txt'));
+        $this->assertSame($public, $this->manager->getVisibility('file.txt'));
 
         $this->manager->setVisibility('file.txt', $private);
-        self::assertSame($private, $this->manager->getVisibility('file.txt'));
+        $this->assertSame($private, $this->manager->getVisibility('file.txt'));
     }
 
     public function testCopyToSameStorage(): void
@@ -168,11 +173,11 @@ class ManagerTestCase extends TestCase
         $this->manager->write('source.txt', $content);
         $this->manager->copy('source.txt', 'copy.txt');
 
-        self::assertTrue($this->manager->exists('source.txt'));
-        self::assertSame($content, $this->manager->getContents('source.txt'));
+        $this->assertTrue($this->manager->exists('source.txt'));
+        $this->assertSame($content, $this->manager->getContents('source.txt'));
 
-        self::assertTrue($this->manager->exists('copy.txt'));
-        self::assertSame($content, $this->manager->getContents('copy.txt'));
+        $this->assertTrue($this->manager->exists('copy.txt'));
+        $this->assertSame($content, $this->manager->getContents('copy.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -186,13 +191,13 @@ class ManagerTestCase extends TestCase
         $manager->write('source.txt', $content);
         $manager->copy('source.txt', 'copy://copy.txt');
 
-        self::assertTrue($manager->exists('source.txt'));
-        self::assertSame($content, $manager->getContents('source.txt'));
-        self::assertFalse($manager->exists('copy.txt'));
+        $this->assertTrue($manager->exists('source.txt'));
+        $this->assertSame($content, $manager->getContents('source.txt'));
+        $this->assertFalse($manager->exists('copy.txt'));
 
-        self::assertTrue($manager->exists('copy://copy.txt'));
-        self::assertSame($content, $manager->getContents('copy://copy.txt'));
-        self::assertFalse($manager->exists('copy://source.txt'));
+        $this->assertTrue($manager->exists('copy://copy.txt'));
+        $this->assertSame($content, $manager->getContents('copy://copy.txt'));
+        $this->assertFalse($manager->exists('copy://source.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -203,9 +208,9 @@ class ManagerTestCase extends TestCase
         $this->manager->write('source.txt', $content);
         $this->manager->move('source.txt', 'moved.txt');
 
-        self::assertFalse($this->manager->exists('source.txt'));
-        self::assertTrue($this->manager->exists('moved.txt'));
-        self::assertSame($content, $this->manager->getContents('moved.txt'));
+        $this->assertFalse($this->manager->exists('source.txt'));
+        $this->assertTrue($this->manager->exists('moved.txt'));
+        $this->assertSame($content, $this->manager->getContents('moved.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -219,12 +224,12 @@ class ManagerTestCase extends TestCase
         $manager->write('source.txt', $content);
         $manager->move('source.txt', 'move://moved.txt');
 
-        self::assertFalse($manager->exists('source.txt'));
-        self::assertFalse($manager->exists('moved.txt'));
+        $this->assertFalse($manager->exists('source.txt'));
+        $this->assertFalse($manager->exists('moved.txt'));
 
-        self::assertTrue($manager->exists('move://moved.txt'));
-        self::assertSame($content, $manager->getContents('move://moved.txt'));
-        self::assertFalse($manager->exists('move://source.txt'));
+        $this->assertTrue($manager->exists('move://moved.txt'));
+        $this->assertSame($content, $manager->getContents('move://moved.txt'));
+        $this->assertFalse($manager->exists('move://source.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -232,10 +237,10 @@ class ManagerTestCase extends TestCase
     public function testDelete(): void
     {
         $this->manager->create('file.txt');
-        self::assertTrue($this->manager->exists('file.txt'));
+        $this->assertTrue($this->manager->exists('file.txt'));
 
         $this->manager->delete('file.txt');
-        self::assertFalse($this->manager->exists('file.txt'));
+        $this->assertFalse($this->manager->exists('file.txt'));
     }
 
     public function testReadingAsStream(): void
@@ -250,16 +255,16 @@ class ManagerTestCase extends TestCase
         }
         \fclose($stream);
 
-        self::assertSame($actual, $content);
+        $this->assertSame($actual, $content);
 
         $this->cleanTempDirectory();
     }
 
     public function testExisting(): void
     {
-        self::assertFalse($this->manager->exists('file.txt'));
+        $this->assertFalse($this->manager->exists('file.txt'));
         $this->manager->create('file.txt');
-        self::assertTrue($this->manager->exists('file.txt'));
+        $this->assertTrue($this->manager->exists('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -273,14 +278,14 @@ class ManagerTestCase extends TestCase
 
         $this->manager->create('file.txt');
         $before = $this->manager->getLastModified('file.txt');
-        self::assertGreaterThanOrEqual($now, $before);
+        $this->assertGreaterThanOrEqual($now, $before);
 
         // Wait 1.1 seconds and then again modify file
         \usleep(1100000);
 
         $this->manager->write('file.txt', 'content');
         $after = $this->manager->getLastModified('file.txt');
-        self::assertGreaterThan($before, $after);
+        $this->assertGreaterThan($before, $after);
     }
 
     public function testSize(): void
@@ -288,7 +293,7 @@ class ManagerTestCase extends TestCase
         $content = \random_bytes(\random_int(32, 256));
         $this->manager->write('file.txt', $content);
 
-        self::assertSame(\strlen($content), $this->manager->getSize('file.txt'));
+        $this->assertSame(\strlen($content), $this->manager->getSize('file.txt'));
     }
 
     /**
@@ -299,6 +304,6 @@ class ManagerTestCase extends TestCase
     {
         $this->manager->write('file.txt', 'content');
 
-        self::assertSame('text/plain', $this->manager->getMimeType('file.txt'));
+        $this->assertSame('text/plain', $this->manager->getMimeType('file.txt'));
     }
 }

@@ -44,9 +44,10 @@ class StorageBootloader extends Bootloader
         $binder->bindSingleton(StorageInterface::class, static function (
             BucketFactoryInterface $bucketFactory,
             StorageConfig $config,
-            FactoryInterface $factory,
-        ): StorageInterface {
+            FactoryInterface $factory
+        ) {
             $manager = new Storage($config->getDefaultBucket());
+
             $distributions = $config->getDistributions();
 
             foreach ($config->getAdapters() as $name => $adapter) {
@@ -72,10 +73,10 @@ class StorageBootloader extends Bootloader
             return $manager;
         });
 
-        $binder->bindSingleton(Storage::class, static fn (StorageInterface $manager): StorageInterface => $manager);
+        $binder->bindSingleton(Storage::class, static fn (StorageInterface $manager) => $manager);
 
-        $binder->bindSingleton(BucketInterface::class, static fn (StorageInterface $manager): BucketInterface => $manager->bucket());
+        $binder->bindSingleton(BucketInterface::class, static fn (StorageInterface $manager) => $manager->bucket());
 
-        $binder->bindSingleton(Bucket::class, static fn (BucketInterface $storage): BucketInterface => $storage);
+        $binder->bindSingleton(Bucket::class, static fn (BucketInterface $storage) => $storage);
     }
 }

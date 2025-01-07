@@ -23,14 +23,14 @@ final class StorageConfigTest extends TestCase
             'default' => 'foo',
         ]);
 
-        self::assertSame('foo', $config->getDefaultBucket());
+        $this->assertSame('foo', $config->getDefaultBucket());
     }
 
     public function testS3Adapter(): void
     {
         $config = new StorageConfig($this->getConfig());
 
-        self::assertEquals(new AwsS3V3Adapter(
+        $this->assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'test-region',
@@ -53,7 +53,7 @@ final class StorageConfigTest extends TestCase
     {
         $config = new StorageConfig($this->getConfig());
 
-        self::assertEquals(new AsyncAwsS3Adapter(
+        $this->assertEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'test-region',
                 'endpoint' => 'test-endpoint',
@@ -73,7 +73,7 @@ final class StorageConfigTest extends TestCase
             'uploads' => ['server' => 's3', 'bucket' => 'overridden']
         ]]));
 
-        self::assertEquals(new AwsS3V3Adapter(
+        $this->assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'test-region',
@@ -98,7 +98,7 @@ final class StorageConfigTest extends TestCase
             'uploads-async' => ['server' => 's3-async', 'bucket' => 'overridden']
         ]]));
 
-        self::assertEquals(new AsyncAwsS3Adapter(
+        $this->assertEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'test-region',
                 'endpoint' => 'test-endpoint',
@@ -118,7 +118,7 @@ final class StorageConfigTest extends TestCase
             'uploads' => ['server' => 's3', 'region' => 'overridden']
         ]]));
 
-        self::assertEquals(new AwsS3V3Adapter(
+        $this->assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'overridden',
@@ -143,7 +143,7 @@ final class StorageConfigTest extends TestCase
             'uploads-async' => ['server' => 's3-async', 'region' => 'overridden']
         ]]));
 
-        self::assertEquals(new AsyncAwsS3Adapter(
+        $this->assertEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'overridden',
                 'endpoint' => 'test-endpoint',
@@ -163,7 +163,7 @@ final class StorageConfigTest extends TestCase
             'uploads' => ['server' => 's3', 'visibility' => Visibility::VISIBILITY_PRIVATE]
         ]]));
 
-        self::assertEquals(new AwsS3V3Adapter(
+        $this->assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'test-region',
@@ -188,7 +188,7 @@ final class StorageConfigTest extends TestCase
             'uploads-async' => ['server' => 's3-async', 'visibility' => Visibility::VISIBILITY_PRIVATE]
         ]]));
 
-        self::assertEquals(new AsyncAwsS3Adapter(
+        $this->assertEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'test-region',
                 'endpoint' => 'test-endpoint',
@@ -208,7 +208,7 @@ final class StorageConfigTest extends TestCase
             'uploads' => ['server' => 's3', 'prefix' => 'overridden']
         ]]));
 
-        self::assertEquals(new AwsS3V3Adapter(
+        $this->assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'test-region',
@@ -233,7 +233,7 @@ final class StorageConfigTest extends TestCase
             'uploads-async' => ['server' => 's3-async', 'prefix' => 'overridden']
         ]]));
 
-        self::assertEquals(new AsyncAwsS3Adapter(
+        $this->assertEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'test-region',
                 'endpoint' => 'test-endpoint',
