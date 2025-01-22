@@ -26,7 +26,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected $second;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
         $this->cleanTempDirectory();
 

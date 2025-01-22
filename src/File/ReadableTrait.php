@@ -47,7 +47,7 @@ trait ReadableTrait
     }
 
     /**
-     * @return int<0, max>
+     * @return positive-int|0
      */
     public function getSize(): int
     {

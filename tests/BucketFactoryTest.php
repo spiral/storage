@@ -19,8 +19,8 @@ final class BucketFactoryTest extends TestCase
             $name = 'foo',
         );
 
-        self::assertSame($name, $bucket->getName());
-        self::assertNull($bucket->getUriResolver());
+        $this->assertSame($name, $bucket->getName());
+        $this->assertNull($bucket->getUriResolver());
     }
 
     public function testCreatesBucketFromAdapterWithResolver(): void
@@ -33,7 +33,7 @@ final class BucketFactoryTest extends TestCase
             $resolver = $this->createMock(UriResolverInterface::class)
         );
 
-        self::assertSame($name, $bucket->getName());
-        self::assertSame($resolver, $bucket->getUriResolver());
+        $this->assertSame($name, $bucket->getName());
+        $this->assertSame($resolver, $bucket->getUriResolver());
     }
 }
