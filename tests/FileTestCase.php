@@ -6,41 +6,39 @@ namespace Spiral\Tests\Storage;
 
 use Spiral\Storage\Visibility;
 
-/**
- * @group unit
- */
+#[\PHPUnit\Framework\Attributes\Group('unit')]
 class FileTestCase extends TestCase
 {
     public function testPathname(): void
     {
         $file = $this->local->file('path/to/file.txt');
 
-        $this->assertSame('path/to/file.txt', $file->getPathname());
+        self::assertSame('path/to/file.txt', $file->getPathname());
     }
 
     public function testStorage(): void
     {
         $file = $this->local->file('path/to/file.txt');
 
-        $this->assertSame($this->local, $file->getBucket());
+        self::assertSame($this->local, $file->getBucket());
     }
 
     public function testCreating(): void
     {
         $file = $this->local->file('path/to/file.txt');
-        $this->assertFalse($file->exists());
+        self::assertFalse($file->exists());
 
         $file->create();
-        $this->assertTrue($file->exists());
+        self::assertTrue($file->exists());
 
         $content = \random_bytes(64);
         $file->write($content);
 
         // execute "create" method again
-        $this->assertSame($content, $file->getContents());
+        self::assertSame($content, $file->getContents());
         $file->create();
         // content must not be changed
-        $this->assertSame($content, $file->getContents());
+        self::assertSame($content, $file->getContents());
     }
 
     public function testWriteString(): void
@@ -50,8 +48,8 @@ class FileTestCase extends TestCase
         $file = $this->local->file('file.txt');
         $file->write($content);
 
-        $this->assertTrue($file->exists());
-        $this->assertSame($content, $file->getContents());
+        self::assertTrue($file->exists());
+        self::assertSame($content, $file->getContents());
 
         $this->cleanTempDirectory();
     }
@@ -65,8 +63,8 @@ class FileTestCase extends TestCase
         $file = $this->local->file('file.txt');
         $file->write($content);
 
-        $this->assertTrue($file->exists());
-        $this->assertSame($content, $file->getContents());
+        self::assertTrue($file->exists());
+        self::assertSame($content, $file->getContents());
 
         $this->cleanTempDirectory();
     }
@@ -76,7 +74,7 @@ class FileTestCase extends TestCase
         $this->markTestSkipped(
             'This test [' . __FUNCTION__ . '] returns incorrect visibility ' .
                 'of files on Windows OS. ' .
-            'It is required to understand the situation'
+            'It is required to understand the situation',
         );
 
         $file = $this->local->file('file.txt')
@@ -87,10 +85,10 @@ class FileTestCase extends TestCase
         $private = Visibility::VISIBILITY_PRIVATE;
 
         $file->setVisibility($public);
-        $this->assertSame($public, $file->getVisibility());
+        self::assertSame($public, $file->getVisibility());
 
         $file->setVisibility($private);
-        $this->assertSame($private, $file->getVisibility());
+        self::assertSame($private, $file->getVisibility());
     }
 
     public function testCopyToSameStorage(): void
@@ -101,11 +99,11 @@ class FileTestCase extends TestCase
 
         $copy = $source->copy('copy.txt');
 
-        $this->assertTrue($source->exists());
-        $this->assertSame($content, $source->getContents());
+        self::assertTrue($source->exists());
+        self::assertSame($content, $source->getContents());
 
-        $this->assertTrue($copy->exists());
-        $this->assertSame($content, $copy->getContents());
+        self::assertTrue($copy->exists());
+        self::assertSame($content, $copy->getContents());
 
         $this->cleanTempDirectory();
     }
@@ -118,13 +116,13 @@ class FileTestCase extends TestCase
 
         $copy = $source->copy('copy.txt', $this->second);
 
-        $this->assertTrue($source->exists());
-        $this->assertSame($content, $source->getContents());
-        $this->assertFalse($this->local->exists('copy.txt'));
+        self::assertTrue($source->exists());
+        self::assertSame($content, $source->getContents());
+        self::assertFalse($this->local->exists('copy.txt'));
 
-        $this->assertTrue($copy->exists());
-        $this->assertSame($content, $copy->getContents());
-        $this->assertFalse($this->second->exists('source.txt'));
+        self::assertTrue($copy->exists());
+        self::assertSame($content, $copy->getContents());
+        self::assertFalse($this->second->exists('source.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -137,9 +135,9 @@ class FileTestCase extends TestCase
 
         $moved = $source->move('moved.txt');
 
-        $this->assertFalse($source->exists());
-        $this->assertTrue($moved->exists());
-        $this->assertSame($content, $moved->getContents());
+        self::assertFalse($source->exists());
+        self::assertTrue($moved->exists());
+        self::assertSame($content, $moved->getContents());
 
         $this->cleanTempDirectory();
     }
@@ -152,12 +150,12 @@ class FileTestCase extends TestCase
 
         $moved = $source->move('moved.txt', $this->second);
 
-        $this->assertFalse($source->exists());
-        $this->assertTrue($moved->exists());
-        $this->assertSame($content, $moved->getContents());
+        self::assertFalse($source->exists());
+        self::assertTrue($moved->exists());
+        self::assertSame($content, $moved->getContents());
 
-        $this->assertFalse($this->local->exists('moved.txt'));
-        $this->assertFalse($this->second->exists('source.txt'));
+        self::assertFalse($this->local->exists('moved.txt'));
+        self::assertFalse($this->second->exists('source.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -165,13 +163,13 @@ class FileTestCase extends TestCase
     public function testDelete(): void
     {
         $source = $this->local->file('file.txt');
-        $this->assertFalse($source->exists());
+        self::assertFalse($source->exists());
 
         $source->create();
-        $this->assertTrue($source->exists());
+        self::assertTrue($source->exists());
 
         $source->delete();
-        $this->assertFalse($source->exists());
+        self::assertFalse($source->exists());
     }
 
     public function testReadingAsStream(): void
@@ -188,7 +186,7 @@ class FileTestCase extends TestCase
         }
         \fclose($stream);
 
-        $this->assertSame($actual, $content);
+        self::assertSame($actual, $content);
 
         $this->cleanTempDirectory();
     }
@@ -197,9 +195,9 @@ class FileTestCase extends TestCase
     {
         $file = $this->local->file('file.txt');
 
-        $this->assertFalse($file->exists());
+        self::assertFalse($file->exists());
         $this->local->create('file.txt');
-        $this->assertTrue($file->exists());
+        self::assertTrue($file->exists());
 
         $this->cleanTempDirectory();
     }
@@ -216,14 +214,14 @@ class FileTestCase extends TestCase
         ;
 
         $before = $file->getLastModified();
-        $this->assertGreaterThanOrEqual($now, $before);
+        self::assertGreaterThanOrEqual($now, $before);
 
         // Wait 1.1 seconds and then again modify file
         \usleep(1100000);
 
         $file->write('content');
         $after = $file->getLastModified();
-        $this->assertGreaterThan($before, $after);
+        self::assertGreaterThan($before, $after);
     }
 
     public function testSize(): void
@@ -233,7 +231,7 @@ class FileTestCase extends TestCase
             ->write($content)
         ;
 
-        $this->assertSame(\strlen($content), $file->getSize());
+        self::assertSame(\strlen($content), $file->getSize());
     }
 
     /**
@@ -246,6 +244,6 @@ class FileTestCase extends TestCase
             ->write('content')
         ;
 
-        $this->assertSame('text/plain', $file->getMimeType());
+        self::assertSame('text/plain', $file->getMimeType());
     }
 }

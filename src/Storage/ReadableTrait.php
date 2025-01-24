@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Spiral\Storage\Storage;
 
 use JetBrains\PhpStorm\ExpectedValues;
-use Psr\Http\Message\UriInterface;
 use Spiral\Storage\Storage;
 use Spiral\Storage\StorageInterface;
 use Spiral\Storage\BucketInterface;
@@ -40,7 +39,7 @@ trait ReadableTrait
     }
 
     /**
-     * @return positive-int|0
+     * @return int<0, max>
      */
     public function getLastModified(string|\Stringable $id): int
     {
@@ -50,7 +49,7 @@ trait ReadableTrait
     }
 
     /**
-     * @return positive-int|0
+     * @return int<0, max>
      */
     public function getSize(string|\Stringable $id): int
     {
