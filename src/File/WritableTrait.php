@@ -36,17 +36,17 @@ trait WritableTrait
 
     public function setVisibility(
         #[ExpectedValues(valuesFromClass: Visibility::class)]
-        string $visibility
+        string $visibility,
     ): FileInterface {
         return $this->getBucket()->setVisibility($this->getPathname(), $visibility);
     }
 
-    public function copy(string $pathname, BucketInterface $storage = null, array $config = []): FileInterface
+    public function copy(string $pathname, ?BucketInterface $storage = null, array $config = []): FileInterface
     {
         return $this->getBucket()->copy($this->getPathname(), $pathname, $storage, $config);
     }
 
-    public function move(string $pathname, BucketInterface $storage = null, array $config = []): FileInterface
+    public function move(string $pathname, ?BucketInterface $storage = null, array $config = []): FileInterface
     {
         return $this->getBucket()->move($this->getPathname(), $pathname, $storage, $config);
     }

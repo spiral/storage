@@ -23,14 +23,14 @@ final class StorageConfigTest extends TestCase
             'default' => 'foo',
         ]);
 
-        $this->assertSame('foo', $config->getDefaultBucket());
+        self::assertSame('foo', $config->getDefaultBucket());
     }
 
     public function testS3Adapter(): void
     {
         $config = new StorageConfig($this->getConfig());
 
-        $this->assertEquals(new AwsS3V3Adapter(
+        self::assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'test-region',
@@ -38,14 +38,12 @@ final class StorageConfigTest extends TestCase
                 'credentials' => new Credentials(
                     'test-key',
                     'test-secret',
-                    null,
-                    null
                 ),
                 'use_path_style_endpoint' => true,
             ]),
             'test-bucket',
             'test-prefix',
-            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC)
+            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC),
         ), $config->getAdapters()['uploads']);
     }
 
@@ -53,7 +51,7 @@ final class StorageConfigTest extends TestCase
     {
         $config = new StorageConfig($this->getConfig());
 
-        $this->assertEquals(new AsyncAwsS3Adapter(
+        $this->assertAsyncAdapterEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'test-region',
                 'endpoint' => 'test-endpoint',
@@ -63,17 +61,17 @@ final class StorageConfigTest extends TestCase
             ]),
             'test-bucket',
             'test-prefix',
-            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC)
+            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC),
         ), $config->getAdapters()['uploads-async']);
     }
 
     public function testS3AdapterWithOverriddenBucket(): void
     {
         $config = new StorageConfig($this->getConfig(['buckets' => [
-            'uploads' => ['server' => 's3', 'bucket' => 'overridden']
+            'uploads' => ['server' => 's3', 'bucket' => 'overridden'],
         ]]));
 
-        $this->assertEquals(new AwsS3V3Adapter(
+        self::assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'test-region',
@@ -81,24 +79,22 @@ final class StorageConfigTest extends TestCase
                 'credentials' => new Credentials(
                     'test-key',
                     'test-secret',
-                    null,
-                    null
                 ),
                 'use_path_style_endpoint' => true,
             ]),
             'overridden',
             'test-prefix',
-            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC)
+            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC),
         ), $config->getAdapters()['uploads']);
     }
 
     public function testS3AsyncAdapterWithOverriddenBucket(): void
     {
         $config = new StorageConfig($this->getConfig(['buckets' => [
-            'uploads-async' => ['server' => 's3-async', 'bucket' => 'overridden']
+            'uploads-async' => ['server' => 's3-async', 'bucket' => 'overridden'],
         ]]));
 
-        $this->assertEquals(new AsyncAwsS3Adapter(
+        $this->assertAsyncAdapterEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'test-region',
                 'endpoint' => 'test-endpoint',
@@ -108,17 +104,17 @@ final class StorageConfigTest extends TestCase
             ]),
             'overridden',
             'test-prefix',
-            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC)
+            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC),
         ), $config->getAdapters()['uploads-async']);
     }
 
     public function testS3AdapterWithOverriddenRegion(): void
     {
         $config = new StorageConfig($this->getConfig(['buckets' => [
-            'uploads' => ['server' => 's3', 'region' => 'overridden']
+            'uploads' => ['server' => 's3', 'region' => 'overridden'],
         ]]));
 
-        $this->assertEquals(new AwsS3V3Adapter(
+        self::assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'overridden',
@@ -126,24 +122,22 @@ final class StorageConfigTest extends TestCase
                 'credentials' => new Credentials(
                     'test-key',
                     'test-secret',
-                    null,
-                    null
                 ),
                 'use_path_style_endpoint' => true,
             ]),
             'test-bucket',
             'test-prefix',
-            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC)
+            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC),
         ), $config->getAdapters()['uploads']);
     }
 
     public function testS3AsyncAdapterWithOverriddenRegion(): void
     {
         $config = new StorageConfig($this->getConfig(['buckets' => [
-            'uploads-async' => ['server' => 's3-async', 'region' => 'overridden']
+            'uploads-async' => ['server' => 's3-async', 'region' => 'overridden'],
         ]]));
 
-        $this->assertEquals(new AsyncAwsS3Adapter(
+        $this->assertAsyncAdapterEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'overridden',
                 'endpoint' => 'test-endpoint',
@@ -153,17 +147,17 @@ final class StorageConfigTest extends TestCase
             ]),
             'test-bucket',
             'test-prefix',
-            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC)
+            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC),
         ), $config->getAdapters()['uploads-async']);
     }
 
     public function testS3AdapterWithOverriddenVisibility(): void
     {
         $config = new StorageConfig($this->getConfig(['buckets' => [
-            'uploads' => ['server' => 's3', 'visibility' => Visibility::VISIBILITY_PRIVATE]
+            'uploads' => ['server' => 's3', 'visibility' => Visibility::VISIBILITY_PRIVATE],
         ]]));
 
-        $this->assertEquals(new AwsS3V3Adapter(
+        self::assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'test-region',
@@ -171,24 +165,22 @@ final class StorageConfigTest extends TestCase
                 'credentials' => new Credentials(
                     'test-key',
                     'test-secret',
-                    null,
-                    null
                 ),
                 'use_path_style_endpoint' => true,
             ]),
             'test-bucket',
             'test-prefix',
-            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PRIVATE)
+            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PRIVATE),
         ), $config->getAdapters()['uploads']);
     }
 
     public function testS3AsyncAdapterWithOverriddenVisibility(): void
     {
         $config = new StorageConfig($this->getConfig(['buckets' => [
-            'uploads-async' => ['server' => 's3-async', 'visibility' => Visibility::VISIBILITY_PRIVATE]
+            'uploads-async' => ['server' => 's3-async', 'visibility' => Visibility::VISIBILITY_PRIVATE],
         ]]));
 
-        $this->assertEquals(new AsyncAwsS3Adapter(
+        $this->assertAsyncAdapterEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'test-region',
                 'endpoint' => 'test-endpoint',
@@ -198,17 +190,17 @@ final class StorageConfigTest extends TestCase
             ]),
             'test-bucket',
             'test-prefix',
-            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PRIVATE)
+            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PRIVATE),
         ), $config->getAdapters()['uploads-async']);
     }
 
     public function testS3AdapterWithOverriddenPrefix(): void
     {
         $config = new StorageConfig($this->getConfig(['buckets' => [
-            'uploads' => ['server' => 's3', 'prefix' => 'overridden']
+            'uploads' => ['server' => 's3', 'prefix' => 'overridden'],
         ]]));
 
-        $this->assertEquals(new AwsS3V3Adapter(
+        self::assertEquals(new AwsS3V3Adapter(
             new S3Client([
                 'version' => 'latest',
                 'region' => 'test-region',
@@ -216,24 +208,22 @@ final class StorageConfigTest extends TestCase
                 'credentials' => new Credentials(
                     'test-key',
                     'test-secret',
-                    null,
-                    null
                 ),
                 'use_path_style_endpoint' => true,
             ]),
             'test-bucket',
             'overridden',
-            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC)
+            new AwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC),
         ), $config->getAdapters()['uploads']);
     }
 
     public function testS3AsyncAdapterWithOverriddenPrefix(): void
     {
         $config = new StorageConfig($this->getConfig(['buckets' => [
-            'uploads-async' => ['server' => 's3-async', 'prefix' => 'overridden']
+            'uploads-async' => ['server' => 's3-async', 'prefix' => 'overridden'],
         ]]));
 
-        $this->assertEquals(new AsyncAwsS3Adapter(
+        $this->assertAsyncAdapterEquals(new AsyncAwsS3Adapter(
             new S3AsyncClient([
                 'region' => 'test-region',
                 'endpoint' => 'test-endpoint',
@@ -243,8 +233,31 @@ final class StorageConfigTest extends TestCase
             ]),
             'test-bucket',
             'overridden',
-            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC)
+            new AsyncAwsS3PortableVisibilityConverter(Visibility::VISIBILITY_PUBLIC),
         ), $config->getAdapters()['uploads-async']);
+    }
+
+    /**
+     * S3AsyncClient eagerly builds a Symfony HTTP client whose internal curl state
+     * (handle id) is non-deterministic across platforms, so a deep object comparison
+     * is flaky on Windows. Drop the HTTP client / credential provider first so the
+     * assertion focuses on the configured bucket/prefix/region/credentials.
+     */
+    private function assertAsyncAdapterEquals(AsyncAwsS3Adapter $expected, mixed $actual): void
+    {
+        self::assertInstanceOf(AsyncAwsS3Adapter::class, $actual);
+        self::assertEquals($this->withoutHttpClient($expected), $this->withoutHttpClient($actual));
+    }
+
+    private function withoutHttpClient(AsyncAwsS3Adapter $adapter): AsyncAwsS3Adapter
+    {
+        $client = (new \ReflectionProperty(AsyncAwsS3Adapter::class, 'client'))->getValue($adapter);
+
+        foreach (['httpClient', 'credentialProvider'] as $property) {
+            (new \ReflectionProperty(\AsyncAws\Core\AbstractApi::class, $property))->setValue($client, null);
+        }
+
+        return $adapter;
     }
 
     private function getConfig(array $config = []): array
@@ -279,7 +292,7 @@ final class StorageConfigTest extends TestCase
                 'uploads-async' => [
                     'server' => 's3-async',
                 ],
-            ]
+            ],
         ];
     }
 }
