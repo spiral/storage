@@ -18,8 +18,14 @@ final class File implements \Stringable, FileInterface
     public function __construct(
         private readonly BucketInterface $storage,
         private readonly string $pathname,
-        private readonly ?UriResolverInterface $resolver = null,
-    ) {}
+        private readonly ?UriResolverInterface $resolver = null
+    ) {
+    }
+
+    public function __toString(): string
+    {
+        return $this->getId();
+    }
 
     public function getId(): string
     {
@@ -40,11 +46,6 @@ final class File implements \Stringable, FileInterface
     public function getBucket(): BucketInterface
     {
         return $this->storage;
-    }
-
-    public function __toString(): string
-    {
-        return $this->getId();
     }
 
     protected function getResolver(): ?UriResolverInterface

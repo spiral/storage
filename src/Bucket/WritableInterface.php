@@ -41,7 +41,7 @@ interface WritableInterface
     public function setVisibility(
         string $pathname,
         #[ExpectedValues(valuesFromClass: Visibility::class)]
-        string $visibility,
+        string $visibility
     ): FileInterface;
 
     /**
@@ -56,8 +56,8 @@ interface WritableInterface
     public function copy(
         string $source,
         string $destination,
-        ?BucketInterface $storage = null,
-        array $config = [],
+        BucketInterface $storage = null,
+        array $config = []
     ): FileInterface;
 
     /**
@@ -72,8 +72,8 @@ interface WritableInterface
     public function move(
         string $source,
         string $destination,
-        ?BucketInterface $storage = null,
-        array $config = [],
+        BucketInterface $storage = null,
+        array $config = []
     ): FileInterface;
 
     /**

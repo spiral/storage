@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Spiral\Tests\Storage;
 
-use PHPUnit\Framework\Attributes\Group;
+use League\Flysystem\Local\LocalFilesystemAdapter;
+use Spiral\Storage\Bucket;
 use Spiral\Storage\Visibility;
 
-#[Group('unit')]
-final class StorageTest extends TestCase
+/**
+ * @group unit
+ */
+class StorageTestCase extends TestCase
 {
     public function testCreate(): void
     {
         $this->local->create('file.txt');
 
-        self::assertTrue($this->local->exists('file.txt'));
+        $this->assertTrue($this->local->exists('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -24,8 +27,8 @@ final class StorageTest extends TestCase
         $content = \random_bytes(64);
         $this->local->write('file.txt', $content);
 
-        self::assertTrue($this->local->exists('file.txt'));
-        self::assertSame($content, $this->local->getContents('file.txt'));
+        $this->assertTrue($this->local->exists('file.txt'));
+        $this->assertSame($content, $this->local->getContents('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -38,8 +41,8 @@ final class StorageTest extends TestCase
 
         $this->local->write('file.txt', $stream);
 
-        self::assertTrue($this->local->exists('file.txt'));
-        self::assertSame($content, $this->local->getContents('file.txt'));
+        $this->assertTrue($this->local->exists('file.txt'));
+        $this->assertSame($content, $this->local->getContents('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -49,7 +52,7 @@ final class StorageTest extends TestCase
         $this->markTestSkipped(
             'This test [' . __FUNCTION__ . '] returns incorrect visibility ' .
                 'of files on Windows OS. ' .
-            'It is required to understand the situation',
+            'It is required to understand the situation'
         );
 
         $this->local->create('file.txt');
@@ -58,10 +61,10 @@ final class StorageTest extends TestCase
         $private = Visibility::VISIBILITY_PRIVATE;
 
         $this->local->setVisibility('file.txt', $public);
-        self::assertSame($public, $this->local->getVisibility('file.txt'));
+        $this->assertSame($public, $this->local->getVisibility('file.txt'));
 
         $this->local->setVisibility('file.txt', $private);
-        self::assertSame($private, $this->local->getVisibility('file.txt'));
+        $this->assertSame($private, $this->local->getVisibility('file.txt'));
     }
 
     public function testCopyToSameStorage(): void
@@ -70,11 +73,11 @@ final class StorageTest extends TestCase
         $this->local->write('source.txt', $content);
         $this->local->copy('source.txt', 'copy.txt');
 
-        self::assertTrue($this->local->exists('source.txt'));
-        self::assertSame($content, $this->local->getContents('source.txt'));
+        $this->assertTrue($this->local->exists('source.txt'));
+        $this->assertSame($content, $this->local->getContents('source.txt'));
 
-        self::assertTrue($this->local->exists('copy.txt'));
-        self::assertSame($content, $this->local->getContents('copy.txt'));
+        $this->assertTrue($this->local->exists('copy.txt'));
+        $this->assertSame($content, $this->local->getContents('copy.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -85,13 +88,13 @@ final class StorageTest extends TestCase
         $this->local->write('source.txt', $content);
         $this->local->copy('source.txt', 'copy.txt', $this->second);
 
-        self::assertTrue($this->local->exists('source.txt'));
-        self::assertSame($content, $this->local->getContents('source.txt'));
-        self::assertFalse($this->local->exists('copy.txt'));
+        $this->assertTrue($this->local->exists('source.txt'));
+        $this->assertSame($content, $this->local->getContents('source.txt'));
+        $this->assertFalse($this->local->exists('copy.txt'));
 
-        self::assertTrue($this->second->exists('copy.txt'));
-        self::assertSame($content, $this->second->getContents('copy.txt'));
-        self::assertFalse($this->second->exists('source.txt'));
+        $this->assertTrue($this->second->exists('copy.txt'));
+        $this->assertSame($content, $this->second->getContents('copy.txt'));
+        $this->assertFalse($this->second->exists('source.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -102,9 +105,9 @@ final class StorageTest extends TestCase
         $this->local->write('source.txt', $content);
         $this->local->move('source.txt', 'moved.txt');
 
-        self::assertFalse($this->local->exists('source.txt'));
-        self::assertTrue($this->local->exists('moved.txt'));
-        self::assertSame($content, $this->local->getContents('moved.txt'));
+        $this->assertFalse($this->local->exists('source.txt'));
+        $this->assertTrue($this->local->exists('moved.txt'));
+        $this->assertSame($content, $this->local->getContents('moved.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -115,12 +118,12 @@ final class StorageTest extends TestCase
         $this->local->write('source.txt', $content);
         $this->local->move('source.txt', 'moved.txt', $this->second);
 
-        self::assertFalse($this->local->exists('source.txt'));
-        self::assertFalse($this->local->exists('moved.txt'));
+        $this->assertFalse($this->local->exists('source.txt'));
+        $this->assertFalse($this->local->exists('moved.txt'));
 
-        self::assertTrue($this->second->exists('moved.txt'));
-        self::assertSame($content, $this->second->getContents('moved.txt'));
-        self::assertFalse($this->second->exists('source.txt'));
+        $this->assertTrue($this->second->exists('moved.txt'));
+        $this->assertSame($content, $this->second->getContents('moved.txt'));
+        $this->assertFalse($this->second->exists('source.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -128,10 +131,10 @@ final class StorageTest extends TestCase
     public function testDelete(): void
     {
         $this->local->create('file.txt');
-        self::assertTrue($this->local->exists('file.txt'));
+        $this->assertTrue($this->local->exists('file.txt'));
 
         $this->local->delete('file.txt');
-        self::assertFalse($this->local->exists('file.txt'));
+        $this->assertFalse($this->local->exists('file.txt'));
     }
 
     public function testReadingAsStream(): void
@@ -146,16 +149,16 @@ final class StorageTest extends TestCase
         }
         \fclose($stream);
 
-        self::assertSame($actual, $content);
+        $this->assertSame($actual, $content);
 
         $this->cleanTempDirectory();
     }
 
     public function testExisting(): void
     {
-        self::assertFalse($this->local->exists('file.txt'));
+        $this->assertFalse($this->local->exists('file.txt'));
         $this->local->create('file.txt');
-        self::assertTrue($this->local->exists('file.txt'));
+        $this->assertTrue($this->local->exists('file.txt'));
 
         $this->cleanTempDirectory();
     }
@@ -169,14 +172,14 @@ final class StorageTest extends TestCase
 
         $this->local->create('file.txt');
         $before = $this->local->getLastModified('file.txt');
-        self::assertGreaterThanOrEqual($now, $before);
+        $this->assertGreaterThanOrEqual($now, $before);
 
         // Wait 1.1 seconds and then again modify file
         \usleep(1100000);
 
         $this->local->write('file.txt', 'content');
         $after = $this->local->getLastModified('file.txt');
-        self::assertGreaterThan($before, $after);
+        $this->assertGreaterThan($before, $after);
     }
 
     public function testSize(): void
@@ -184,7 +187,7 @@ final class StorageTest extends TestCase
         $content = \random_bytes(\random_int(32, 256));
         $this->local->write('file.txt', $content);
 
-        self::assertSame(\strlen($content), $this->local->getSize('file.txt'));
+        $this->assertSame(\strlen($content), $this->local->getSize('file.txt'));
     }
 
     /**
@@ -195,6 +198,6 @@ final class StorageTest extends TestCase
     {
         $this->local->write('file.txt', 'content');
 
-        self::assertSame('text/plain', $this->local->getMimeType('file.txt'));
+        $this->assertSame('text/plain', $this->local->getMimeType('file.txt'));
     }
 }

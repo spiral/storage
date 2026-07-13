@@ -26,35 +26,44 @@ abstract class TestCase extends BaseTestCase
      */
     protected $second;
 
-    protected function setUp(): void
+    /**
+     * @return void
+     */
+    public function setUp(): void
     {
         parent::setUp();
 
         $this->local = Bucket::fromAdapter(
-            new LocalFilesystemAdapter(self::LOCAL_STORAGE_DIRECTORY),
+            new LocalFilesystemAdapter(self::LOCAL_STORAGE_DIRECTORY)
         );
 
         $this->second = Bucket::fromAdapter(
-            new LocalFilesystemAdapter(self::LOCAL_STORAGE_DIRECTORY . '/second'),
+            new LocalFilesystemAdapter(self::LOCAL_STORAGE_DIRECTORY . '/second')
         );
     }
 
-    protected function tearDown(): void
+    /**
+     * @return void
+     */
+    public function tearDown(): void
     {
         $this->cleanTempDirectory();
 
         parent::tearDown();
     }
 
+    /**
+     * @return void
+     */
     protected function cleanTempDirectory(): void
     {
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(self::LOCAL_STORAGE_DIRECTORY, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
+            \RecursiveIteratorIterator::CHILD_FIRST
         );
 
         /** @var \SplFileInfo $file */
-        foreach ($iterator as $file) {
+        foreach($iterator as $file) {
             if ($file->getFilename() === '.gitignore') {
                 continue;
             }

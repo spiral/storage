@@ -20,17 +20,8 @@ class Bucket implements BucketInterface
     public function __construct(
         protected FilesystemOperator $fs,
         protected ?string $name = null,
-        protected ?UriResolverInterface $resolver = null,
-    ) {}
-
-    public static function fromAdapter(
-        FilesystemAdapter $adapter,
-        ?string $name = null,
-        ?UriResolverInterface $resolver = null,
-    ): self {
-        $fs = new Filesystem($adapter);
-
-        return new self($fs, $name, $resolver);
+        protected ?UriResolverInterface $resolver = null
+    ) {
     }
 
     public function getName(): ?string
@@ -62,6 +53,16 @@ class Bucket implements BucketInterface
     public function file(string $pathname): FileInterface
     {
         return new File($this, $pathname, $this->resolver);
+    }
+
+    public static function fromAdapter(
+        FilesystemAdapter $adapter,
+        string $name = null,
+        UriResolverInterface $resolver = null
+    ): self {
+        $fs = new Filesystem($adapter);
+
+        return new self($fs, $name, $resolver);
     }
 
     protected function getOperator(): FilesystemOperator
